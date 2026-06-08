@@ -1,0 +1,205 @@
+.about {
+  padding: var(--space-4xl) 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+}
+
+.about__bg-accent {
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 168, 83, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.about__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4xl);
+  align-items: center;
+}
+
+/* Visual */
+.about__visual {
+  position: relative;
+  height: 550px;
+}
+
+.about__image-main {
+  position: relative;
+  width: 85%;
+  height: 450px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.about__image-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about__image-border {
+  position: absolute;
+  inset: -8px;
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: var(--radius-xl);
+  pointer-events: none;
+  animation: borderGlow 4s ease-in-out infinite;
+}
+
+.about__image-accent {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 220px;
+  height: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 3px solid var(--color-bg-secondary);
+  box-shadow: var(--shadow-lg);
+}
+
+.about__image-accent img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about__exp-badge {
+  position: absolute;
+  top: var(--space-xl);
+  right: 80px;
+  background: var(--color-bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: float 4s ease-in-out infinite;
+}
+
+.about__exp-number {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.about__exp-text {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+/* Content */
+.about__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.about__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-gold-400);
+}
+
+.about__text {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* Features */
+.about__features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.about__feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(212, 168, 83, 0.04);
+  border: 1px solid rgba(212, 168, 83, 0.08);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+.about__feature:hover {
+  border-color: rgba(212, 168, 83, 0.2);
+  background: rgba(212, 168, 83, 0.06);
+  transform: translateX(4px);
+}
+
+.about__feature-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(212, 168, 83, 0.1);
+  border-radius: var(--radius-md);
+  color: var(--color-gold-400);
+  flex-shrink: 0;
+}
+
+.about__feature-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.about__feature-text {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .about__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3xl);
+  }
+
+  .about__visual {
+    height: 400px;
+  }
+
+  .about__image-main {
+    width: 100%;
+    height: 350px;
+  }
+
+  .about__image-accent {
+    width: 160px;
+    height: 200px;
+  }
+
+  .about__exp-badge {
+    right: 20px;
+    top: auto;
+    bottom: 80px;
+  }
+}
