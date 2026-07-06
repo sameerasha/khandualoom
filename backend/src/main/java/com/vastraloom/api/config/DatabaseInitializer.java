@@ -41,7 +41,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("admin123"))
                     .role("ROLE_ADMIN")
                     .build();
-            userRepository.save(admin);
+            userRepository.save(java.util.Objects.requireNonNull(admin));
             System.out.println("Admin user initialized successfully with username: admin / password: admin123");
         }
     }
