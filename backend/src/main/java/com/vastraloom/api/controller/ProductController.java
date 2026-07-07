@@ -65,6 +65,9 @@ public class ProductController {
                     if (productDetails.getBadge() != null) {
                         product.setBadge(productDetails.getBadge());
                     }
+                    if (productDetails.getImages() != null) {
+                        product.setImages(productDetails.getImages());
+                    }
                     Product updated = productRepository.save(product);
                     return ResponseEntity.ok(updated);
                 })

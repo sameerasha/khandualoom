@@ -16,15 +16,31 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
   }, []);
 
   const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const currentHash = window.location.hash;
+    const isOnHome = currentHash === '' || currentHash === '#/' || currentHash === '#';
+
+    if (!isOnHome) {
+      onNavigate('');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 250);
+    } else {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
     setMenuOpen(false);
   };
 
   return (
     <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="navbar">
       <div className="navbar__inner container">
-        {/* Logo */}
-        <a href="#" className="navbar__logo" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+        {/* Logo redirecting to storefront home */}
+        <a href="#" className="navbar__logo" onClick={(e) => { e.preventDefault(); onNavigate(''); }}>
           <span className="navbar__logo-icon">✦</span>
           <span className="navbar__logo-text">
             <span className="navbar__logo-main">Vastra Loom</span>
@@ -32,13 +48,25 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
           </span>
         </a>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation with custom quick links when logged in */}
         <ul className="navbar__links">
-          <li><a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('hero'); }}>Home</a></li>
-          <li><a href="#collections" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>Collections</a></li>
-          <li><a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>Our Story</a></li>
-          <li><a href="#testimonials" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Testimonials</a></li>
-          <li><a href="#admin" onClick={(e) => { e.preventDefault(); onNavigate('admin'); }} id="nav-admin-link">Admin</a></li>
+          {isCustomerLoggedIn ? (
+            <>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate(''); }}>Home</a></li>
+              <li><a href="#collections" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>Collections</a></li>
+              <li><a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>Our Story</a></li>
+              <li><a href="#testimonials" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Testimonials</a></li>
+              <li><a href="#profile" onClick={(e) => { e.preventDefault(); onNavigate('profile'); }}>My Profile</a></li>
+            </>
+          ) : (
+            <>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate(''); }}>Home</a></li>
+              <li><a href="#collections" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>Collections</a></li>
+              <li><a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>Our Story</a></li>
+              <li><a href="#testimonials" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Testimonials</a></li>
+              <li><a href="#admin" onClick={(e) => { e.preventDefault(); onNavigate('admin'); }} id="nav-admin-link">Admin</a></li>
+            </>
+          )}
         </ul>
 
         {/* Actions */}
@@ -50,8 +78,6 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
             </svg>
             {totalItems > 0 && <span className="navbar__cart-badge">{totalItems}</span>}
           </button>
-
-
 
           {isCustomerLoggedIn ? (
             <div className="navbar__user-menu" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -68,63 +94,66 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
               }}>
                 Hi, {customerInfo?.username || 'Profile'}
               </button>
-              <button className="navbar__logout-btn" onClick={() => { logout(); onNavigate('home'); }} id="logout-nav-button" title="Logout" style={{
+              <button className="navbar__logout-btn" onClick={() => { logout(); onNavigate(''); }} id="logout-nav-button" title="Logout" style={{
                 background: 'none',
                 border: 'none',
                 color: '#ef4444',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                padding: '6px'
+                justifyContent: 'center',
+                padding: '8px',
+                transition: 'color 0.2s ease'
               }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
               </button>
             </div>
           ) : (
-            <button className="navbar__signup-btn" onClick={onSignUpClick} id="signup-nav-button">
+            <button className="navbar__signup-btn" onClick={() => onSignUpClick()} id="signin-nav-button">
               Sign In
             </button>
           )}
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className={`navbar__menu-toggle ${menuOpen ? 'open' : ''}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle Menu"
-            id="menu-toggle"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
+          {/* Toggle Mobile Menu */}
+          <button className="navbar__toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle Navigation">
+            <span className={`navbar__toggle-bar ${menuOpen ? 'navbar__toggle-bar--open' : ''}`}></span>
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu with conditional links */}
       <div className={`navbar__mobile-menu ${menuOpen ? 'navbar__mobile-menu--open' : ''}`}>
         <ul>
-          <li><a href="#" onClick={(e) => { e.preventDefault(); scrollToSection('hero'); }}>Home</a></li>
-          <li><a href="#" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>Collections</a></li>
-          <li><a href="#" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>Our Story</a></li>
-          <li><a href="#" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Testimonials</a></li>
-          <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate('admin'); }} id="nav-admin-link-mobile">Admin Portal</a></li>
           {isCustomerLoggedIn ? (
             <>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate(''); }}>Home</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('collections'); }}>Collections</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('about'); }}>Our Story</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('testimonials'); }}>Testimonials</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate('profile'); }}>My Profile</a></li>
               <li>
-                <button className="navbar__signup-btn navbar__signup-btn--mobile" onClick={() => { logout(); setMenuOpen(false); onNavigate('home'); }}>
+                <button className="navbar__signup-btn navbar__signup-btn--mobile" onClick={() => { logout(); setMenuOpen(false); onNavigate(''); }}>
                   Logout
                 </button>
               </li>
             </>
           ) : (
-            <li>
-              <button className="navbar__signup-btn navbar__signup-btn--mobile" onClick={() => { onSignUpClick(); setMenuOpen(false); }}>
-                Sign In
-              </button>
-            </li>
+            <>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate(''); }}>Home</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('collections'); }}>Collections</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('about'); }}>Our Story</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('testimonials'); }}>Testimonials</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate('admin'); }} id="nav-admin-link-mobile">Admin Portal</a></li>
+              <li>
+                <button className="navbar__signup-btn navbar__signup-btn--mobile" onClick={() => { onSignUpClick(); setMenuOpen(false); }}>
+                  Sign In
+                </button>
+              </li>
+            </>
           )}
         </ul>
       </div>

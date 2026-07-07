@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 import CartSidebar from './components/CartSidebar';
 import ProfileDashboard from './admin/ProfileDashboard';
+import ProductDetails from './components/ProductDetails';
 
 // Admin Pages & Layouts
 import AdminLogin from './admin/AdminLogin';
@@ -18,6 +19,7 @@ import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import ProductManager from './admin/ProductManager';
 import ProductEditor from './admin/ProductEditor';
+import UserManager from './admin/UserManager';
 
 function ToastContainer() {
   const { toasts, dismissToast } = useCart();
@@ -39,13 +41,18 @@ function parseHashRoute() {
   const hash = window.location.hash;
   if (!hash || hash === '#/') return { path: '', id: null };
   
-  // Format: #/admin/products/edit/123
   const cleanHash = hash.replace(/^#\//, ''); // e.g. "admin/products/edit/123"
   
   if (cleanHash.startsWith('admin/products/edit/')) {
     const parts = cleanHash.split('/');
     const id = parts[parts.length - 1];
     return { path: 'admin/products/edit', id };
+  }
+
+  if (cleanHash.startsWith('product/')) {
+    const parts = cleanHash.split('/');
+    const id = parts[parts.length - 1];
+    return { path: 'product', id: parseInt(id, 10) };
   }
   
   return { path: cleanHash, id: null };
@@ -105,6 +112,8 @@ function AppContent() {
       adminChild = <ProductEditor onNavigate={handleNavigate} />;
     } else if (route.path === 'admin/products/edit') {
       adminChild = <ProductEditor productId={route.id} onNavigate={handleNavigate} />;
+    } else if (route.path === 'admin/users') {
+      adminChild = <UserManager />;
     }
 
     return (
@@ -117,7 +126,6 @@ function AppContent() {
   // Profile Route
   if (route.path === 'profile') {
     if (!isCustomerLoggedIn) {
-      // Direct route protection: if customer logs out or navigates to profile without auth, go home
       handleNavigate('');
       return null;
     }
@@ -142,7 +150,30 @@ function AppContent() {
     );
   }
 
-  // Default: Storefront Home
+  // Product Details Route
+  if (route.path === 'product') {
+    return (
+      <div className="app">
+        <Navbar
+          onSignUpClick={() => openAuth('login')}
+          onCartClick={() => setIsCartOpen(true)}
+          onNavigate={handleNavigate}
+        />
+        <main>
+          <ProductDetails productId={route.id} onNavigate={handleNavigate} />
+        </main>
+        <Footer onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
+
+        {/* Overlays */}
+        <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
+        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  // Default: Storefront Home (Minimal if signed in)
+  const showMinimal = isCustomerLoggedIn;
   return (
     <div className="app">
       <Navbar
@@ -151,10 +182,10 @@ function AppContent() {
         onNavigate={handleNavigate}
       />
       <main>
-        <Hero onSignUpClick={() => openAuth('signup')} />
-        <ProductGrid />
-        <About />
-        <Testimonials />
+        {!showMinimal && <Hero onSignUpClick={() => openAuth('signup')} />}
+        <ProductGrid onNavigate={handleNavigate} />
+        {!showMinimal && <About />}
+        {!showMinimal && <Testimonials />}
       </main>
       <Footer onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
 

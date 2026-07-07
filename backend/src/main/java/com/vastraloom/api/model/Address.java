@@ -41,4 +41,8 @@ public class Address {
     private String country;
 
     private String phone; // shipping contact phone
+
+    @Column(name = "is_primary", nullable = false)
+    @Builder.Default
+    private boolean isPrimary = false;
 }

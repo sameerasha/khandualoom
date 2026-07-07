@@ -1,0 +1,315 @@
+import { useState, useEffect } from 'react';
+import { useProducts } from '../context/ProductContext';
+import { useCart } from '../context/CartContext';
+import './ProductDetails.css';
+
+export default function ProductDetails({ productId, onNavigate }) {
+  const { products } = useProducts();
+  const { addToCart } = useCart();
+  
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [images, setImages] = useState([]);
+  const [activeImage, setActiveImage] = useState('');
+  const [isAdded, setIsAdded] = useState(false);
+  const [zoomStyle, setZoomStyle] = useState({
+    transformOrigin: 'center center',
+    transform: 'scale(1)'
+  });
+
+  useEffect(() => {
+    // Reset state when product ID changes
+    setLoading(true);
+    setProduct(null);
+
+    // Try finding locally first
+    const localProduct = products.find((p) => p.id === productId);
+    if (localProduct) {
+      setProduct(localProduct);
+      setLoading(false);
+    } else {
+      // Fallback API call
+      fetch(`http://localhost:8080/api/products/${productId}`)
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw new Error('Product not found');
+        })
+        .then((data) => {
+          setProduct(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error('Failed to load product:', err);
+          setLoading(false);
+        });
+    }
+  }, [productId, products]);
+
+  // Set up specific gallery images or generate fallback views
+  useEffect(() => {
+    if (product) {
+      let gallery = [];
+      if (product.images && product.images.length > 0) {
+        // Filter out empty images
+        const customImages = product.images.filter((img) => img && img.trim() !== '');
+        
+        // Ensure main product image is present at the front
+        if (customImages.includes(product.image)) {
+          gallery = customImages;
+        } else {
+          gallery = [product.image, ...customImages];
+        }
+      } else {
+        // Fallback generator
+        const otherImages = [
+          '/images/saree_purple_gold.png',
+          '/images/saree_crimson_red.png',
+          '/images/saree_emerald_green.png',
+          '/images/saree_navy_blue.png',
+          '/images/saree_saffron_orange.png',
+          '/images/saree_blush_pink.png',
+        ].filter((img) => img !== product.image);
+
+        gallery = [
+          product.image,
+          otherImages[0] || '/images/saree_purple_gold.png',
+          otherImages[1] || '/images/saree_crimson_red.png',
+          otherImages[2] || '/images/saree_emerald_green.png',
+        ];
+      }
+      setImages(gallery);
+      setActiveImage(product.image);
+    }
+  }, [product]);
+
+  // Handle Zoom tracking coordinates
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomStyle({
+      transformOrigin: `${x}% ${y}%`,
+      transform: 'scale(2)'
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomStyle({
+      transformOrigin: 'center center',
+      transform: 'scale(1)'
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product);
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 2000);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="product-details-loading">
+        <div className="spinner"></div>
+        <p>Loading masterpiece details...</p>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="product-details-error">
+        <h2>Weave Not Found</h2>
+        <p>The saree collection item you are looking for does not exist or has been archived.</p>
+        <button onClick={() => onNavigate('')} className="back-home-btn">Return to Catalog</button>
+      </div>
+    );
+  }
+
+  const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+
+  return (
+    <div className="product-details-page">
+      <div className="container">
+        {/* Breadcrumb Navigation */}
+        <div className="product-details-breadcrumb">
+          <span onClick={() => onNavigate('')} className="breadcrumb-link">Home</span>
+          <span className="breadcrumb-separator">/</span>
+          <span onClick={() => onNavigate('')} className="breadcrumb-link">Collections</span>
+          <span className="breadcrumb-separator">/</span>
+          <span className="breadcrumb-current">{product.name}</span>
+        </div>
+
+        <button onClick={() => onNavigate('')} className="product-details-back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Collections
+        </button>
+
+        {/* Details Grid */}
+        <div className="product-details-grid">
+          
+          {/* Left Column: Image Gallery */}
+          <div className="product-gallery">
+            <div className="product-gallery__thumbnails">
+              {images.map((img, i) => (
+                <div 
+                  key={i} 
+                  className={`product-gallery__thumb ${activeImage === img ? 'active' : ''}`}
+                  onMouseEnter={() => setActiveImage(img)}
+                  onClick={() => setActiveImage(img)}
+                >
+                  <img src={img} alt={`View angle ${i + 1}`} />
+                </div>
+              ))}
+            </div>
+            
+            <div 
+              className="product-gallery__main-wrap"
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              <img 
+                src={activeImage} 
+                alt={product.name} 
+                className="product-gallery__main-image"
+                style={zoomStyle}
+              />
+              <span className="zoom-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="11" y1="8" x2="11" y2="14"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+                Hover to Zoom
+              </span>
+            </div>
+          </div>
+
+          {/* Right Column: Specifications & Checkout info */}
+          <div className="product-info-panel">
+            <div className="product-info-panel__category">{product.category} Collection</div>
+            <h1 className="product-info-panel__name">{product.name}</h1>
+            
+            {/* Reviews / Stars */}
+            <div className="product-info-panel__rating">
+              <div className="stars">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill={i < Math.floor(product.rating) ? 'var(--color-accent)' : 'none'} stroke="var(--color-accent)" strokeWidth="1.5">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                ))}
+              </div>
+              <span className="rating-val">{product.rating}</span>
+              <span className="separator">|</span>
+              <span className="reviews-count">{product.reviews} Verified Reviews</span>
+            </div>
+
+            {/* Prices & Badges */}
+            <div className="product-info-panel__price-row">
+              <div className="price-box">
+                <span className="price-current">₹{product.price.toLocaleString('en-IN')}</span>
+                <span className="price-original">₹{product.originalPrice.toLocaleString('en-IN')}</span>
+                <span className="discount-badge">-{discount}% Off</span>
+              </div>
+              <span className={`badge badge--${product.badge.toLowerCase().replace(' ', '-')}`}>
+                {product.badge}
+              </span>
+            </div>
+
+            {/* Description */}
+            <p className="product-info-panel__desc">{product.description}</p>
+
+            {/* Actions */}
+            <div className="product-info-panel__actions">
+              <button 
+                onClick={handleAddToCart} 
+                className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
+                disabled={isAdded}
+              >
+                {isAdded ? (
+                  <>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Added to Wardrobe!
+                  </>
+                ) : (
+                  <>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="9" cy="21" r="1"></circle>
+                      <circle cx="20" cy="21" r="1"></circle>
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    Add to Cart
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Saree Details Table */}
+            <div className="product-specs">
+              <h3>Specification Details</h3>
+              <table className="specs-table">
+                <tbody>
+                  <tr>
+                    <td>Fabric Material</td>
+                    <td>{product.fabric}</td>
+                  </tr>
+                  <tr>
+                    <td>Weaving Technique</td>
+                    <td>{product.weave}</td>
+                  </tr>
+                  <tr>
+                    <td>Color Shade</td>
+                    <td>{product.color}</td>
+                  </tr>
+                  <tr>
+                    <td>Standard Length</td>
+                    <td>5.5 Meters + 0.8 Meter unstitched blouse piece</td>
+                  </tr>
+                  <tr>
+                    <td>Care Instructions</td>
+                    <td>Dry Clean Only (recommended for fine silk)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Free Shipping & Policies */}
+            <div className="shipping-highlights">
+              <div className="highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+                <span>Free Insured Shipping across India</span>
+              </div>
+              <div className="highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span>100% Authentic Handloom Mark Certified</span>
+              </div>
+              <div className="highlight-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M23 10a10 10 0 1 1-3.79-5.79L23 10z"></path>
+                </svg>
+                <span>7-Day Hassle Free Returns & Exchanges</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

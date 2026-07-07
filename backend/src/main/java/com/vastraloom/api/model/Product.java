@@ -47,4 +47,27 @@ public class Product {
     private double rating;
     private int reviews;
     private String badge; // e.g. "Bestseller", "Premium", "New Arrival"
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    @Builder.Default
+    private java.util.List<String> images = new java.util.ArrayList<>();
+
+    @Column(name = "created_date", updatable = false)
+    private java.time.LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    private java.time.LocalDateTime modifiedDate;
+
+    @PrePersist
+    protected void onCreate() {
+        createdDate = java.time.LocalDateTime.now();
+        modifiedDate = java.time.LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        modifiedDate = java.time.LocalDateTime.now();
+    }
 }

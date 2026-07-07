@@ -82,4 +82,26 @@ public class AuthController {
 
         return ResponseEntity.ok("User registered successfully!");
     }
+
+    @PostMapping("/signup-admin")
+    public ResponseEntity<?> registerAdmin(@RequestBody SignupRequest signupRequest) {
+        if (userRepository.findByUsername(signupRequest.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("Error: Username is already taken!");
+        }
+
+        if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Error: Email is already registered!");
+        }
+
+        User user = User.builder()
+                .username(signupRequest.getUsername())
+                .email(signupRequest.getEmail())
+                .password(passwordEncoder.encode(signupRequest.getPassword()))
+                .phone(signupRequest.getPhone())
+                .role("ROLE_ADMIN")
+                .build();
+
+        userRepository.save(user);
+        return ResponseEntity.ok("Admin registered successfully!");
+    }
 }

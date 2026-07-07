@@ -280,6 +280,16 @@
   border-color: rgba(195, 162, 126, 0.3);
 }
 
+.address-card.primary {
+  border-color: rgba(195, 162, 126, 0.35);
+  background-color: rgba(195, 162, 126, 0.03);
+}
+
+.address-badge.primary-badge {
+  background-color: var(--color-accent);
+  color: #06070a;
+}
+
 .address-card__header {
   display: flex;
   justify-content: space-between;

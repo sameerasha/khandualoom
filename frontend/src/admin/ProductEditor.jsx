@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
+import ProductImageEditor from './ProductImageEditor';
 import './ProductEditor.css';
 
 export default function ProductEditor({ productId, onNavigate }) {
@@ -18,9 +19,9 @@ export default function ProductEditor({ productId, onNavigate }) {
     color: '',
     badge: '',
     image: '',
+    images: ['', '', '', ''], // Holds up to 4 detail views (5 total images including cover)
   });
 
-  const [imagePreview, setImagePreview] = useState('');
   const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
 
@@ -40,51 +41,22 @@ export default function ProductEditor({ productId, onNavigate }) {
           color: product.color || '',
           badge: product.badge || '',
           image: product.image || '',
+          images: product.images && product.images.length > 0 
+            ? [product.images[0] || '', product.images[1] || '', product.images[2] || '', product.images[3] || '']
+            : ['', '', '', ''],
         });
-        setImagePreview(product.image || '');
       } else {
-        // Product not found, go back
         onNavigate('admin/products');
       }
     }
   }, [productId, isEditMode, getProduct, onNavigate]);
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
-  };
-
-  // Handle Image Upload (convert to Base64)
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      setErrors((prev) => ({ ...prev, image: 'Image size should be less than 2MB' }));
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result;
-      setFormData((prev) => ({ ...prev, image: base64String }));
-      setImagePreview(base64String);
-      if (errors.image) {
-        setErrors((prev) => ({ ...prev, image: '' }));
-      }
-    };
-    reader.onerror = () => {
-      setErrors((prev) => ({ ...prev, image: 'Failed to read file' }));
-    };
-    reader.readAsDataURL(file);
   };
 
   // Form Validation
@@ -108,16 +80,15 @@ export default function ProductEditor({ productId, onNavigate }) {
     }
 
     if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.fabric.trim()) newErrors.fabric = 'Fabric description is required (e.g. Pure Silk)';
-    if (!formData.weave.trim()) newErrors.weave = 'Weave description is required (e.g. Handloom)';
+    if (!formData.fabric.trim()) newErrors.fabric = 'Fabric description is required';
+    if (!formData.weave.trim()) newErrors.weave = 'Weave description is required';
     if (!formData.color.trim()) newErrors.color = 'Color description is required';
-    if (!formData.image) newErrors.image = 'An image is required';
+    if (!formData.image) newErrors.image = 'A catalog cover image is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle Form Submit
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -126,6 +97,7 @@ export default function ProductEditor({ productId, onNavigate }) {
       ...formData,
       price: Number(formData.price),
       originalPrice: formData.originalPrice ? Number(formData.originalPrice) : Number(formData.price),
+      images: formData.images.filter((img) => img.trim() !== ''),
     };
 
     if (isEditMode) {
@@ -311,64 +283,19 @@ export default function ProductEditor({ productId, onNavigate }) {
 
             </div>
 
-            {/* Right side Image Upload panel */}
+            {/* Right side: Tabbed Product Image Editor (Max 5 Images) */}
             <div className="product-editor__form-sidebar">
-              <div className="product-editor__group">
-                <label className="product-editor__label">Product Image</label>
-                
-                <div className={`product-editor__image-upload-zone ${errors.image ? 'product-editor__image-upload-zone--error' : ''}`}>
-                  {imagePreview ? (
-                    <div className="product-editor__preview-wrap">
-                      <img src={imagePreview} alt="Preview" />
-                      <button
-                        type="button"
-                        className="product-editor__remove-image"
-                        onClick={() => { setFormData(prev => ({ ...prev, image: '' })); setImagePreview(''); }}
-                        aria-label="Remove image"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="product-editor__upload-prompt">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <polyline points="21 15 16 10 5 21" />
-                      </svg>
-                      <span className="product-editor__upload-text">Drag & drop or click to upload</span>
-                      <span className="product-editor__upload-limit">Max size: 2MB</span>
-                      <input
-                        type="file"
-                        className="product-editor__file-input"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        id="product-image-file"
-                      />
-                    </div>
-                  )}
-                </div>
-                {errors.image && <span className="product-editor__error">{errors.image}</span>}
-              </div>
-
-              {/* URL fallback option for images */}
-              <div className="product-editor__group">
-                <label htmlFor="product-image-url" className="product-editor__label">Or Image URL (Fallback)</label>
-                <input
-                  type="text"
-                  id="product-image-url"
-                  name="image"
-                  className="product-editor__input"
-                  placeholder="e.g. /images/saree_green.png"
-                  value={formData.image.startsWith('data:') ? '' : formData.image}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFormData(prev => ({ ...prev, image: val }));
-                    setImagePreview(val);
-                    if (errors.image && val) setErrors(prev => ({ ...prev, image: '' }));
-                  }}
-                />
-              </div>
+              <ProductImageEditor
+                image={formData.image}
+                images={formData.images}
+                onChange={({ image, images }) => {
+                  setFormData(prev => ({ ...prev, image, images }));
+                  if (errors.image && image) {
+                    setErrors(prev => ({ ...prev, image: '' }));
+                  }
+                }}
+              />
+              {errors.image && <span className="product-editor__error" style={{ display: 'block', marginTop: '4px' }}>{errors.image}</span>}
             </div>
 
           </div>

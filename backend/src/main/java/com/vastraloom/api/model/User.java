@@ -37,4 +37,21 @@ public class User {
     @JoinColumn(name = "user_id")
     @Builder.Default
     private List<Address> addresses = new ArrayList<>();
+
+    @Column(name = "created_date", updatable = false)
+    private java.time.LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    private java.time.LocalDateTime modifiedDate;
+
+    @PrePersist
+    protected void onCreate() {
+        createdDate = java.time.LocalDateTime.now();
+        modifiedDate = java.time.LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        modifiedDate = java.time.LocalDateTime.now();
+    }
 }

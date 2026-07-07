@@ -15,6 +15,7 @@ export function AuthProvider({ children }) {
   const fetchProfile = useCallback(async () => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) return null;
+    if (token.startsWith('mock-sso-token')) return null;
 
     try {
       const response = await fetch('http://localhost:8080/api/users/profile', {
@@ -48,7 +49,30 @@ export function AuthProvider({ children }) {
         } else if (role === 'ROLE_USER') {
           setIsCustomerLoggedIn(true);
           setCustomerInfo({ username });
-          await fetchProfile();
+          
+          if (!token.startsWith('mock-sso-token')) {
+            await fetchProfile();
+          } else {
+            // Re-inflate mock info for social SSO user session
+            setCustomerInfo({
+              username: username,
+              email: `${username.toLowerCase()}@social.com`,
+              phone: '+91 99999 88888',
+              addresses: [
+                {
+                  id: 999,
+                  addressType: 'HOME',
+                  fullName: username,
+                  streetAddress: '123 Heritage Lane, Handloom Enclave',
+                  city: 'Varanasi',
+                  state: 'Uttar Pradesh',
+                  pincode: '221001',
+                  landmark: 'Near Kashi Vishwanath Temple',
+                  country: 'India'
+                }
+              ]
+            });
+          }
         }
       }
     };
@@ -109,6 +133,37 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // Mock SSO Login for Social Networks (Gmail, Facebook, Instagram)
+  const socialLogin = useCallback((provider, username) => {
+    const mockToken = `mock-sso-token-${provider}-${Date.now()}`;
+    localStorage.setItem(TOKEN_KEY, mockToken);
+    localStorage.setItem(ROLE_KEY, 'ROLE_USER');
+    localStorage.setItem(USERNAME_KEY, username);
+
+    setIsCustomerLoggedIn(true);
+    setIsAdmin(false);
+    setCustomerInfo({
+      username: username,
+      email: `${username.toLowerCase()}@${provider.toLowerCase()}.com`,
+      phone: '+91 99999 88888',
+      addresses: [
+        {
+          id: 999,
+          addressType: 'HOME',
+          fullName: username,
+          streetAddress: '123 Heritage Lane, Handloom Enclave',
+          city: 'Varanasi',
+          state: 'Uttar Pradesh',
+          pincode: '221001',
+          landmark: 'Near Kashi Vishwanath Temple',
+          country: 'India'
+        }
+      ]
+    });
+    setLoginError('');
+    return { success: true, role: 'ROLE_USER' };
+  }, []);
+
   // Customer Sign Up
   const signup = useCallback(async (username, email, password, phone) => {
     try {
@@ -135,6 +190,23 @@ export function AuthProvider({ children }) {
   const updateProfile = useCallback(async (profileData) => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) return { success: false, error: 'Not authenticated' };
+
+    if (token.startsWith('mock-sso-token')) {
+      // Simulate profile updates locally for mock SSO user
+      setCustomerInfo((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          username: profileData.username || prev.username,
+          phone: profileData.phone || prev.phone,
+          addresses: profileData.addresses || prev.addresses,
+        };
+      });
+      if (profileData.username) {
+        localStorage.setItem(USERNAME_KEY, profileData.username);
+      }
+      return { success: true };
+    }
 
     try {
       const response = await fetch('http://localhost:8080/api/users/profile', {
@@ -181,6 +253,7 @@ export function AuthProvider({ children }) {
       isCustomerLoggedIn,
       customerInfo,
       login,
+      socialLogin,
       signup,
       logout,
       loginError,

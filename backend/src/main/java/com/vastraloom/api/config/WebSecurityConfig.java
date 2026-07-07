@@ -40,6 +40,7 @@ public class WebSecurityConfig {
                         // Auth APIs
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
+                        .requestMatchers("/api/auth/signup-admin").permitAll()
 
                         // Public Products APIs
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
@@ -49,6 +50,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/users/profile").hasAnyRole("USER", "ADMIN")
 
                         // Admin Restricted APIs
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*/role").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")

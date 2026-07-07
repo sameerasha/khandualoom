@@ -154,9 +154,11 @@
   transition: all 0.3s ease;
 }
 
-.product-editor__image-upload-zone:hover {
+.product-editor__image-upload-zone:hover,
+.product-editor__image-upload-zone.dragging {
   border-color: var(--color-accent);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(232, 168, 124, 0.06);
+  box-shadow: 0 0 12px rgba(232, 168, 124, 0.1);
 }
 
 .product-editor__image-upload-zone--error {

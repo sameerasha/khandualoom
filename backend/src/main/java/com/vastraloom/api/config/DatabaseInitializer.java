@@ -64,6 +64,11 @@ public class DatabaseInitializer implements CommandLineRunner {
             p1.setRating(4.9);
             p1.setReviews(128);
             p1.setBadge("Bestseller");
+            p1.setImages(List.of(
+                "/images/saree_purple_gold.png", 
+                "/images/saree_navy_blue.png", 
+                "/images/saree_blush_pink.png"
+            ));
             defaultProducts.add(p1);
 
             // 2. Kanjeevaram Temple Border
@@ -80,6 +85,11 @@ public class DatabaseInitializer implements CommandLineRunner {
             p2.setRating(5.0);
             p2.setReviews(89);
             p2.setBadge("Premium");
+            p2.setImages(List.of(
+                "/images/saree_crimson_red.png", 
+                "/images/saree_saffron_orange.png", 
+                "/images/saree_purple_gold.png"
+            ));
             defaultProducts.add(p2);
 
             // 3. Chanderi Emerald Dream
@@ -96,6 +106,11 @@ public class DatabaseInitializer implements CommandLineRunner {
             p3.setRating(4.7);
             p3.setReviews(156);
             p3.setBadge("New Arrival");
+            p3.setImages(List.of(
+                "/images/saree_emerald_green.png", 
+                "/images/saree_navy_blue.png", 
+                "/images/saree_blush_pink.png"
+            ));
             defaultProducts.add(p3);
 
             // 4. Tussar Royal Indigo
@@ -112,6 +127,11 @@ public class DatabaseInitializer implements CommandLineRunner {
             p4.setRating(4.8);
             p4.setReviews(94);
             p4.setBadge("Trending");
+            p4.setImages(List.of(
+                "/images/saree_navy_blue.png", 
+                "/images/saree_purple_gold.png", 
+                "/images/saree_emerald_green.png"
+            ));
             defaultProducts.add(p4);
 
             // 5. Patola Heritage Weave
@@ -128,6 +148,11 @@ public class DatabaseInitializer implements CommandLineRunner {
             p5.setRating(5.0);
             p5.setReviews(42);
             p5.setBadge("Heirloom");
+            p5.setImages(List.of(
+                "/images/saree_saffron_orange.png", 
+                "/images/saree_crimson_red.png", 
+                "/images/saree_blush_pink.png"
+            ));
             defaultProducts.add(p5);
 
             // 6. Mysore Silk Rosé
@@ -144,6 +169,11 @@ public class DatabaseInitializer implements CommandLineRunner {
             p6.setRating(4.6);
             p6.setReviews(203);
             p6.setBadge("Popular");
+            p6.setImages(List.of(
+                "/images/saree_blush_pink.png", 
+                "/images/saree_purple_gold.png", 
+                "/images/saree_emerald_green.png"
+            ));
             defaultProducts.add(p6);
 
             productRepository.saveAll(defaultProducts);

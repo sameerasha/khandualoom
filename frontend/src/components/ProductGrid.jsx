@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductContext';
 import './ProductGrid.css';
 
-function ProductCard({ product, index }) {
+function ProductCard({ product, index, onNavigate }) {
   const { addToCart } = useCart();
   const [isHovered, setIsHovered] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -26,10 +26,17 @@ function ProductCard({ product, index }) {
     return () => observer.disconnect();
   }, []);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
     addToCart(product);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 1500);
+  };
+
+  const handleCardClick = () => {
+    if (onNavigate) {
+      onNavigate(`product/${product.id}`);
+    }
   };
 
   const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
@@ -40,6 +47,8 @@ function ProductCard({ product, index }) {
       ref={cardRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleCardClick}
+      style={{ cursor: 'pointer' }}
       id={`product-card-${product.id}`}
     >
       {/* Image Container */}
@@ -141,7 +150,7 @@ function ProductCard({ product, index }) {
   );
 }
 
-export default function ProductGrid() {
+export default function ProductGrid({ onNavigate }) {
   const { products, categories } = useProducts();
   const [activeCategory, setActiveCategory] = useState('All');
   const [filteredProducts, setFilteredProducts] = useState(products);
@@ -186,7 +195,7 @@ export default function ProductGrid() {
         {/* Product Grid */}
         <div className="products-grid">
           {filteredProducts.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
+            <ProductCard key={product.id} product={product} index={index} onNavigate={onNavigate} />
           ))}
         </div>
       </div>

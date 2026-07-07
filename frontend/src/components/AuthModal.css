@@ -18,13 +18,14 @@
   background: var(--color-bg-card);
   border: 1px solid rgba(195, 162, 126, 0.15);
   border-radius: 16px;
-  width: 100%;
-  max-width: 440px;
-  padding: 36px;
+  width: 95%;
+  max-width: 920px;
+  padding: 0;
   position: relative;
   box-shadow: var(--shadow-xl);
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   color: var(--color-text-primary);
+  overflow: hidden;
 }
 
 .auth-modal-close {
@@ -36,6 +37,7 @@
   color: #9ca3af;
   font-size: 28px;
   cursor: pointer;
+  z-index: 10;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
@@ -44,17 +46,109 @@
   transform: rotate(90deg);
 }
 
+/* Split Layout */
+.auth-modal-split {
+  display: flex;
+  min-height: 560px;
+}
+
+/* Left Side: Brand Visual Cover */
+.auth-modal-visual {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .auth-modal-visual {
+    display: none;
+  }
+}
+
+.auth-modal-visual__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(11, 13, 23, 0.95) 20%, rgba(19, 22, 40, 0.6) 100%);
+  z-index: 1;
+}
+
+.auth-modal-visual__content {
+  position: relative;
+  z-index: 2;
+}
+
+.visual-logo-badge {
+  font-size: 28px;
+  color: #c3a27e;
+  margin-bottom: 12px;
+  display: inline-block;
+  text-shadow: 0 0 10px rgba(195, 162, 126, 0.4);
+}
+
+.auth-modal-visual__content h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  margin: 0 0 12px 0;
+  letter-spacing: 0.5px;
+  color: #c3a27e;
+}
+
+.auth-modal-visual__content p {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.85;
+  margin: 0 0 28px 0;
+}
+
+.visual-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v-feat {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #c3a27e;
+  background-color: rgba(195, 162, 126, 0.1);
+  padding: 6px 12px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+/* Right Side: Access Forms */
+.auth-modal-content {
+  flex: 1.1;
+  padding: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 576px) {
+  .auth-modal-content {
+    padding: 32px 24px;
+  }
+}
+
 .auth-modal-tabs {
   display: flex;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 24px;
 }
 
 .auth-modal-tab {
   flex: 1;
   background: none;
   border: none;
-  color: #9ca3af;
+  color: var(--color-text-muted);
   padding: 12px;
   font-size: 16px;
   font-weight: 500;
@@ -86,36 +180,36 @@
 .auth-modal-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .auth-modal-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .auth-modal-group label {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-secondary);
   font-weight: 500;
   letter-spacing: 0.5px;
 }
 
 .auth-modal-group input {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(128, 128, 128, 0.15);
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 11px 14px;
   color: var(--color-text-primary);
-  font-size: 15px;
+  font-size: 14px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .auth-modal-group input:focus {
   outline: none;
   border-color: #c3a27e;
-  box-shadow: 0 0 0 3px rgba(195, 162, 126, 0.15);
+  box-shadow: 0 0 0 3px rgba(195, 162, 126, 0.12);
 }
 
 .auth-modal-btn {
@@ -123,12 +217,12 @@
   color: #06070a;
   border: none;
   border-radius: 8px;
-  padding: 14px;
+  padding: 13px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .auth-modal-btn:hover {
@@ -146,22 +240,106 @@
 
 .auth-modal-error {
   background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.15);
   color: #f87171;
-  padding: 12px;
+  padding: 10px 14px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 16px;
 }
 
 .auth-modal-success {
   background-color: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.15);
   color: #34d399;
-  padding: 12px;
+  padding: 10px 14px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 16px;
+}
+
+/* Social SSO section styles */
+.auth-modal-sso {
+  margin-top: 24px;
+}
+
+.sso-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+.sso-divider::before, .sso-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sso-divider:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.sso-divider:not(:empty)::after {
+  margin-left: .5em;
+}
+
+.sso-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.sso-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(128, 128, 128, 0.15);
+  background-color: rgba(255, 255, 255, 0.01);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sso-btn:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: rgba(195, 162, 126, 0.3);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.sso-btn:active {
+  transform: translateY(0);
+}
+
+.sso-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.sso-btn:hover svg {
+  transform: scale(1.08);
+}
+
+.sso-btn--gmail:hover {
+  color: #ea4335;
+}
+
+.sso-btn--facebook:hover {
+  color: #1877f2;
+}
+
+.sso-btn--instagram:hover {
+  color: #e1306c;
 }
 
 @keyframes fadeIn {

@@ -29,6 +29,7 @@ export default function ProfileDashboard({ onNavigate }) {
   const [pincode, setPincode] = useState('');
   const [country, setCountry] = useState('India');
   const [shippingPhone, setShippingPhone] = useState('');
+  const [isPrimary, setIsPrimary] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -96,6 +97,7 @@ export default function ProfileDashboard({ onNavigate }) {
     setPincode('');
     setCountry('India');
     setShippingPhone('');
+    setIsPrimary(false);
   };
 
   const handleEditAddressClick = (addr) => {
@@ -111,6 +113,7 @@ export default function ProfileDashboard({ onNavigate }) {
     setPincode(addr.pincode || '');
     setCountry(addr.country || 'India');
     setShippingPhone(addr.phone || '');
+    setIsPrimary(addr.isPrimary || false);
   };
 
   const handleAddressSubmit = (e) => {
@@ -125,7 +128,8 @@ export default function ProfileDashboard({ onNavigate }) {
       state,
       pincode,
       country,
-      phone: shippingPhone
+      phone: shippingPhone,
+      isPrimary
     };
 
     let updatedList;
@@ -137,6 +141,17 @@ export default function ProfileDashboard({ onNavigate }) {
       // Edit mode
       newAddress.id = editingAddressId;
       updatedList = addresses.map(addr => addr.id === editingAddressId ? newAddress : addr);
+    }
+
+    // Normalize primary address flag: if newAddress is primary, set all others to false
+    if (newAddress.isPrimary) {
+      updatedList = updatedList.map(addr => addr.id === newAddress.id ? addr : { ...addr, isPrimary: false });
+    } else {
+      // If no address is primary in the array, make the first one primary
+      const hasPrimary = updatedList.some(addr => addr.isPrimary);
+      if (!hasPrimary && updatedList.length > 0) {
+        updatedList = updatedList.map((addr, idx) => idx === 0 ? { ...addr, isPrimary: true } : addr);
+      }
     }
 
     setAddresses(updatedList);
@@ -352,6 +367,16 @@ export default function ProfileDashboard({ onNavigate }) {
                   placeholder="Alternate phone for delivery rider"
                 />
               </div>
+              <div className="profile-form__group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+                <input
+                  type="checkbox"
+                  id="address-primary"
+                  checked={isPrimary}
+                  onChange={(e) => setIsPrimary(e.target.checked)}
+                  style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
+                />
+                <label htmlFor="address-primary" style={{ cursor: 'pointer', marginBottom: 0 }}>Set as Primary Shipping Address</label>
+              </div>
 
               <div className="address-form__actions">
                 <button type="submit" className="save-addr-btn">
@@ -371,11 +396,16 @@ export default function ProfileDashboard({ onNavigate }) {
                 </div>
               ) : (
                 addresses.map((addr) => (
-                  <div className="address-card" key={addr.id}>
+                  <div className={`address-card ${addr.isPrimary ? 'primary' : ''}`} key={addr.id}>
                     <div className="address-card__header">
-                      <span className={`address-badge ${addr.addressType.toLowerCase()}`}>
-                        {addr.addressType}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className={`address-badge ${addr.addressType.toLowerCase()}`}>
+                          {addr.addressType}
+                        </span>
+                        {addr.isPrimary && (
+                          <span className="address-badge primary-badge">★ Primary</span>
+                        )}
+                      </div>
                       <div className="address-card__actions">
                         <button className="edit-addr-btn" onClick={() => handleEditAddressClick(addr)}>Edit</button>
                         <button className="delete-addr-btn" onClick={() => handleDeleteAddress(addr.id)}>Delete</button>

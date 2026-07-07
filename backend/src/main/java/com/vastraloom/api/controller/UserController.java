@@ -3,6 +3,7 @@ package com.vastraloom.api.controller;
 import com.vastraloom.api.dto.ProfileUpdateRequest;
 import com.vastraloom.api.dto.UserProfileResponse;
 import com.vastraloom.api.model.User;
+import com.vastraloom.api.model.Address;
 import com.vastraloom.api.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -73,6 +74,21 @@ public class UserController {
                 }
             });
             user.getAddresses().addAll(request.getAddresses());
+
+            // Normalize primary flag: exactly one address must be primary in the database
+            boolean hasPrimary = false;
+            for (Address addr : user.getAddresses()) {
+                if (addr.isPrimary()) {
+                    if (!hasPrimary) {
+                        hasPrimary = true;
+                    } else {
+                        addr.setPrimary(false);
+                    }
+                }
+            }
+            if (!hasPrimary && !user.getAddresses().isEmpty()) {
+                user.getAddresses().get(0).setPrimary(true);
+            }
         }
 
         User updatedUser = userRepository.save(user);
@@ -86,5 +102,23 @@ public class UserController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    // GET /api/users (Requires ROLE_ADMIN)
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    // PUT /api/users/{id}/role (Requires ROLE_ADMIN)
+    @PutMapping("/{id}/role")
+    public ResponseEntity<?> updateUserRole(@PathVariable Long id, @RequestParam String role) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setRole(role);
+                    userRepository.save(user);
+                    return ResponseEntity.ok("User role updated successfully");
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
