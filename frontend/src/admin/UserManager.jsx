@@ -7,23 +7,17 @@ export default function UserManager() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  // Filter state (roleFilter removed as we only show Customers)
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Detail inline state
   const [selectedUser, setSelectedUser] = useState(null);
+  const [showAllAddresses, setShowAllAddresses] = useState(false);
 
   const fetchUsers = async () => {
     const token = getToken();
     try {
       const response = await fetch('http://localhost:8080/api/users', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
-
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
@@ -37,150 +31,260 @@ export default function UserManager() {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, [getToken]);
+  useEffect(() => { fetchUsers(); }, [getToken]);
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return 'Initial Setup';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (e) {
-      return dateStr;
-    }
-  };
-
-  // Filter: Show only users having Customer role (ROLE_USER)
   const filteredUsers = users.filter((user) => {
     if (user.role !== 'ROLE_USER') return false;
-    
-    const matchesSearch = 
-      user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.phone && user.phone.includes(searchQuery));
-
-    return matchesSearch;
+    const q = searchQuery.toLowerCase();
+    return (
+      user.username.toLowerCase().includes(q) ||
+      user.email.toLowerCase().includes(q) ||
+      (user.phone && user.phone.includes(q))
+    );
   });
 
-  // 1. INLINE DETAIL VIEW
+  /* ─── PHONE SVG helper ─────────────────────────────────────── */
+  const PhoneIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.48 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </svg>
+  );
+
+  /* ─── DETAIL VIEW ──────────────────────────────────────────── */
   if (selectedUser) {
+    const initials    = selectedUser.username.slice(0, 2).toUpperCase();
+    const primaryAddr = selectedUser.addresses?.find(a => a.isPrimary)
+                     || (selectedUser.addresses?.length ? selectedUser.addresses[0] : null);
+    const otherAddrs  = selectedUser.addresses?.filter(a => !a.isPrimary) || [];
+    const totalAddrs  = selectedUser.addresses?.length || 0;
+
     return (
       <div className="user-manager">
-        <div className="user-manager__header">
-          <div>
-            <button 
-              className="user-manager__back-inline-btn" 
-              onClick={() => setSelectedUser(null)}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
-              </svg>
-              Back to Registry List
-            </button>
-            <h1 className="user-manager__title" style={{ marginTop: '8px' }}>User Account Profile</h1>
-          </div>
+
+        {/* ── TOP BAR ─────────────────────────────────────── */}
+        <div className="ud-topbar">
+          <button
+            className="ud-back-btn"
+            onClick={() => { setSelectedUser(null); setShowAllAddresses(false); }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Registry
+          </button>
+          <span className="ud-breadcrumb">Customer Directory &rsaquo; Profile</span>
         </div>
 
-        <div className="user-details-inline card-glow animate-scale-in">
-          <div className="user-details-inline__grid">
-            
-            {/* Left side: Avatar & Static Role Display */}
-            <div className="user-details-inline__left-col">
-              <div className="user-details-inline__avatar-large">
-                {selectedUser.username.charAt(0).toUpperCase()}
-              </div>
-              <h2 className="user-details-inline__username">{selectedUser.username}</h2>
-              <span className="user-details-inline__id">User ID: #{selectedUser.id}</span>
+        <div className="ud-card animate-scale-in">
 
-              {/* Static Role Information (Role cannot be changed) */}
-              <div className="user-details-inline__role-box">
-                <span className="user-details-inline__role-label">Account Privilege</span>
-                <div className="user-details-inline__role-static-badge">
-                  Customer Account (Shopper Access)
+          {/* ── HERO BANNER ──────────────────────────────── */}
+          <div className="ud-hero">
+            <div className="ud-hero__bg" />
+            <div className="ud-hero__content">
+              <div className="ud-hero__avatar">{initials}</div>
+              <div className="ud-hero__info">
+                <h2 className="ud-hero__name">{selectedUser.username}</h2>
+                <div className="ud-hero__meta">
+                  <span className="ud-hero__id">ID #{selectedUser.id}</span>
+                  <span className="ud-hero__dot" />
+                  <span className="ud-hero__badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Verified Customer
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── CONTACT STRIP (email · phone · addresses) ── */}
+          <div className="ud-contact-strip">
+            {/* Email */}
+            <div className="ud-contact-item">
+              <div className="ud-contact-item__icon email">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+              <div className="ud-contact-item__text">
+                <div className="ud-contact-item__label">Email Address</div>
+                <div className="ud-contact-item__value ud-contact-item__value--email">
+                  {selectedUser.email}
                 </div>
               </div>
             </div>
 
-            {/* Right side: Personal Info & Address Lists */}
-            <div className="user-details-inline__right-col">
-              
-              <div className="user-details-inline__section">
-                <h3>Contact & Session Metrics</h3>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <span className="info-label">Email Address</span>
-                    <span className="info-val">{selectedUser.email}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">Phone Number</span>
-                    <span className="info-val">{selectedUser.phone || '—'}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">Joined Date</span>
-                    <span className="info-val">{formatDate(selectedUser.createdDate)}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">Last Modified Date</span>
-                    <span className="info-val">{formatDate(selectedUser.modifiedDate)}</span>
-                  </div>
+            <div className="ud-contact-divider" />
+
+            {/* Phone */}
+            <div className="ud-contact-item">
+              <div className="ud-contact-item__icon phone">
+                <PhoneIcon size={16} />
+              </div>
+              <div className="ud-contact-item__text">
+                <div className="ud-contact-item__label">Phone Number</div>
+                <div className="ud-contact-item__value">
+                  {selectedUser.phone
+                    ? <span className="ud-contact-item__value--phone">{selectedUser.phone}</span>
+                    : <span className="ud-contact-item__empty">Not provided</span>}
                 </div>
               </div>
+            </div>
 
-              <div className="user-details-inline__section">
-                <h3>Saved Shipment & Billing Addresses ({selectedUser.addresses?.length || 0})</h3>
-                {selectedUser.addresses && selectedUser.addresses.length > 0 ? (
-                  <div className="user-details-inline__address-list">
-                    {selectedUser.addresses.map((addr, idx) => (
-                      <div 
-                        className={`user-details-inline__address-card ${addr.isPrimary ? 'primary' : ''}`} 
-                        key={addr.id}
-                      >
-                        <div className="user-details-inline__address-header">
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span className="user-details-inline__address-type">{addr.addressType}</span>
-                            {addr.isPrimary && (
-                              <span className="user-details-inline__primary-badge">★ Primary</span>
-                            )}
-                          </div>
-                          <span className="user-details-inline__address-name">{addr.fullName}</span>
+            <div className="ud-contact-divider" />
+
+            {/* Addresses count */}
+            <div className="ud-contact-item">
+              <div className="ud-contact-item__icon addresses">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <div className="ud-contact-item__text">
+                <div className="ud-contact-item__label">Saved Addresses</div>
+                <div className="ud-contact-item__value">
+                  {totalAddrs} address{totalAddrs !== 1 ? 'es' : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── ADDRESS SECTION ───────────────────────────── */}
+          <div className="ud-body">
+            {totalAddrs === 0 ? (
+              <div className="ud-no-addresses">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <p>No delivery addresses saved for this account.</p>
+              </div>
+            ) : (
+              <>
+                {/* Primary address — always visible */}
+                <div className="ud-primary-section">
+                  <div className="ud-section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Primary Shipping Address
+                  </div>
+
+                  {primaryAddr && (
+                    <div className="ud-address-card ud-address-card--primary">
+                      <div className="ud-address-card__top">
+                        <div className="ud-address-card__badges">
+                          <span className="ud-addr-type">{primaryAddr.addressType}</span>
+                          <span className="ud-addr-primary">★ Primary</span>
                         </div>
-                        <p className="user-details-inline__address-body">
-                          {addr.streetAddress}<br />
-                          {addr.landmark ? `Landmark: ${addr.landmark}, ` : ''}
-                          {addr.city}, {addr.state} - <strong>{addr.pincode}</strong><br />
-                          {addr.country}
-                        </p>
-                        {addr.phone && (
-                          <div className="user-details-inline__address-contact">
-                            📞 <span>Delivery Phone: {addr.phone}</span>
+                        <span className="ud-address-card__name">{primaryAddr.fullName}</span>
+                      </div>
+
+                      {/* Structured detail grid */}
+                      <div className="ud-primary-detail-row">
+                        <div className="ud-primary-detail-block">
+                          <span className="ud-detail-key">Street</span>
+                          <span className="ud-detail-val">
+                            {primaryAddr.streetAddress}
+                            {primaryAddr.landmark && (
+                              <span className="ud-detail-landmark"> · {primaryAddr.landmark}</span>
+                            )}
+                          </span>
+                        </div>
+                        <div className="ud-primary-detail-block">
+                          <span className="ud-detail-key">City / State</span>
+                          <span className="ud-detail-val">{primaryAddr.city}, {primaryAddr.state}</span>
+                        </div>
+                        <div className="ud-primary-detail-block">
+                          <span className="ud-detail-key">PIN Code</span>
+                          <span className="ud-detail-val ud-detail-val--pin">{primaryAddr.pincode}</span>
+                        </div>
+                        <div className="ud-primary-detail-block">
+                          <span className="ud-detail-key">Country</span>
+                          <span className="ud-detail-val">{primaryAddr.country}</span>
+                        </div>
+                        {primaryAddr.phone && (
+                          <div className="ud-primary-detail-block">
+                            <span className="ud-detail-key">Delivery Phone</span>
+                            <span className="ud-detail-val ud-detail-val--phone">
+                              <PhoneIcon size={12} />
+                              {primaryAddr.phone}
+                            </span>
                           </div>
                         )}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="user-details-inline__address-empty">
-                    <span>No shipping addresses registered for this account.</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* View all addresses toggle */}
+                {otherAddrs.length > 0 && (
+                  <div className="ud-all-addresses-section">
+                    <button
+                      className="ud-toggle-all-btn"
+                      onClick={() => setShowAllAddresses(v => !v)}
+                    >
+                      {showAllAddresses ? (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="18 15 12 9 6 15"/>
+                          </svg>
+                          Hide Other Addresses
+                        </>
+                      ) : (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                          </svg>
+                          View All Addresses
+                          <span className="ud-toggle-count">+{otherAddrs.length} more</span>
+                        </>
+                      )}
+                    </button>
+
+                    {showAllAddresses && (
+                      <div className="ud-address-others">
+                        {otherAddrs.map((addr) => (
+                          <div className="ud-address-card" key={addr.id}>
+                            <div className="ud-address-card__top">
+                              <div className="ud-address-card__badges">
+                                <span className="ud-addr-type">{addr.addressType}</span>
+                              </div>
+                              <span className="ud-address-card__name">{addr.fullName}</span>
+                            </div>
+                            <p className="ud-address-card__body">
+                              {addr.streetAddress}
+                              {addr.landmark && <>, <em>{addr.landmark}</em></>}
+                              <br />
+                              {addr.city}, {addr.state} – <strong>{addr.pincode}</strong>
+                              <br />
+                              {addr.country}
+                            </p>
+                            {addr.phone && (
+                              <div className="ud-address-card__phone">
+                                <PhoneIcon size={12} />
+                                {addr.phone}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-
-            </div>
-
+              </>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
-  // 2. STANDARD USER LIST TABLE VIEW
+  /* ─── LIST VIEW ────────────────────────────────────────────── */
   return (
     <div className="user-manager">
       <div className="user-manager__header">
@@ -193,11 +297,10 @@ export default function UserManager() {
         </div>
       </div>
 
-      {/* Filters bar */}
       <div className="user-manager__filters">
         <div className="user-manager__search-wrap">
           <svg className="user-manager__search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input
             type="text"
@@ -209,20 +312,15 @@ export default function UserManager() {
         </div>
       </div>
 
-      {/* Users table */}
       {loading ? (
         <div className="user-manager__loading">
-          <div className="user-manager__spinner"></div>
+          <div className="user-manager__spinner" />
           <p>Retrieving shopper records...</p>
         </div>
       ) : error ? (
-        <div className="user-manager__error-box">
-          <p>{error}</p>
-        </div>
+        <div className="user-manager__error-box"><p>{error}</p></div>
       ) : filteredUsers.length === 0 ? (
-        <div className="user-manager__empty">
-          <p>No shopper records matched your criteria.</p>
-        </div>
+        <div className="user-manager__empty"><p>No shopper records matched your criteria.</p></div>
       ) : (
         <div className="user-manager__table-wrap animate-fade-in">
           <table className="user-manager__table">
@@ -233,21 +331,17 @@ export default function UserManager() {
                 <th>Email Address</th>
                 <th>Phone Number</th>
                 <th>Account Status</th>
-                <th>Joined Date</th>
-                <th>Last Update</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.map((user) => (
-                <tr 
-                  key={user.id} 
-                  className="user-manager__row-clickable" 
-                  onClick={() => setSelectedUser(user)}
+                <tr
+                  key={user.id}
+                  className="user-manager__row-clickable"
+                  onClick={() => { setSelectedUser(user); setShowAllAddresses(false); }}
                   title="Click to inspect profile & shipping address book"
                 >
-                  <td>
-                    <span className="user-manager__id-badge">#{user.id}</span>
-                  </td>
+                  <td><span className="user-manager__id-badge">#{user.id}</span></td>
                   <td>
                     <div className="user-manager__username-cell">
                       <div className="user-avatar">{user.username.charAt(0).toUpperCase()}</div>
@@ -256,22 +350,12 @@ export default function UserManager() {
                   </td>
                   <td>{user.email}</td>
                   <td>
-                    {user.phone ? (
-                      <span className="user-manager__phone">{user.phone}</span>
-                    ) : (
-                      <span className="user-manager__none-tag">—</span>
-                    )}
+                    {user.phone
+                      ? <span className="user-manager__phone">{user.phone}</span>
+                      : <span className="user-manager__none-tag">—</span>}
                   </td>
                   <td>
-                    <span className="user-manager__role-badge user-manager__role-badge--user">
-                      Active Customer
-                    </span>
-                  </td>
-                  <td>
-                    <span className="user-manager__date">{formatDate(user.createdDate)}</span>
-                  </td>
-                  <td>
-                    <span className="user-manager__date">{formatDate(user.modifiedDate)}</span>
+                    <span className="user-manager__role-badge user-manager__role-badge--user">Active Customer</span>
                   </td>
                 </tr>
               ))}
