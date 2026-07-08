@@ -44,5 +44,6 @@ public class Address {
 
     @Column(name = "is_primary", nullable = false)
     @Builder.Default
+    @com.fasterxml.jackson.annotation.JsonProperty("isPrimary")
     private boolean isPrimary = false;
 }

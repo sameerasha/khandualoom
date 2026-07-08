@@ -141,7 +141,7 @@ export default function Navbar({ onSignUpClick, onCartClick, onContactClick, onN
                 cursor: 'pointer',
                 transition: 'all 0.3s ease'
               }}>
-                Hi, {customerInfo?.username || 'Profile'}
+                Hi, {customerInfo?.firstName || 'Profile'}
               </button>
               <button className="navbar__logout-btn" onClick={() => { logout(); onNavigate(''); }} id="logout-nav-button" title="Logout" style={{
                 background: 'none',

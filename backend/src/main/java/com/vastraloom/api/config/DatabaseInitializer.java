@@ -1,10 +1,14 @@
 package com.vastraloom.api.config;
 
+import com.vastraloom.api.model.AppConfig;
 import com.vastraloom.api.model.Product;
 import com.vastraloom.api.model.User;
+import com.vastraloom.api.repository.AppConfigRepository;
 import com.vastraloom.api.repository.ProductRepository;
 import com.vastraloom.api.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -12,37 +16,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class DatabaseInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final AppConfigRepository appConfigRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     public DatabaseInitializer(
             UserRepository userRepository,
             ProductRepository productRepository,
-            PasswordEncoder passwordEncoder) {
+            AppConfigRepository appConfigRepository,
+            PasswordEncoder passwordEncoder,
+            JdbcTemplate jdbcTemplate) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.appConfigRepository = appConfigRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public void run(String... args) throws Exception {
+        try {
+            jdbcTemplate.execute("ALTER TABLE recent_views DROP COLUMN IF EXISTS session_id");
+            log.info("Dropped session_id column from recent_views if it existed.");
+        } catch (Exception e) {
+            log.warn("Could not drop session_id column: {}", e.getMessage());
+        }
+        
+        initializeConfigs();
         initializeAdminUser();
         initializeProducts();
     }
 
+    private void initializeConfigs() {
+        if (!appConfigRepository.existsById("OTP_VALIDITY_MINUTES")) {
+            appConfigRepository.save(new AppConfig("OTP_VALIDITY_MINUTES", "2"));
+        }
+        if (!appConfigRepository.existsById("OTP_MAX_ATTEMPTS")) {
+            appConfigRepository.save(new AppConfig("OTP_MAX_ATTEMPTS", "5"));
+        }
+    }
+
     private void initializeAdminUser() {
-        if (userRepository.findByUsername("admin").isEmpty()) {
+        if (userRepository.findByEmail("admin@vastraloom.com").isEmpty()) {
             User admin = User.builder()
-                    .username("admin")
+                    .firstName("Super")
+                    .lastName("Admin")
                     .email("admin@vastraloom.com")
                     .password(passwordEncoder.encode("admin123"))
+                    .phone("9999999999")
                     .role("ROLE_ADMIN")
+                    .emailVerified(true)
+                    .phoneVerified(true)
                     .build();
-            userRepository.save(java.util.Objects.requireNonNull(admin));
-            System.out.println("Admin user initialized successfully with username: admin / password: admin123");
+            userRepository.save(admin);
+            log.info("Admin user initialized successfully with email: admin@vastraloom.com / password: admin123");
         }
     }
 
@@ -110,7 +142,7 @@ public class DatabaseInitializer implements CommandLineRunner {
             }
 
             productRepository.saveAll(defaultProducts);
-            System.out.println("Default product catalog seeded successfully with " + defaultProducts.size() + " products.");
+            log.info("Default product catalog seeded successfully with {} products.", defaultProducts.size());
         }
     }
 }

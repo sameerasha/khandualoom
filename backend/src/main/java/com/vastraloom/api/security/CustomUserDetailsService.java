@@ -9,8 +9,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -20,15 +22,19 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        // Support loading user by either username or email
-        User user = userRepository.findByUsername(usernameOrEmail)
-                .or(() -> userRepository.findByEmail(usernameOrEmail))
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username or email: " + usernameOrEmail));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        log.debug("Attempting to load user by email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", email);
+                    return new UsernameNotFoundException("User not found with email: " + email);
+                });
+        
+        log.debug("User {} loaded successfully", email);
 
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
+                user.getEmail(),
+                user.getPassword() != null ? user.getPassword() : "",
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole()))
         );
     }

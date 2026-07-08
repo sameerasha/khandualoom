@@ -12,8 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class UserProfileResponse {
-    private String username;
+    private Long id;
+    private String firstName;
+    private String lastName;
     private String email;
     private String phone;
+    private boolean emailVerified;
+    private boolean phoneVerified;
     private List<Address> addresses;
 }

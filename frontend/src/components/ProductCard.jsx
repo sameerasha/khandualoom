@@ -42,7 +42,9 @@ export default function ProductCard({ product, index, onNavigate }) {
     }
   };
 
-  const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+  const discount = product.originalPrice && product.price && product.originalPrice > product.price
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
 
   return (
     <div
@@ -65,12 +67,16 @@ export default function ProductCard({ product, index, onNavigate }) {
         <div className="product-card__image-overlay"></div>
 
         {/* Badge */}
-        <span className={`product-card__badge product-card__badge--${product.badge.toLowerCase().replace(' ', '-')}`}>
-          {product.badge}
-        </span>
+        {product.badge && (
+          <span className={`product-card__badge product-card__badge--${product.badge.toLowerCase().replace(' ', '-')}`}>
+            {product.badge}
+          </span>
+        )}
 
         {/* Discount Badge */}
-        <span className="product-card__discount">-{discount}%</span>
+        {discount > 0 && (
+          <span className="product-card__discount">-{discount}%</span>
+        )}
 
         {/* Quick Actions */}
         <div className={`product-card__quick-actions ${isHovered ? 'product-card__quick-actions--visible' : ''}`}>
@@ -137,8 +143,10 @@ export default function ProductCard({ product, index, onNavigate }) {
         {/* Price */}
         <div className="product-card__price-row">
           <div className="product-card__price">
-            <span className="product-card__price-current">₹{product.price.toLocaleString('en-IN')}</span>
-            <span className="product-card__price-original">₹{product.originalPrice.toLocaleString('en-IN')}</span>
+            <span className="product-card__price-current">₹{(product.price || 0).toLocaleString('en-IN')}</span>
+            {product.originalPrice > product.price && (
+              <span className="product-card__price-original">₹{(product.originalPrice || 0).toLocaleString('en-IN')}</span>
+            )}
           </div>
           <button
             className={`product-card__cart-btn-sm ${isAdded ? 'product-card__cart-btn-sm--added' : ''}`}

@@ -39,19 +39,19 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateTokenFromUsername(String username) {
+    public String generateTokenFromEmail(String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .subject(username)
+                .subject(email)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(jwtSecretKey)
                 .compact();
     }
 
-    public String getUsernameFromJWT(String token) {
+    public String getEmailFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(jwtSecretKey)
                 .build()

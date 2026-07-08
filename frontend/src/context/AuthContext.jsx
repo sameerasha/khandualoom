@@ -48,14 +48,15 @@ export function AuthProvider({ children }) {
           setIsAdmin(true);
         } else if (role === 'ROLE_USER') {
           setIsCustomerLoggedIn(true);
-          setCustomerInfo({ username });
+          setCustomerInfo({ firstName: username, email: username }); // username var holds email or original mock id
           
           if (!token.startsWith('mock-sso-token')) {
             await fetchProfile();
           } else {
             // Re-inflate mock info for social SSO user session
             setCustomerInfo({
-              username: username,
+              firstName: username,
+              lastName: '',
               email: `${username.toLowerCase()}@social.com`,
               phone: '+91 99999 88888',
               addresses: [
@@ -80,14 +81,14 @@ export function AuthProvider({ children }) {
   }, [fetchProfile]);
 
   // Unified login handling both admins and customers based on role
-  const login = useCallback(async (username, password) => {
+  const login = useCallback(async (email, password) => {
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (response.ok) {
@@ -103,7 +104,7 @@ export function AuthProvider({ children }) {
         } else {
           setIsCustomerLoggedIn(true);
           setIsAdmin(false);
-          setCustomerInfo({ username: data.username });
+          setCustomerInfo({ email: data.username, firstName: 'User' }); // username field from jwt holds email
           // Fetch full profile (including addresses)
           try {
             const profileResponse = await fetch('http://localhost:8080/api/users/profile', {
@@ -143,7 +144,8 @@ export function AuthProvider({ children }) {
     setIsCustomerLoggedIn(true);
     setIsAdmin(false);
     setCustomerInfo({
-      username: username,
+      firstName: username,
+      lastName: '',
       email: `${username.toLowerCase()}@${provider.toLowerCase()}.com`,
       phone: '+91 99999 88888',
       addresses: [
@@ -165,14 +167,14 @@ export function AuthProvider({ children }) {
   }, []);
 
   // Customer Sign Up
-  const signup = useCallback(async (username, email, password, phone) => {
+  const signup = useCallback(async (firstName, lastName, email, password, phone, otp) => {
     try {
       const response = await fetch('http://localhost:8080/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password, phone }),
+        body: JSON.stringify({ firstName, lastName, email, password, phone, otp }),
       });
 
       if (response.ok) {
@@ -185,6 +187,106 @@ export function AuthProvider({ children }) {
       return { success: false, error: 'Server connection error. Please try again.' };
     }
   }, []);
+
+  // Send OTP
+  const sendOtp = async (identifier) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return { success: true, ...data };
+      } else {
+        const err = await response.text();
+        return { success: false, error: err };
+      }
+    } catch (err) {
+      return { success: false, error: 'Connection error while sending OTP.' };
+    }
+  };
+
+  const verifyOtpStep = async (identifier, otp) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/verify-otp-step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, otp })
+      });
+      if (response.ok) {
+        return { success: true };
+      } else {
+        const err = await response.text();
+        return { success: false, error: err };
+      }
+    } catch (err) {
+      return { success: false, error: 'Connection error while verifying OTP.' };
+    }
+  };
+
+  const loginWithOtp = async (identifier, otp) => {
+    try {
+      setLoginError('');
+      const response = await fetch('http://localhost:8080/api/auth/login-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, otp })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem(TOKEN_KEY, data.token);
+        
+        const role = data.role;
+        if (role === 'ROLE_ADMIN') {
+          setIsAdmin(true);
+        } else {
+          setIsCustomerLoggedIn(true);
+          setIsAdmin(false);
+          setCustomerInfo({ email: data.username, firstName: 'User' });
+          try {
+            const profileResponse = await fetch('http://localhost:8080/api/users/profile', {
+              headers: { 'Authorization': `Bearer ${data.token}` }
+            });
+            if (profileResponse.ok) {
+              const profileData = await profileResponse.json();
+              setCustomerInfo(profileData);
+            }
+          } catch (e) {
+            console.error("Failed to fetch full profile after OTP login", e);
+          }
+        }
+        return { success: true, role };
+      } else {
+        const err = await response.text();
+        setLoginError(err || 'OTP Login failed.');
+        return { success: false, error: err };
+      }
+    } catch (err) {
+      setLoginError('Connection error during OTP login.');
+      return { success: false, error: 'Connection error during OTP login.' };
+    }
+  };
+
+  const resetPassword = async (identifier, otp, newPassword) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, otp, newPassword })
+      });
+      if (response.ok) {
+        return { success: true };
+      } else {
+        const err = await response.text();
+        return { success: false, error: err };
+      }
+    } catch (err) {
+      return { success: false, error: 'Connection error while resetting password.' };
+    }
+  };
 
   // Update profile settings & shipping addresses
   const updateProfile = useCallback(async (profileData) => {
@@ -260,7 +362,11 @@ export function AuthProvider({ children }) {
       clearError,
       getToken,
       fetchProfile,
-      updateProfile
+      updateProfile,
+      sendOtp,
+      verifyOtpStep,
+      loginWithOtp,
+      resetPassword,
     }}>
       {children}
     </AuthContext.Provider>

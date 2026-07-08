@@ -10,8 +10,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfileUpdateRequest {
-    private String username;
-    private String password; // Optional
+    private String firstName;
+    private String lastName;
+    private String previousPassword; // Optional, required if newPassword is provided
+    private String newPassword; // Optional
     private String phone;
     private List<Address> addresses;
 }

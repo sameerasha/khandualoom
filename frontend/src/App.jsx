@@ -7,6 +7,7 @@ import Hero from './components/Hero';
 import ProductGrid from './components/ProductGrid';
 import About from './components/About';
 import Testimonials from './components/Testimonials';
+import RecentViews from './components/RecentViews';
 import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 import CartSidebar from './components/CartSidebar';
@@ -150,6 +151,7 @@ function AppContent() {
           onCartClick={() => setIsCartOpen(true)}
           onContactClick={() => handleNavigate('contact')}
           onNavigate={handleNavigate}
+          currentRoute={route.path}
         />
         <main>
           <ProfileDashboard onNavigate={handleNavigate} />
@@ -169,7 +171,7 @@ function AppContent() {
     return (
       <div className="app">
         <Navbar 
-          onAuthClick={(tab) => { setAuthTab(tab); setIsAuthOpen(true); }}
+          onSignUpClick={() => openAuth('signup')}
           onContactClick={() => handleNavigate('contact')}
           onCartClick={() => setIsCartOpen(true)}
           onNavigate={handleNavigate}
@@ -198,7 +200,7 @@ function AppContent() {
     return (
       <div className="app">
         <Navbar 
-          onAuthClick={(tab) => { setAuthTab(tab); setIsAuthOpen(true); }}
+          onSignUpClick={() => openAuth('signup')}
           onContactClick={() => handleNavigate('contact')}
           onCartClick={() => setIsCartOpen(true)}
           onNavigate={handleNavigate}
@@ -231,12 +233,14 @@ function AppContent() {
         onCartClick={() => setIsCartOpen(true)}
         onContactClick={() => handleNavigate('contact')}
         onNavigate={handleNavigate}
+        currentRoute={route.path}
       />
       <main>
         {!showMinimal && <Hero onSignUpClick={() => openAuth('signup')} />}
         <ProductGrid onNavigate={handleNavigate} />
         {!showMinimal && <About />}
         {!showMinimal && <Testimonials />}
+        <RecentViews onNavigate={handleNavigate} />
       </main>
       <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
 

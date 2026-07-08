@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import ProductCard from './ProductCard';
 import './ProductDetails.css';
 
 export default function ProductDetails({ productId, onNavigate }) {
   const { products } = useProducts();
   const { cartItems, addToCart, setIsCartOpen } = useCart();
+  const { isCustomerLoggedIn, customerInfo } = useAuth();
   
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -17,6 +19,11 @@ export default function ProductDetails({ productId, onNavigate }) {
     transformOrigin: 'center center',
     transform: 'scale(1)'
   });
+
+  // Discover More State
+  const [discoverProductsPool, setDiscoverProductsPool] = useState([]);
+  const [discoverDisplayCount, setDiscoverDisplayCount] = useState(8);
+  const [loadingDiscover, setLoadingDiscover] = useState(false);
 
   useEffect(() => {
     // Reset state when product ID changes
@@ -59,7 +66,48 @@ export default function ProductDetails({ productId, onNavigate }) {
       .catch((err) => {
         console.error('Failed to fetch related products:', err);
       });
+
+    // Reset and fetch Discover More products
+    setDiscoverDisplayCount(8);
+    fetchDiscoverProducts(productId);
   }, [productId, products]);
+
+  // Track product view if customer is logged in
+  useEffect(() => {
+    if (!productId || !isCustomerLoggedIn || !customerInfo?.id) return;
+    
+    fetch(`http://localhost:8080/api/products/${productId}/view?userId=${customerInfo.id}`, {
+      method: 'POST',
+    }).catch(err => console.error('Failed to track view', err));
+
+  }, [productId, isCustomerLoggedIn, customerInfo]);
+
+  const fetchDiscoverProducts = (currentProdId = productId) => {
+    setLoadingDiscover(true);
+    // Fetch 21 to account for potential exclusion of the current product, ensuring we get up to 20
+    fetch(`http://localhost:8080/api/products/paged?page=0&size=21`)
+      .then(res => {
+        if (res.ok) return res.json();
+        throw new Error('Failed to load paged products');
+      })
+      .then(data => {
+        if (data && data.content) {
+          // Exclude the current product and limit to exactly 20
+          const filtered = data.content.filter(p => p.id !== currentProdId).slice(0, 20);
+          setDiscoverProductsPool(filtered);
+          setDiscoverDisplayCount(8);
+        }
+      })
+      .catch(err => console.error('Failed to load discover products', err))
+      .finally(() => setLoadingDiscover(false));
+  };
+
+  const handleLoadMoreDiscover = () => {
+    setDiscoverDisplayCount(prev => Math.min(prev + 8, 20));
+  };
+
+  const displayedDiscoverProducts = discoverProductsPool.slice(0, discoverDisplayCount);
+  const hasMoreDiscover = discoverDisplayCount < discoverProductsPool.length;
 
   // Set up specific gallery images or generate fallback views
   useEffect(() => {
@@ -340,6 +388,53 @@ export default function ProductDetails({ productId, onNavigate }) {
                 <ProductCard key={p.id} product={p} index={i} onNavigate={onNavigate} />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Discover More Feed */}
+        {displayedDiscoverProducts && displayedDiscoverProducts.length > 0 && (
+          <div className="product-details__discover" style={{ marginTop: '60px', paddingBottom: '40px' }}>
+            <h2 className="related-title">Discover More</h2>
+            <div className="products-grid">
+              {displayedDiscoverProducts.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} onNavigate={onNavigate} />
+              ))}
+            </div>
+            {hasMoreDiscover && (
+              <div className="load-more-container" style={{ textAlign: 'center', marginTop: '40px' }}>
+                <button 
+                  className="btn-load-more" 
+                  onClick={handleLoadMoreDiscover}
+                  disabled={loadingDiscover}
+                  style={{ 
+                    padding: '12px 32px', 
+                    background: 'transparent', 
+                    border: '1px solid #c3a27e', 
+                    color: '#c3a27e', 
+                    borderRadius: '8px', 
+                    cursor: loadingDiscover ? 'not-allowed' : 'pointer', 
+                    fontWeight: '600',
+                    fontSize: '15px',
+                    transition: 'all 0.3s ease',
+                    opacity: loadingDiscover ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if(!loadingDiscover) {
+                      e.currentTarget.style.background = '#c3a27e';
+                      e.currentTarget.style.color = '#06070a';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if(!loadingDiscover) {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = '#c3a27e';
+                    }
+                  }}
+                >
+                  {loadingDiscover ? 'Loading Masterpieces...' : 'Load More Options'}
+                </button>
+              </div>
+            )}
           </div>
         )}
 

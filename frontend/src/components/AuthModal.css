@@ -258,6 +258,34 @@
   margin-bottom: 16px;
 }
 
+.required-star {
+  color: #ff9f1c;
+  margin-left: 3px;
+  font-weight: bold;
+}
+
+/* Custom Validation Styles */
+.auth-modal-group.has-error input {
+  border-color: #ff9f1c;
+  background-color: rgba(255, 159, 28, 0.05);
+  box-shadow: 0 0 10px rgba(255, 159, 28, 0.5), 0 0 4px rgba(255, 159, 28, 0.7);
+}
+
+.field-error-msg {
+  color: #ff9f1c;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+  text-shadow: 0 0 6px rgba(255, 159, 28, 0.5);
+  animation: shakeError 0.4s ease-in-out;
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
 /* Social SSO section styles */
 .auth-modal-sso {
   margin-top: 24px;

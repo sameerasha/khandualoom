@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.vastraloom.api.service.OtpService;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -16,22 +18,28 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.otpService = otpService;
     }
 
     // GET /api/users/profile
     @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByUsername(username)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
                 .map(user -> {
                     UserProfileResponse response = UserProfileResponse.builder()
-                            .username(user.getUsername())
+                            .id(user.getId())
+                            .firstName(user.getFirstName())
+                            .lastName(user.getLastName())
                             .email(user.getEmail())
                             .phone(user.getPhone())
+                            .emailVerified(user.isEmailVerified())
+                            .phoneVerified(user.isPhoneVerified())
                             .addresses(user.getAddresses())
                             .build();
                     return ResponseEntity.ok(response);
@@ -42,26 +50,32 @@ public class UserController {
     // PUT /api/users/profile
     @PutMapping("/profile")
     public ResponseEntity<?> updateUserProfile(@RequestBody ProfileUpdateRequest request) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new RuntimeException("User not found: " + currentUsername));
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new RuntimeException("User not found: " + currentEmail));
 
-        // 1. If username is changing, verify the new one is not already taken
-        if (!user.getUsername().equals(request.getUsername())) {
-            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-                return ResponseEntity.badRequest().body("Error: Username is already taken!");
-            }
-            user.setUsername(request.getUsername());
+        // 1. Update Name
+        if (request.getFirstName() != null && !request.getFirstName().trim().isEmpty()) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null && !request.getLastName().trim().isEmpty()) {
+            user.setLastName(request.getLastName());
         }
 
         // 2. Optional password update
-        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (request.getNewPassword() != null && !request.getNewPassword().trim().isEmpty()) {
+            if (request.getPreviousPassword() == null || !passwordEncoder.matches(request.getPreviousPassword(), user.getPassword())) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Incorrect previous password."));
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         }
 
         // 3. Update phone number
-        user.setPhone(request.getPhone());
+        if (request.getPhone() != null && !request.getPhone().equals(user.getPhone())) {
+            user.setPhone(request.getPhone());
+            user.setPhoneVerified(false); // require re-verification if phone changes
+        }
 
         // 4. Update/sync child Address collection
         user.getAddresses().clear();
@@ -95,12 +109,75 @@ public class UserController {
 
         // Return updated profile details
         UserProfileResponse response = UserProfileResponse.builder()
-                .username(updatedUser.getUsername())
+                .id(updatedUser.getId())
+                .firstName(updatedUser.getFirstName())
+                .lastName(updatedUser.getLastName())
                 .email(updatedUser.getEmail())
                 .phone(updatedUser.getPhone())
+                .emailVerified(updatedUser.isEmailVerified())
+                .phoneVerified(updatedUser.isPhoneVerified())
                 .addresses(updatedUser.getAddresses())
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyProfileOtp(@RequestBody Map<String, String> request) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String identifier = request.get("identifier");
+        String otp = request.get("otp");
+
+        if (identifier == null || otp == null) {
+            return ResponseEntity.badRequest().body("Identifier and OTP are required.");
+        }
+
+        // For normal verification, must belong to the user
+        if (!identifier.equals(user.getEmail()) && !identifier.equals(user.getPhone())) {
+            return ResponseEntity.badRequest().body("Identifier does not belong to the authenticated user.");
+        }
+
+        try {
+            otpService.verifyOtp(identifier, otp);
+            
+            if (identifier.equals(user.getEmail())) {
+                user.setEmailVerified(true);
+            } else if (identifier.equals(user.getPhone())) {
+                user.setPhoneVerified(true);
+            }
+            userRepository.save(user);
+
+            return ResponseEntity.ok("Verification successful.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("OTP Verification failed: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/profile/phone")
+    public ResponseEntity<?> updatePhoneWithOtp(@RequestBody Map<String, String> payload) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String newPhone = payload.get("newPhone");
+        String otp = payload.get("otp");
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "error", "User not found"));
+        }
+
+        try {
+            // Verify OTP that was sent to the NEW PHONE number
+            otpService.verifyOtp(newPhone, otp);
+            
+            user.setPhone(newPhone);
+            user.setPhoneVerified(true); // Directly mark as verified since we just verified it
+            userRepository.save(user);
+            
+            return ResponseEntity.ok(Map.of("success", true, "message", "Phone number updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Invalid OTP"));
+        }
     }
 }

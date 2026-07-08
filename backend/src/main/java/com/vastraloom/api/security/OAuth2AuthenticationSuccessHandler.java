@@ -72,16 +72,18 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             // Create new user
             user = User.builder()
                     .email(email)
-                    .username(name != null ? name : "user_" + UUID.randomUUID().toString().substring(0, 8))
+                    .firstName(name != null ? name.split(" ")[0] : "User")
+                    .lastName(name != null && name.split(" ").length > 1 ? name.split(" ")[1] : "")
                     .role("ROLE_USER")
                     .provider(AuthProvider.valueOf(registrationId.toLowerCase()))
                     .providerId(providerId)
+                    .emailVerified(true)
                     .build();
             userRepository.save(user);
         }
 
         // Generate JWT Token
-        String token = jwtTokenProvider.generateTokenFromUsername(user.getEmail());
+        String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
 
         // Redirect to Frontend
         String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/oauth2/redirect")

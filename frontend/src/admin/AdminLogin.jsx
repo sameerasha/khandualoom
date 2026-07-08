@@ -6,7 +6,7 @@ export default function AdminLogin({ onNavigate }) {
   const { login, loginError, clearError } = useAuth();
   
   // Fields
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +18,7 @@ export default function AdminLogin({ onNavigate }) {
     setError('');
     clearError();
 
-    const result = await login(username, password);
+    const result = await login(email, password);
     setIsLoading(false);
     
     if (result && result.success && result.role === 'ROLE_ADMIN') {
@@ -77,19 +77,19 @@ export default function AdminLogin({ onNavigate }) {
 
             <form className="admin-login__form" onSubmit={handleSubmit} id="admin-login-form">
               <div className="admin-login__field">
-                <label className="admin-login__label" htmlFor="admin-username">
+                <label className="admin-login__label" htmlFor="admin-email">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
                   </svg>
-                  Username
+                  Email Address
                 </label>
                 <input
-                  type="text"
-                  id="admin-username"
+                  type="email"
+                  id="admin-email"
                   className="admin-login__input"
-                  placeholder="Enter admin username"
-                  value={username}
-                  onChange={(e) => { setUsername(e.target.value); setError(''); }}
+                  placeholder="admin@vastraloom.com"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
                   required
                 />
               </div>
@@ -129,7 +129,7 @@ export default function AdminLogin({ onNavigate }) {
               <button
                 type="submit"
                 className={`admin-login__submit ${isLoading ? 'admin-login__submit--loading' : ''}`}
-                disabled={isLoading || !username || !password}
+                disabled={isLoading || !email || !password}
                 id="admin-login-submit"
               >
                 {isLoading ? (

@@ -44,10 +44,14 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
                         .requestMatchers("/api/auth/signup-admin").permitAll()
+                        .requestMatchers("/api/auth/send-otp").permitAll()
+                        .requestMatchers("/api/auth/verify-otp-step").permitAll()
+                        .requestMatchers("/api/auth/login-otp").permitAll()
+                        .requestMatchers("/api/auth/reset-password").permitAll()
 
                         // Public Products APIs
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+                        .requestMatchers("/api/products/**").permitAll()
+                        .requestMatchers("/api/products").permitAll()
 
                         // Public Social Media
                         .requestMatchers(HttpMethod.GET, "/api/social-media").permitAll()

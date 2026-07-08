@@ -10,6 +10,7 @@ export default function UserManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [showAllAddresses, setShowAllAddresses] = useState(false);
+  const [copiedField, setCopiedField] = useState(null);
   
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
@@ -39,8 +40,9 @@ export default function UserManager() {
   const filteredUsers = users.filter((user) => {
     if (user.role !== 'ROLE_USER') return false;
     const q = searchQuery.toLowerCase();
+    const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
     return (
-      user.username.toLowerCase().includes(q) ||
+      fullName.includes(q) ||
       user.email.toLowerCase().includes(q) ||
       (user.phone && user.phone.includes(q))
     );
@@ -53,19 +55,53 @@ export default function UserManager() {
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  /* ─── PHONE SVG helper ─────────────────────────────────────── */
+  /* ─── SVG helpers ─────────────────────────────────────── */
   const PhoneIcon = ({ size = 12 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.48 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
     </svg>
   );
 
+  const CopyIcon = ({ size = 14 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </svg>
+  );
+
+  const CheckIcon = ({ size = 14 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  );
+
+  const BadgeCheckIcon = () => (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  );
+
+  const BadgeAlertIcon = () => (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  );
+
+  const handleCopy = (text, field) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
   /* ─── DETAIL VIEW ──────────────────────────────────────────── */
   if (selectedUser) {
-    const initials    = selectedUser.username.slice(0, 2).toUpperCase();
+    const displayName = `${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim() || 'User';
+    const initials    = displayName.slice(0, 2).toUpperCase();
     const primaryAddr = selectedUser.addresses?.find(a => a.isPrimary)
                      || (selectedUser.addresses?.length ? selectedUser.addresses[0] : null);
-    const otherAddrs  = selectedUser.addresses?.filter(a => !a.isPrimary) || [];
+    const otherAddrs  = selectedUser.addresses?.filter(a => a.id !== primaryAddr?.id) || [];
     const totalAddrs  = selectedUser.addresses?.length || 0;
 
     return (
@@ -93,7 +129,7 @@ export default function UserManager() {
             <div className="ud-hero__content">
               <div className="ud-hero__avatar">{initials}</div>
               <div className="ud-hero__info">
-                <h2 className="ud-hero__name">{selectedUser.username}</h2>
+                <h2 className="ud-hero__name">{displayName}</h2>
                 <div className="ud-hero__meta">
                   <span className="ud-hero__id">ID #{selectedUser.id}</span>
                   <span className="ud-hero__dot" />
@@ -119,9 +155,19 @@ export default function UserManager() {
                 </svg>
               </div>
               <div className="ud-contact-item__text">
-                <div className="ud-contact-item__label">Email Address</div>
-                <div className="ud-contact-item__value ud-contact-item__value--email">
+                <div className="ud-contact-item__label">
+                  Email Address
+                  {selectedUser.emailVerified ? (
+                    <span className="verified-badge"><BadgeCheckIcon /> Verified</span>
+                  ) : (
+                    <span className="unverified-badge"><BadgeAlertIcon /> Unverified</span>
+                  )}
+                </div>
+                <div className="ud-contact-item__value ud-contact-item__value--email" style={{ display: 'flex', alignItems: 'center' }}>
                   {selectedUser.email}
+                  <button className="copy-btn" onClick={() => handleCopy(selectedUser.email, 'email')} title="Copy Email">
+                    {copiedField === 'email' ? <CheckIcon /> : <CopyIcon />}
+                  </button>
                 </div>
               </div>
             </div>
@@ -134,10 +180,24 @@ export default function UserManager() {
                 <PhoneIcon size={16} />
               </div>
               <div className="ud-contact-item__text">
-                <div className="ud-contact-item__label">Phone Number</div>
-                <div className="ud-contact-item__value">
+                <div className="ud-contact-item__label">
+                  Phone Number
+                  {selectedUser.phone ? (
+                    selectedUser.phoneVerified ? (
+                      <span className="verified-badge"><BadgeCheckIcon /> Verified</span>
+                    ) : (
+                      <span className="unverified-badge"><BadgeAlertIcon /> Unverified</span>
+                    )
+                  ) : null}
+                </div>
+                <div className="ud-contact-item__value" style={{ display: 'flex', alignItems: 'center' }}>
                   {selectedUser.phone
-                    ? <span className="ud-contact-item__value--phone">{selectedUser.phone}</span>
+                    ? <>
+                        <span className="ud-contact-item__value--phone">{selectedUser.phone}</span>
+                        <button className="copy-btn" onClick={() => handleCopy(selectedUser.phone, 'phone')} title="Copy Phone">
+                          {copiedField === 'phone' ? <CheckIcon /> : <CopyIcon />}
+                        </button>
+                      </>
                     : <span className="ud-contact-item__empty">Not provided</span>}
                 </div>
               </div>
@@ -354,8 +414,8 @@ export default function UserManager() {
                   <td><span className="user-manager__id-badge">#{user.id}</span></td>
                   <td>
                     <div className="user-manager__username-cell">
-                      <div className="user-avatar">{user.username.charAt(0).toUpperCase()}</div>
-                      <span>{user.username}</span>
+                      <div className="user-avatar">{(`${user.firstName || ''} ${user.lastName || ''}`.trim() || 'U').charAt(0).toUpperCase()}</div>
+                      <span>{`${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown User'}</span>
                     </div>
                   </td>
                   <td>{user.email}</td>
