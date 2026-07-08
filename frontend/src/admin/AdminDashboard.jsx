@@ -94,7 +94,7 @@ export default function AdminDashboard({ onNavigate }) {
       <div className="admin-dashboard__section">
         <h2 className="admin-dashboard__section-title">Recent Products</h2>
         <div className="admin-dashboard__recent">
-          {products.slice(-5).reverse().map((product) => (
+          {products.slice(-10).reverse().map((product) => (
             <div key={product.id} className="admin-recent-item" onClick={() => onNavigate(`admin/products/edit/${product.id}`)}>
               <div className="admin-recent-item__image">
                 <img src={product.image} alt={product.name} />

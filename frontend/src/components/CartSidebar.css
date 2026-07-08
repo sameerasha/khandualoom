@@ -20,7 +20,7 @@
   right: 0;
   bottom: 0;
   z-index: 9000;
-  width: 420px;
+  width: 460px;
   max-width: 100%;
   background: var(--color-bg-secondary);
   border-left: 1px solid rgba(212, 168, 83, 0.1);

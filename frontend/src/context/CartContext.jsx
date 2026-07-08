@@ -5,6 +5,15 @@ const CartContext = createContext();
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [toasts, setToasts] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const addToast = useCallback((message, type = 'success') => {
+    const toastId = Date.now() + Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id: toastId, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== toastId));
+    }, 3000);
+  }, []);
 
   const addToCart = useCallback((product) => {
     setCartItems((prev) => {
@@ -20,12 +29,8 @@ export function CartProvider({ children }) {
     });
 
     // Show toast
-    const toastId = Date.now();
-    setToasts((prev) => [...prev, { id: toastId, message: `${product.name} added to cart` }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== toastId));
-    }, 3000);
-  }, []);
+    addToast(`${product.name} added to cart`);
+  }, [addToast]);
 
   const removeFromCart = useCallback((productId) => {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
@@ -55,6 +60,9 @@ export function CartProvider({ children }) {
       value={{
         cartItems,
         toasts,
+        isCartOpen,
+        setIsCartOpen,
+        addToast,
         addToCart,
         removeFromCart,
         updateQuantity,

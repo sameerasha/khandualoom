@@ -25,8 +25,13 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private AuthProvider provider = AuthProvider.local;
+
+    private String providerId;
 
     private String phone;
 

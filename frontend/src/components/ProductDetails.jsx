@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
+import ProductCard from './ProductCard';
 import './ProductDetails.css';
 
 export default function ProductDetails({ productId, onNavigate }) {
   const { products } = useProducts();
-  const { addToCart } = useCart();
+  const { cartItems, addToCart, setIsCartOpen } = useCart();
   
   const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [images, setImages] = useState([]);
   const [activeImage, setActiveImage] = useState('');
-  const [isAdded, setIsAdded] = useState(false);
   const [zoomStyle, setZoomStyle] = useState({
     transformOrigin: 'center center',
     transform: 'scale(1)'
@@ -19,8 +20,10 @@ export default function ProductDetails({ productId, onNavigate }) {
 
   useEffect(() => {
     // Reset state when product ID changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setLoading(true);
     setProduct(null);
+    setRelatedProducts([]);
 
     // Try finding locally first
     const localProduct = products.find((p) => p.id === productId);
@@ -43,6 +46,19 @@ export default function ProductDetails({ productId, onNavigate }) {
           setLoading(false);
         });
     }
+
+    // Fetch related products
+    fetch(`http://localhost:8080/api/products/${productId}/related`)
+      .then((res) => {
+        if (res.ok) return res.json();
+        return [];
+      })
+      .then((data) => {
+        setRelatedProducts(data);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch related products:', err);
+      });
   }, [productId, products]);
 
   // Set up specific gallery images or generate fallback views
@@ -100,11 +116,17 @@ export default function ProductDetails({ productId, onNavigate }) {
     });
   };
 
-  const handleAddToCart = () => {
+  const isAdded = product ? cartItems.some(item => item.id === product.id) : false;
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (product) {
-      addToCart(product);
-      setIsAdded(true);
-      setTimeout(() => setIsAdded(false), 2000);
+      if (isAdded) {
+        setIsCartOpen(true);
+      } else {
+        addToCart(product);
+      }
     }
   };
 
@@ -229,14 +251,13 @@ export default function ProductDetails({ productId, onNavigate }) {
               <button 
                 onClick={handleAddToCart} 
                 className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
-                disabled={isAdded}
               >
                 {isAdded ? (
                   <>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Added to Wardrobe!
+                    Go to Cart
                   </>
                 ) : (
                   <>
@@ -309,6 +330,19 @@ export default function ProductDetails({ productId, onNavigate }) {
 
           </div>
         </div>
+
+        {/* Related Products */}
+        {relatedProducts && relatedProducts.length > 0 && (
+          <div className="product-details__related">
+            <h2 className="related-title">Related Masterpieces</h2>
+            <div className="products-grid">
+              {relatedProducts.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} onNavigate={onNavigate} />
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

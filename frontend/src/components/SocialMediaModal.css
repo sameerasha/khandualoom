@@ -1,0 +1,174 @@
+.social-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease forwards;
+  padding: var(--space-md);
+}
+
+.social-modal-overlay--closing {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+.social-modal {
+  background: var(--color-surface);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.social-modal-overlay--closing .social-modal {
+  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.social-modal__close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: var(--color-text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.social-modal__close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.social-modal__title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--color-gold-300);
+  margin-bottom: var(--space-xs);
+  text-align: center;
+}
+
+.social-modal__subtitle {
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.social-modal__links {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.social-modal__card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  transition: transform var(--transition-base), border-color var(--transition-base);
+}
+
+.social-modal__card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 168, 83, 0.3);
+}
+
+.social-modal__card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.social-modal__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.social-modal__icon--whatsapp { color: #25D366; background: rgba(37, 211, 102, 0.1); }
+.social-modal__icon--instagram { color: #E1306C; background: rgba(225, 48, 108, 0.1); }
+.social-modal__icon--facebook { color: #1877F2; background: rgba(24, 119, 242, 0.1); }
+.social-modal__icon--telegram { color: #0088cc; background: rgba(0, 136, 204, 0.1); }
+.social-modal__icon--twitter { color: #1DA1F2; background: rgba(29, 161, 242, 0.1); }
+.social-modal__icon--youtube { color: #FF0000; background: rgba(255, 0, 0, 0.1); }
+
+.social-modal__platform-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--color-text);
+  text-transform: capitalize;
+}
+
+.social-modal__announcement {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-bottom: var(--space-lg);
+  line-height: 1.5;
+  padding-left: 64px;
+}
+
+.social-modal__btn {
+  display: block;
+  width: calc(100% - 64px);
+  margin-left: 64px;
+  text-align: center;
+  background: rgba(212, 168, 83, 0.1);
+  color: var(--color-gold-400);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all var(--transition-base);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+}
+
+.social-modal__btn:hover {
+  background: var(--color-gold-500);
+  color: #121212;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes slideDown {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(20px) scale(0.95); }
+}
+
+@media (max-width: 600px) {
+  .social-modal {
+    padding: var(--space-xl);
+  }
+  .social-modal__btn {
+    width: 100%;
+    margin-left: 0;
+  }
+  .social-modal__announcement {
+    padding-left: 0;
+  }
+}

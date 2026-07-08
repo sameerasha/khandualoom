@@ -64,25 +64,15 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     }
   };
 
-  // Handle Gmail / Facebook / Instagram SSO mock triggers
-  const handleSSO = (provider, guestName) => {
+  // Handle Gmail / Facebook / Instagram SSO redirects
+  const handleSSO = (provider) => {
     setIsLoading(true);
     setError('');
     setSuccessMsg(`Redirecting to ${provider} secure authorization portal...`);
     
-    setTimeout(() => {
-      const res = socialLogin(provider, guestName);
-      setIsLoading(false);
-      if (res.success) {
-        setSuccessMsg(`Authenticated successfully! Welcome, ${guestName}.`);
-        setTimeout(() => {
-          onClose();
-          onNavigate('');
-        }, 1000);
-      } else {
-        setError(`${provider} SSO sign-in failed. Please try credentials.`);
-      }
-    }, 1200);
+    // Redirect to Spring Boot OAuth2 authorization endpoint
+    const backendUrl = 'http://localhost:8080';
+    window.location.href = `${backendUrl}/oauth2/authorization/${provider.toLowerCase()}`;
   };
 
   return (
@@ -229,7 +219,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                 {/* Gmail SSO */}
                 <button 
                   className="sso-btn sso-btn--gmail" 
-                  onClick={() => handleSSO('Google', 'Vastra Patron')} 
+                  onClick={() => handleSSO('google')} 
                   type="button" 
                   title="Sign In with Google"
                   disabled={isLoading}
@@ -243,13 +233,13 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                 {/* Facebook SSO */}
                 <button 
                   className="sso-btn sso-btn--facebook" 
-                  onClick={() => handleSSO('Facebook', 'Silk Lover')} 
+                  onClick={() => handleSSO('facebook')} 
                   type="button" 
                   title="Sign In with Facebook"
                   disabled={isLoading}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669c1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073Z"/>
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669c1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
                   <span>Facebook</span>
                 </button>
@@ -257,7 +247,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                 {/* Instagram SSO */}
                 <button 
                   className="sso-btn sso-btn--instagram" 
-                  onClick={() => handleSSO('Instagram', 'Heritage Collector')} 
+                  onClick={() => handleSSO('instagram')} 
                   type="button" 
                   title="Sign In with Instagram"
                   disabled={isLoading}

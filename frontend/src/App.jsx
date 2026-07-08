@@ -10,8 +10,10 @@ import Testimonials from './components/Testimonials';
 import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 import CartSidebar from './components/CartSidebar';
+import ContactPage from './components/ContactPage';
 import ProfileDashboard from './admin/ProfileDashboard';
 import ProductDetails from './components/ProductDetails';
+import OAuth2RedirectHandler from './components/OAuth2RedirectHandler';
 
 // Admin Pages & Layouts
 import AdminLogin from './admin/AdminLogin';
@@ -20,6 +22,7 @@ import AdminDashboard from './admin/AdminDashboard';
 import ProductManager from './admin/ProductManager';
 import ProductEditor from './admin/ProductEditor';
 import UserManager from './admin/UserManager';
+import StoreSettings from './admin/StoreSettings';
 
 function ToastContainer() {
   const { toasts, dismissToast } = useCart();
@@ -27,8 +30,8 @@ function ToastContainer() {
   return (
     <div className="toast-container">
       {toasts.map((toast) => (
-        <div key={toast.id} className="toast">
-          <span className="toast-icon">🛒</span>
+        <div key={toast.id} className={`toast toast--${toast.type || 'success'}`}>
+          <span className="toast-icon">{toast.type === 'error' ? '⚠️' : '🛒'}</span>
           <span className="toast-message">{toast.message}</span>
           <button className="toast-close" onClick={() => dismissToast(toast.id)} aria-label="Close notification">×</button>
         </div>
@@ -61,7 +64,7 @@ function parseHashRoute() {
 function AppContent() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState('login');
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { isCartOpen, setIsCartOpen } = useCart();
   const { isAdmin, isCustomerLoggedIn } = useAuth();
   const [route, setRoute] = useState(() => parseHashRoute());
 
@@ -93,6 +96,11 @@ function AppContent() {
     setIsAuthOpen(true);
   };
 
+  // Check for OAuth2 Redirect via pathname (since backend redirects normally, not via hash)
+  if (window.location.pathname.startsWith('/oauth2/redirect')) {
+    return <OAuth2RedirectHandler />;
+  }
+
   // Render pages based on route
   if (route.path === 'admin') {
     return <AdminLogin onNavigate={handleNavigate} />;
@@ -114,12 +122,17 @@ function AppContent() {
       adminChild = <ProductEditor productId={route.id} onNavigate={handleNavigate} />;
     } else if (route.path === 'admin/users') {
       adminChild = <UserManager />;
+    } else if (route.path === 'admin/settings') {
+      adminChild = <StoreSettings />;
     }
 
     return (
-      <AdminLayout currentRoute={route.path} onNavigate={handleNavigate}>
-        {adminChild}
-      </AdminLayout>
+      <>
+        <AdminLayout currentRoute={route.path} onNavigate={handleNavigate}>
+          {adminChild}
+        </AdminLayout>
+        <ToastContainer />
+      </>
     );
   }
 
@@ -135,12 +148,13 @@ function AppContent() {
         <Navbar
           onSignUpClick={() => openAuth('signup')}
           onCartClick={() => setIsCartOpen(true)}
+          onContactClick={() => handleNavigate('contact')}
           onNavigate={handleNavigate}
         />
         <main>
           <ProfileDashboard onNavigate={handleNavigate} />
         </main>
-        <Footer onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
+        <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
 
         {/* Overlays */}
         <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
@@ -154,18 +168,54 @@ function AppContent() {
   if (route.path === 'product') {
     return (
       <div className="app">
-        <Navbar
-          onSignUpClick={() => openAuth('login')}
+        <Navbar 
+          onAuthClick={(tab) => { setAuthTab(tab); setIsAuthOpen(true); }}
+          onContactClick={() => handleNavigate('contact')}
           onCartClick={() => setIsCartOpen(true)}
           onNavigate={handleNavigate}
+          currentRoute={route.path}
         />
         <main>
           <ProductDetails productId={route.id} onNavigate={handleNavigate} />
         </main>
-        <Footer onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
+        <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
 
         {/* Overlays */}
-        <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
+        <AuthModal 
+          isOpen={isAuthOpen} 
+          onClose={() => setIsAuthOpen(false)} 
+          defaultTab={authTab} 
+          onNavigate={handleNavigate} 
+        />
+        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  // Contact Route
+  if (route.path === 'contact') {
+    return (
+      <div className="app">
+        <Navbar 
+          onAuthClick={(tab) => { setAuthTab(tab); setIsAuthOpen(true); }}
+          onContactClick={() => handleNavigate('contact')}
+          onCartClick={() => setIsCartOpen(true)}
+          onNavigate={handleNavigate}
+          currentRoute={route.path}
+        />
+        <main>
+          <ContactPage />
+        </main>
+        <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
+
+        {/* Overlays */}
+        <AuthModal 
+          isOpen={isAuthOpen} 
+          onClose={() => setIsAuthOpen(false)} 
+          defaultTab={authTab} 
+          onNavigate={handleNavigate} 
+        />
         <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
         <ToastContainer />
       </div>
@@ -179,6 +229,7 @@ function AppContent() {
       <Navbar
         onSignUpClick={() => openAuth('login')}
         onCartClick={() => setIsCartOpen(true)}
+        onContactClick={() => handleNavigate('contact')}
         onNavigate={handleNavigate}
       />
       <main>
@@ -187,7 +238,7 @@ function AppContent() {
         {!showMinimal && <About />}
         {!showMinimal && <Testimonials />}
       </main>
-      <Footer onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
+      <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
 
       {/* Overlays */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />

@@ -1,167 +1,134 @@
-import { useState, useEffect, useRef } from 'react';
-import { useCart } from '../context/CartContext';
+import { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
+import ProductCard from './ProductCard';
 import './ProductGrid.css';
 
-function ProductCard({ product, index, onNavigate }) {
-  const { addToCart } = useCart();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
-  const cardRef = useRef(null);
+export default function ProductGrid({ onNavigate }) {
+  const { categories, badges, weaves, fabrics } = useProducts();
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeBadge, setActiveBadge] = useState('All');
+  const [activeWeave, setActiveWeave] = useState('All');
+  const [activeFabric, setActiveFabric] = useState('All');
+  const [activeSort, setActiveSort] = useState('id,desc');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  const [draftFilters, setDraftFilters] = useState({
+    category: 'All', badge: 'All', weave: 'All', fabric: 'All', sort: 'id,desc'
+  });
+
+  const handleOpenSidebar = () => {
+    setDraftFilters({
+      category: activeCategory,
+      badge: activeBadge,
+      weave: activeWeave,
+      fabric: activeFabric,
+      sort: activeSort
+    });
+    setIsSidebarOpen(true);
+  };
+
+  const handleApplyFilters = () => {
+    setActiveCategory(draftFilters.category);
+    setActiveBadge(draftFilters.badge);
+    setActiveWeave(draftFilters.weave);
+    setActiveFabric(draftFilters.fabric);
+    setActiveSort(draftFilters.sort);
+    setIsSidebarOpen(false);
+  };
+  
+  const handleClearDraftFilters = () => {
+    setDraftFilters({
+      category: 'All', badge: 'All', weave: 'All', fabric: 'All', sort: 'id,desc'
+    });
+  };
+
+  const handleClearAllAndFetch = () => {
+    setActiveCategory('All');
+    setActiveBadge('All');
+    setActiveWeave('All');
+    setActiveFabric('All');
+    setActiveSort('id,desc');
+  };
+
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [isLastPage, setIsLastPage] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchProducts = async (currentPage, currentFilters) => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: currentPage,
+        size: 8,
+        sort: currentFilters.sort
+      });
+      if (currentFilters.category !== 'All') params.append('category', currentFilters.category);
+      if (currentFilters.badge !== 'All') params.append('badge', currentFilters.badge);
+      if (currentFilters.weave !== 'All') params.append('weave', currentFilters.weave);
+      if (currentFilters.fabric !== 'All') params.append('fabric', currentFilters.fabric);
+
+      const res = await fetch(`http://localhost:8080/api/products/paged?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (currentPage === 0) {
+          setFilteredProducts(data.content);
+        } else {
+          setFilteredProducts(prev => [...prev, ...data.content]);
+        }
+        setIsLastPage(data.last);
+      }
+    } catch (e) {
+      console.error('Failed to load paged products:', e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
+    setPage(0);
+    fetchProducts(0, { category: activeCategory, badge: activeBadge, weave: activeWeave, fabric: activeFabric, sort: activeSort });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory, activeBadge, activeWeave, activeFabric, activeSort]);
 
-    if (cardRef.current) observer.observe(cardRef.current);
-    return () => observer.disconnect();
+  useEffect(() => {
+    const handleApplyFilter = (e) => {
+      const { type, value } = e.detail;
+      if (type === 'badge') {
+        setActiveCategory('All');
+        setActiveWeave('All');
+        setActiveFabric('All');
+        setActiveSort('id,desc');
+        setActiveBadge(value);
+      }
+      if (type === 'category') {
+        setActiveBadge('All');
+        setActiveWeave('All');
+        setActiveFabric('All');
+        setActiveSort('id,desc');
+        setActiveCategory(value);
+      }
+    };
+    
+    // Legacy support for selectCategory from previous version
+    const handleCategorySelect = (e) => {
+      setActiveCategory(e.detail);
+    };
+
+    window.addEventListener('applyFilter', handleApplyFilter);
+    window.addEventListener('selectCategory', handleCategorySelect);
+    
+    return () => {
+      window.removeEventListener('applyFilter', handleApplyFilter);
+      window.removeEventListener('selectCategory', handleCategorySelect);
+    };
   }, []);
 
-  const handleAddToCart = (e) => {
-    e.stopPropagation();
-    addToCart(product);
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1500);
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts(nextPage, { category: activeCategory, badge: activeBadge, weave: activeWeave, fabric: activeFabric, sort: activeSort });
   };
-
-  const handleCardClick = () => {
-    if (onNavigate) {
-      onNavigate(`product/${product.id}`);
-    }
-  };
-
-  const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
-
-  return (
-    <div
-      className={`product-card reveal reveal-delay-${(index % 4) + 1}`}
-      ref={cardRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleCardClick}
-      style={{ cursor: 'pointer' }}
-      id={`product-card-${product.id}`}
-    >
-      {/* Image Container */}
-      <div className="product-card__image-wrap">
-        <img
-          src={product.image}
-          alt={product.name}
-          className={`product-card__image ${isHovered ? 'product-card__image--zoomed' : ''}`}
-          loading="lazy"
-        />
-        <div className="product-card__image-overlay"></div>
-
-        {/* Badge */}
-        <span className={`product-card__badge product-card__badge--${product.badge.toLowerCase().replace(' ', '-')}`}>
-          {product.badge}
-        </span>
-
-        {/* Discount Badge */}
-        <span className="product-card__discount">-{discount}%</span>
-
-        {/* Quick Actions */}
-        <div className={`product-card__quick-actions ${isHovered ? 'product-card__quick-actions--visible' : ''}`}>
-          <button
-            className={`product-card__add-btn ${isAdded ? 'product-card__add-btn--added' : ''}`}
-            onClick={handleAddToCart}
-            id={`add-to-cart-${product.id}`}
-          >
-            {isAdded ? (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span>Added!</span>
-              </>
-            ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-                  <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-                </svg>
-                <span>Add to Cart</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="product-card__info">
-        <div className="product-card__category">{product.category}</div>
-        <h3 className="product-card__name">{product.name}</h3>
-        <p className="product-card__description">{product.description}</p>
-
-        {/* Rating */}
-        <div className="product-card__rating">
-          <div className="product-card__stars">
-            {Array.from({ length: 5 }, (_, i) => (
-              <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < Math.floor(product.rating) ? 'var(--color-accent)' : 'none'} stroke="var(--color-accent)" strokeWidth="1.5">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-            ))}
-          </div>
-          <span className="product-card__rating-text">{product.rating} ({product.reviews})</span>
-        </div>
-
-        {/* Details */}
-        <div className="product-card__details">
-          <span className="product-card__detail">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20.38 3.46 16 2 12 5.27 8 2 3.62 3.46 2 8l3.27 4L2 16l1.62 4.54L8 22l4-3.27L16 22l4.38-1.46L22 16l-3.27-4L22 8Z" />
-            </svg>
-            {product.fabric}
-          </span>
-          <span className="product-card__detail">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-            </svg>
-            {product.weave}
-          </span>
-        </div>
-
-        {/* Price */}
-        <div className="product-card__price-row">
-          <div className="product-card__price">
-            <span className="product-card__price-current">₹{product.price.toLocaleString('en-IN')}</span>
-            <span className="product-card__price-original">₹{product.originalPrice.toLocaleString('en-IN')}</span>
-          </div>
-          <button
-            className={`product-card__cart-btn-sm ${isAdded ? 'product-card__cart-btn-sm--added' : ''}`}
-            onClick={handleAddToCart}
-            aria-label="Add to cart"
-          >
-            {isAdded ? '✓' : '+'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function ProductGrid({ onNavigate }) {
-  const { products, categories } = useProducts();
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [filteredProducts, setFilteredProducts] = useState(products);
-
-  useEffect(() => {
-    if (activeCategory === 'All') {
-      setFilteredProducts(products);
-    } else {
-      setFilteredProducts(products.filter((p) => p.category === activeCategory));
-    }
-  }, [activeCategory, products]);
 
   return (
     <section className="products-section" id="collections">
@@ -178,26 +145,153 @@ export default function ProductGrid({ onNavigate }) {
           <hr className="divider" style={{ margin: '1rem auto 0' }} />
         </div>
 
-        {/* Category Filter */}
-        <div className="products-section__filters">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`products-section__filter-btn ${activeCategory === cat ? 'products-section__filter-btn--active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
-              id={`filter-${cat.toLowerCase()}`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Desktop Category Filter & Mobile Filter Toggle */}
+        <div className="products-section__filters-header">
+          <button className="products-section__filter-toggle-btn" onClick={handleOpenSidebar}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
+              <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line>
+              <line x1="17" y1="16" x2="23" y2="16"></line>
+            </svg>
+            Filters
+          </button>
+          
+          <div className="products-section__filters">
+            {badges.map((b) => (
+              <button
+                key={b}
+                className={`products-section__filter-btn ${activeBadge === b ? 'products-section__filter-btn--active' : ''}`}
+                onClick={() => {
+                  setActiveCategory('All');
+                  setActiveWeave('All');
+                  setActiveFabric('All');
+                  setActiveSort('id,desc');
+                  setActiveBadge(b);
+                }}
+                id={`filter-${b.toLowerCase().replace(' ', '-')}`}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="products-grid">
-          {filteredProducts.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} onNavigate={onNavigate} />
-          ))}
+        {/* Mobile Filter Sidebar */}
+        <div className={`filter-sidebar-overlay ${isSidebarOpen ? 'filter-sidebar-overlay--open' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+        <div className={`filter-sidebar ${isSidebarOpen ? 'filter-sidebar--open' : ''}`}>
+          <div className="filter-sidebar__header">
+            <h3>Filters</h3>
+            <button className="filter-sidebar__close" onClick={() => setIsSidebarOpen(false)}>✕</button>
+          </div>
+          <div className="filter-sidebar__top-actions" style={{ padding: '0 var(--space-lg)', display: 'flex', justifyContent: 'flex-end' }}>
+            <button className="filter-sidebar__clear-btn" onClick={handleClearDraftFilters}>Clear All</button>
+          </div>
+          <div className="filter-sidebar__content">
+            {/* Sort */}
+            <div className="filter-group">
+              <h4>Sort By</h4>
+              <select value={draftFilters.sort} onChange={(e) => setDraftFilters({...draftFilters, sort: e.target.value})} className="filter-select">
+                <option value="id,desc">Newest Arrivals</option>
+                <option value="price,asc">Price: Low to High</option>
+                <option value="price,desc">Price: High to Low</option>
+                <option value="rating,desc">Top Rated</option>
+              </select>
+            </div>
+            
+            {/* Badges */}
+            <div className="filter-group">
+              <h4>Collection</h4>
+              <div className="filter-chips">
+                {badges.map(b => (
+                  <button key={b} className={`filter-chip ${draftFilters.badge === b ? 'active' : ''}`} onClick={() => setDraftFilters({...draftFilters, badge: b})}>
+                    {b}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Categories */}
+            <div className="filter-group">
+              <h4>Category</h4>
+              <div className="filter-chips">
+                {categories.map(c => (
+                  <button key={c} className={`filter-chip ${draftFilters.category === c ? 'active' : ''}`} onClick={() => setDraftFilters({...draftFilters, category: c})}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Weaves */}
+            <div className="filter-group">
+              <h4>Weave</h4>
+              <div className="filter-chips">
+                {weaves.map(w => (
+                  <button key={w} className={`filter-chip ${draftFilters.weave === w ? 'active' : ''}`} onClick={() => setDraftFilters({...draftFilters, weave: w})}>
+                    {w}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Fabrics */}
+            <div className="filter-group">
+              <h4>Fabric</h4>
+              <div className="filter-chips">
+                {fabrics.map(f => (
+                  <button key={f} className={`filter-chip ${draftFilters.fabric === f ? 'active' : ''}`} onClick={() => setDraftFilters({...draftFilters, fabric: f})}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <div className="filter-sidebar__footer">
+            <button className="filter-sidebar__apply" onClick={handleApplyFilters}>Apply Filters</button>
+          </div>
         </div>
+
+        {/* Product Grid or Empty State */}
+        {!isLoading && filteredProducts.length === 0 ? (
+          <div className="products-section__empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <h3>No masterpieces found</h3>
+            <p>We couldn't find any sarees matching your selected filters.</p>
+            <button className="products-section__clear-filters-btn" onClick={handleClearAllAndFetch}>
+              Clear Filters & Browse More
+            </button>
+          </div>
+        ) : (
+          <div className="products-grid">
+            {filteredProducts.map((product, index) => (
+              <ProductCard key={`${product.id}-${index}`} product={product} index={index} onNavigate={onNavigate} />
+            ))}
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {!isLastPage && (
+          <div className="load-more-container">
+            <button className="load-more-btn" onClick={loadMore} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <svg className="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                  Weaving...
+                </>
+              ) : (
+                'Load More Masterpieces'
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

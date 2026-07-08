@@ -123,7 +123,13 @@
   font-size: 0.82rem;
   color: var(--color-text-muted);
   line-height: 1.5;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.footer__social-empty {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-style: italic;
 }
 
 .footer__newsletter-btn {

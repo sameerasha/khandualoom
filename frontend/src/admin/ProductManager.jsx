@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import './ProductManager.css';
@@ -9,6 +9,10 @@ export default function ProductManager({ onNavigate }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBadge, setSelectedBadge] = useState('All');
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'modified', 'price-asc', 'price-desc', 'name'
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   
   // States for overlays and detail view
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -27,6 +31,11 @@ export default function ProductManager({ onNavigate }) {
     
     return matchesSearch && matchesCategory && matchesBadge;
   });
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedBadge]);
 
   // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -47,6 +56,20 @@ export default function ProductManager({ onNavigate }) {
     }
     return 0;
   });
+
+  // Calculate pagination
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / itemsPerPage));
+  // Ensure current page is within valid range after filtering
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  
+  const startIndex = (safeCurrentPage - 1) * itemsPerPage;
+  const paginatedProducts = sortedProducts.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   const handleDeleteClick = (product) => {
     setProductToDelete(product);
@@ -357,7 +380,7 @@ export default function ProductManager({ onNavigate }) {
                 </tr>
               </thead>
               <tbody>
-                {sortedProducts.map((product) => {
+                {paginatedProducts.map((product) => {
                   const hasDiscount = product.originalPrice > product.price;
                   return (
                     <tr 
@@ -435,6 +458,35 @@ export default function ProductManager({ onNavigate }) {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {sortedProducts.length > itemsPerPage && (
+          <div className="product-manager__pagination">
+            <button 
+              className="product-manager__page-btn" 
+              disabled={safeCurrentPage === 1}
+              onClick={() => handlePageChange(safeCurrentPage - 1)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Previous
+            </button>
+            <span className="product-manager__page-info">
+              Page <strong>{safeCurrentPage}</strong> of <strong>{totalPages}</strong>
+            </span>
+            <button 
+              className="product-manager__page-btn" 
+              disabled={safeCurrentPage === totalPages}
+              onClick={() => handlePageChange(safeCurrentPage + 1)}
+            >
+              Next
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
           </div>
         )}
       </div>

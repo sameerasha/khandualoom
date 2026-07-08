@@ -108,6 +108,83 @@
   width: 100%;
 }
 
+/* Dropdown */
+.navbar__dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-arrow {
+  font-size: 0.55rem;
+  margin-left: 4px;
+  transition: transform var(--transition-base);
+}
+
+.navbar__dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.navbar__dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  min-width: 200px;
+  background: rgba(10, 9, 8, 0.98);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 168, 83, 0.25);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) 0;
+  margin-top: 15px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(15px);
+  transition: all 0.4s var(--transition-spring);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Invisible bridge so hover doesn't break when moving cursor down */
+.navbar__dropdown::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 15px;
+}
+
+.navbar__dropdown:hover .navbar__dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.navbar__dropdown-menu li {
+  padding: 0;
+}
+
+.navbar__dropdown-menu a {
+  display: block;
+  padding: 0.75rem var(--space-lg) !important;
+  text-transform: capitalize !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-base);
+  letter-spacing: 0.03em;
+}
+
+.navbar__dropdown-menu a::after {
+  display: none !important;
+}
+
+.navbar__dropdown-menu a:hover {
+  background: rgba(212, 168, 83, 0.15);
+  color: var(--color-gold-400) !important;
+  padding-left: calc(var(--space-lg) + 6px) !important;
+}
+
 /* Actions */
 .navbar__actions {
   display: flex;
@@ -233,6 +310,33 @@
 
 .navbar__mobile-menu a:hover {
   color: var(--color-text-gold);
+}
+
+.mobile-dropdown-arrow {
+  font-size: 0.8rem;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.navbar__mobile-submenu {
+  margin-top: var(--space-md);
+  padding: var(--space-sm) 0;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md) !important;
+}
+
+.navbar__mobile-submenu a {
+  font-size: 1.25rem !important;
+  font-family: var(--font-base) !important;
+  font-weight: 400 !important;
+  color: var(--color-text-muted) !important;
+}
+
+.navbar__mobile-submenu a:hover {
+  color: var(--color-gold-400) !important;
 }
 
 .navbar__signup-btn--mobile {

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useProducts } from '../context/ProductContext';
 import './Navbar.css';
 
-export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
+export default function Navbar({ onSignUpClick, onCartClick, onContactClick, onNavigate, currentRoute }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
   const { totalItems } = useCart();
   const { isCustomerLoggedIn, customerInfo, logout } = useAuth();
+  const { categories, badges } = useProducts();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -36,6 +39,26 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
     setMenuOpen(false);
   };
 
+  const handleBadgeSelect = (e, badge) => {
+    e.preventDefault();
+    const currentHash = window.location.hash;
+    const isOnHome = currentHash === '' || currentHash === '#/' || currentHash === '#';
+    
+    const triggerEvent = () => {
+      window.dispatchEvent(new CustomEvent('applyFilter', { detail: { type: 'badge', value: badge } }));
+      const el = document.getElementById('collections');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    if (!isOnHome) {
+      onNavigate('');
+      setTimeout(triggerEvent, 250);
+    } else {
+      triggerEvent();
+    }
+    setMenuOpen(false);
+  };
+
   return (
     <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="navbar">
       <div className="navbar__inner container">
@@ -53,17 +76,43 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
           {isCustomerLoggedIn ? (
             <>
               <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate(''); }}>Home</a></li>
-              <li><a href="#collections" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>Collections</a></li>
-              <li><a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>Our Story</a></li>
-              <li><a href="#testimonials" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Testimonials</a></li>
+              <li className="navbar__dropdown">
+                <a href="#collections" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>
+                  Collections <span className="dropdown-arrow">▼</span>
+                </a>
+                <ul className="navbar__dropdown-menu">
+                  {badges?.map((badge) => (
+                    <li key={badge}>
+                      <a href={`#collections?badge=${badge}`} onClick={(e) => handleBadgeSelect(e, badge)}>
+                        {badge}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
               <li><a href="#profile" onClick={(e) => { e.preventDefault(); onNavigate('profile'); }}>My Profile</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); onContactClick(); }}>Contact</a></li>
             </>
           ) : (
             <>
               <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate(''); }}>Home</a></li>
-              <li><a href="#collections" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>Collections</a></li>
+              <li className="navbar__dropdown">
+                <a href="#collections" onClick={(e) => { e.preventDefault(); scrollToSection('collections'); }}>
+                  Collections <span className="dropdown-arrow">▼</span>
+                </a>
+                <ul className="navbar__dropdown-menu">
+                  {badges?.map((badge) => (
+                    <li key={badge}>
+                      <a href={`#collections?badge=${badge}`} onClick={(e) => handleBadgeSelect(e, badge)}>
+                        {badge}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
               <li><a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>Our Story</a></li>
               <li><a href="#testimonials" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Testimonials</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); onContactClick(); }}>Contact</a></li>
               <li><a href="#admin" onClick={(e) => { e.preventDefault(); onNavigate('admin'); }} id="nav-admin-link">Admin</a></li>
             </>
           )}
@@ -132,9 +181,9 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
             <>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate(''); }}>Home</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('collections'); }}>Collections</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('about'); }}>Our Story</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('testimonials'); }}>Testimonials</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate('profile'); }}>My Profile</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onContactClick(); }}>Contact Us</a></li>
+              <li><a href="#policies" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('policies'); }}>Policies</a></li>
               <li>
                 <button className="navbar__signup-btn navbar__signup-btn--mobile" onClick={() => { logout(); setMenuOpen(false); onNavigate(''); }}>
                   Logout
@@ -147,6 +196,8 @@ export default function Navbar({ onSignUpClick, onCartClick, onNavigate }) {
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('collections'); }}>Collections</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('about'); }}>Our Story</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('testimonials'); }}>Testimonials</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onContactClick(); }}>Contact Us</a></li>
+              <li><a href="#policies" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('policies'); }}>Policies</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate('admin'); }} id="nav-admin-link-mobile">Admin Portal</a></li>
               <li>
                 <button className="navbar__signup-btn navbar__signup-btn--mobile" onClick={() => { onSignUpClick(); setMenuOpen(false); }}>

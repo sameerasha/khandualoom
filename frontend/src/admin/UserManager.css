@@ -713,3 +713,40 @@
   .ud-contact-divider { margin: 10px 16px 10px 0; }
   .ud-body { padding: 20px; }
 }
+
+/* Pagination */
+.user-manager__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.user-manager__page-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-weight: 500;
+}
+
+.user-manager__page-btn:hover:not(:disabled) {
+  background: var(--color-gold-500);
+  color: #121212;
+  border-color: var(--color-gold-500);
+}
+
+.user-manager__page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.user-manager__page-info {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}

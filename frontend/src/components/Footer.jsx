@@ -1,6 +1,31 @@
+import { useState, useEffect } from 'react';
 import './Footer.css';
+import { useAuth } from '../context/AuthContext';
+import SocialMediaModal from './SocialMediaModal';
 
-export default function Footer({ onSignUpClick, onNavigate }) {
+export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
+  const { isCustomerLoggedIn } = useAuth();
+  const [socialLinks, setSocialLinks] = useState([]);
+  const [selectedSocialLink, setSelectedSocialLink] = useState(null);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/social-media')
+      .then(res => res.json())
+      .then(data => setSocialLinks(data))
+      .catch(err => console.error('Failed to fetch social media links', err));
+  }, []);
+
+  const getIcon = (platform) => {
+    switch (platform) {
+      case 'facebook': return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" /></svg>;
+      case 'instagram': return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>;
+      case 'twitter': return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" /></svg>;
+      case 'whatsapp': return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
+      case 'telegram': return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
+      case 'youtube': return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>;
+      default: return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>;
+    }
+  };
   return (
     <footer className="footer" id="footer">
       <div className="footer__top-border"></div>
@@ -20,18 +45,18 @@ export default function Footer({ onSignUpClick, onNavigate }) {
               with discerning connoisseurs worldwide.
             </p>
             <div className="footer__socials">
-              <a href="#" aria-label="Instagram" className="footer__social">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
-              </a>
-              <a href="#" aria-label="Facebook" className="footer__social">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" /></svg>
-              </a>
-              <a href="#" aria-label="Twitter" className="footer__social">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" /></svg>
-              </a>
-              <a href="#" aria-label="Pinterest" className="footer__social">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.236 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.182-.78 1.172-4.97 1.172-4.97s-.299-.598-.299-1.482c0-1.388.806-2.425 1.808-2.425.853 0 1.265.64 1.265 1.408 0 .858-.546 2.14-.828 3.33-.236.995.5 1.807 1.48 1.807 1.778 0 3.144-1.874 3.144-4.58 0-2.393-1.72-4.068-4.177-4.068-2.845 0-4.515 2.135-4.515 4.34 0 .859.331 1.781.745 2.282a.3.3 0 01.069.288l-.278 1.133c-.044.183-.145.222-.335.134-1.249-.581-2.03-2.407-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.965-.527-2.291-1.148l-.623 2.378c-.226.869-.835 1.958-1.244 2.621.937.29 1.931.446 2.962.446 5.523 0 10-4.477 10-10S17.523 2 12 2z" /></svg>
-              </a>
+              {socialLinks.length > 0 && (
+                socialLinks.map(link => (
+                  <button 
+                    key={link.id} 
+                    aria-label={link.platform} 
+                    className="footer__social"
+                    onClick={() => setSelectedSocialLink(link)}
+                  >
+                    {getIcon(link.platform)}
+                  </button>
+                ))
+              )}
             </div>
           </div>
 
@@ -41,8 +66,13 @@ export default function Footer({ onSignUpClick, onNavigate }) {
             <ul className="footer__links">
               <li><a href="#hero">Home</a></li>
               <li><a href="#collections">Collections</a></li>
-              <li><a href="#about">Our Story</a></li>
-              <li><a href="#testimonials">Testimonials</a></li>
+              {!isCustomerLoggedIn && (
+                <>
+                  <li><a href="#about">Our Story</a></li>
+                  <li><a href="#testimonials">Testimonials</a></li>
+                </>
+              )}
+              <li><a href="#" onClick={(e) => { e.preventDefault(); onContactClick(); }} id="contact">Contact Us</a></li>
               <li><a href="#admin" onClick={(e) => { e.preventDefault(); onNavigate('admin'); }} id="footer-admin-link">Admin Portal</a></li>
             </ul>
           </div>
@@ -79,13 +109,17 @@ export default function Footer({ onSignUpClick, onNavigate }) {
           <p className="footer__copyright">
             © 2026 Vastra Loom. All rights reserved. Handcrafted with ❤ in India.
           </p>
-          <div className="footer__bottom-links">
+          <div className="footer__bottom-links" id="policies">
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
             <a href="#">Shipping Policy</a>
           </div>
         </div>
       </div>
+      
+      {selectedSocialLink && (
+        <SocialMediaModal socialLinks={[selectedSocialLink]} onClose={() => setSelectedSocialLink(null)} />
+      )}
     </footer>
   );
 }

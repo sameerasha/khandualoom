@@ -401,6 +401,21 @@
   flex-shrink: 0;
 }
 
+/* Related Products */
+.product-details__related {
+  margin-top: var(--space-4xl);
+  padding-top: var(--space-2xl);
+  border-top: 1px solid rgba(212, 168, 83, 0.1);
+}
+
+.related-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--color-gold-300);
+  margin-bottom: var(--space-2xl);
+  text-align: center;
+}
+
 /* Loading & Error States */
 .product-details-loading, .product-details-error {
   min-height: 70vh;

@@ -25,6 +25,9 @@ export function ProductProvider({ children }) {
   }, [fetchProducts]);
 
   const categories = ['All', ...new Set(products.map((p) => p.category))];
+  const badges = ['All', ...new Set(products.map((p) => p.badge).filter(Boolean))];
+  const weaves = ['All', ...new Set(products.map((p) => p.weave).filter(Boolean))];
+  const fabrics = ['All', ...new Set(products.map((p) => p.fabric).filter(Boolean))];
 
   const addProduct = useCallback(async (product) => {
     try {
@@ -102,6 +105,9 @@ export function ProductProvider({ children }) {
       value={{
         products,
         categories,
+        badges,
+        weaves,
+        fabrics,
         addProduct,
         updateProduct,
         deleteProduct,

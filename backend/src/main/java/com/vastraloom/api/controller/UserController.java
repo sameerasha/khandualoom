@@ -103,22 +103,4 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
-
-    // GET /api/users (Requires ROLE_ADMIN)
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        return ResponseEntity.ok(userRepository.findAll());
-    }
-
-    // PUT /api/users/{id}/role (Requires ROLE_ADMIN)
-    @PutMapping("/{id}/role")
-    public ResponseEntity<?> updateUserRole(@PathVariable Long id, @RequestParam String role) {
-        return userRepository.findById(id)
-                .map(user -> {
-                    user.setRole(role);
-                    userRepository.save(user);
-                    return ResponseEntity.ok("User role updated successfully");
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
 }

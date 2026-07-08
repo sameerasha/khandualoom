@@ -10,11 +10,14 @@ export default function UserManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [showAllAddresses, setShowAllAddresses] = useState(false);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const fetchUsers = async () => {
     const token = getToken();
     try {
-      const response = await fetch('http://localhost:8080/api/users', {
+      const response = await fetch('http://localhost:8080/api/admin/users', {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -42,6 +45,13 @@ export default function UserManager() {
       (user.phone && user.phone.includes(q))
     );
   });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   /* ─── PHONE SVG helper ─────────────────────────────────────── */
   const PhoneIcon = ({ size = 12 }) => (
@@ -334,7 +344,7 @@ export default function UserManager() {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user) => (
+              {paginatedUsers.map((user) => (
                 <tr
                   key={user.id}
                   className="user-manager__row-clickable"
@@ -361,6 +371,28 @@ export default function UserManager() {
               ))}
             </tbody>
           </table>
+          
+          {totalPages > 1 && (
+            <div className="user-manager__pagination">
+              <button 
+                disabled={currentPage === 1} 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                className="user-manager__page-btn"
+              >
+                &larr; Prev
+              </button>
+              <span className="user-manager__page-info">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button 
+                disabled={currentPage === totalPages} 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                className="user-manager__page-btn"
+              >
+                Next &rarr;
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
