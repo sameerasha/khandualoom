@@ -234,7 +234,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     setIsLoading(true);
     setError('');
     setSuccessMsg(`Redirecting to ${provider}...`);
-    window.location.href = `http://localhost:8080/oauth2/authorization/${provider.toLowerCase()}`;
+    window.location.href = `${import.meta.env.VITE_API_URL}/oauth2/authorization/${provider.toLowerCase()}`;
   };
 
   return (

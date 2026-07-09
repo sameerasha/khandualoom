@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 public class OtpService {
 
     private final AppConfigRepository appConfigRepository;
+    @SuppressWarnings("unused")
     private final EmailService emailService;
+    @SuppressWarnings("unused")
     private final SmsService smsService;
 
     public OtpService(AppConfigRepository appConfigRepository, EmailService emailService, SmsService smsService) {

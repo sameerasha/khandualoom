@@ -39,7 +39,7 @@ export default function ProductDetails({ productId, onNavigate }) {
       setLoading(false);
     } else {
       // Fallback API call
-      fetch(`http://localhost:8080/api/products/${productId}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/products/${productId}`)
         .then((res) => {
           if (res.ok) return res.json();
           throw new Error('Product not found');
@@ -55,7 +55,7 @@ export default function ProductDetails({ productId, onNavigate }) {
     }
 
     // Fetch related products
-    fetch(`http://localhost:8080/api/products/${productId}/related`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/products/${productId}/related`)
       .then((res) => {
         if (res.ok) return res.json();
         return [];
@@ -76,7 +76,7 @@ export default function ProductDetails({ productId, onNavigate }) {
   useEffect(() => {
     if (!productId || !isCustomerLoggedIn || !customerInfo?.id) return;
     
-    fetch(`http://localhost:8080/api/products/${productId}/view?userId=${customerInfo.id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/products/${productId}/view?userId=${customerInfo.id}`, {
       method: 'POST',
     }).catch(err => console.error('Failed to track view', err));
 
@@ -85,7 +85,7 @@ export default function ProductDetails({ productId, onNavigate }) {
   const fetchDiscoverProducts = (currentProdId = productId) => {
     setLoadingDiscover(true);
     // Fetch 21 to account for potential exclusion of the current product, ensuring we get up to 20
-    fetch(`http://localhost:8080/api/products/paged?page=0&size=21`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/products/paged?page=0&size=21`)
       .then(res => {
         if (res.ok) return res.json();
         throw new Error('Failed to load paged products');

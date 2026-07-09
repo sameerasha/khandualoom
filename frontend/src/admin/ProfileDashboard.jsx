@@ -251,7 +251,7 @@ export default function ProfileDashboard({ onNavigate }) {
     setIsLoading(true);
     const identifier = type === 'email' ? email : phone;
     try {
-      const response = await fetch('http://localhost:8080/api/users/verify-otp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -289,7 +289,7 @@ export default function ProfileDashboard({ onNavigate }) {
     setError('');
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/users/profile/phone', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile/phone`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
         body: JSON.stringify({ newPhone, otp })

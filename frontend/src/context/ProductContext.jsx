@@ -10,7 +10,7 @@ export function ProductProvider({ children }) {
   // Load products from backend REST API
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/products');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
       if (response.ok) {
         const data = await response.json();
         setProducts(data);
@@ -31,7 +31,7 @@ export function ProductProvider({ children }) {
 
   const addProduct = useCallback(async (product) => {
     try {
-      const response = await fetch('http://localhost:8080/api/products', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export function ProductProvider({ children }) {
 
   const updateProduct = useCallback(async (id, updates) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/products/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export function ProductProvider({ children }) {
 
   const deleteProduct = useCallback(async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/products/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${getToken()}`,

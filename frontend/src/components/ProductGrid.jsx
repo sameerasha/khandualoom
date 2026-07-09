@@ -68,7 +68,7 @@ export default function ProductGrid({ onNavigate }) {
       if (currentFilters.weave !== 'All') params.append('weave', currentFilters.weave);
       if (currentFilters.fabric !== 'All') params.append('fabric', currentFilters.fabric);
 
-      const res = await fetch(`http://localhost:8080/api/products/paged?${params.toString()}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/paged?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         if (currentPage === 0) {

@@ -17,10 +17,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Component
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;

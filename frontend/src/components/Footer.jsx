@@ -9,7 +9,7 @@ export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
   const [selectedSocialLink, setSelectedSocialLink] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/social-media')
+    fetch(`${import.meta.env.VITE_API_URL}/api/social-media`)
       .then(res => res.json())
       .then(data => setSocialLinks(data))
       .catch(err => console.error('Failed to fetch social media links', err));

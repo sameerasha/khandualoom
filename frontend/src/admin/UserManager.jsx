@@ -18,7 +18,7 @@ export default function UserManager() {
   const fetchUsers = async () => {
     const token = getToken();
     try {
-      const response = await fetch('http://localhost:8080/api/admin/users', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` },
       });

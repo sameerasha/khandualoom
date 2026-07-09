@@ -11,14 +11,37 @@ export function AuthProvider({ children }) {
   const [customerInfo, setCustomerInfo] = useState(null);
   const [loginError, setLoginError] = useState('');
 
+  const logout = useCallback(() => {
+    setIsAdmin(false);
+    setIsCustomerLoggedIn(false);
+    setCustomerInfo(null);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(ROLE_KEY);
+    localStorage.removeItem(USERNAME_KEY);
+  }, []);
+
+  const handleSessionExpired = useCallback(() => {
+    logout();
+    setLoginError('Your session has expired. Please log in again.');
+  }, [logout]);
+
   // Fetch the currently authenticated user's profile (for customer)
   const fetchProfile = useCallback(async () => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) return null;
-    if (token.startsWith('mock-sso-token')) return null;
+    
+    if (token.startsWith('mock-sso-token')) {
+      const parts = token.split('-');
+      const timestamp = parseInt(parts[parts.length - 1], 10);
+      if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
+        handleSessionExpired();
+        return null;
+      }
+      return null; // Mock profile handled in initAuth
+    }
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -29,12 +52,14 @@ export function AuthProvider({ children }) {
         const data = await response.json();
         setCustomerInfo(data);
         return data;
+      } else if (response.status === 401) {
+        handleSessionExpired();
       }
     } catch (e) {
       console.error('Failed to fetch user profile:', e);
     }
     return null;
-  }, []);
+  }, [handleSessionExpired]);
 
   // Initialize auth state on mount/reload
   useEffect(() => {
@@ -44,6 +69,16 @@ export function AuthProvider({ children }) {
       const username = localStorage.getItem(USERNAME_KEY);
 
       if (token) {
+        // For mock tokens, enforce 24hr check immediately on load
+        if (token.startsWith('mock-sso-token')) {
+          const parts = token.split('-');
+          const timestamp = parseInt(parts[parts.length - 1], 10);
+          if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
+            handleSessionExpired();
+            return;
+          }
+        }
+
         if (role === 'ROLE_ADMIN') {
           setIsAdmin(true);
         } else if (role === 'ROLE_USER') {
@@ -78,12 +113,12 @@ export function AuthProvider({ children }) {
       }
     };
     initAuth();
-  }, [fetchProfile]);
+  }, [fetchProfile, handleSessionExpired]);
 
   // Unified login handling both admins and customers based on role
   const login = useCallback(async (email, password) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +142,7 @@ export function AuthProvider({ children }) {
           setCustomerInfo({ email: data.username, firstName: 'User' }); // username field from jwt holds email
           // Fetch full profile (including addresses)
           try {
-            const profileResponse = await fetch('http://localhost:8080/api/users/profile', {
+            const profileResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${data.accessToken}`,
@@ -169,7 +204,7 @@ export function AuthProvider({ children }) {
   // Customer Sign Up
   const signup = useCallback(async (firstName, lastName, email, password, phone, otp) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/signup', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -191,7 +226,7 @@ export function AuthProvider({ children }) {
   // Send OTP
   const sendOtp = async (identifier) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/send-otp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier })
@@ -210,7 +245,7 @@ export function AuthProvider({ children }) {
 
   const verifyOtpStep = async (identifier, otp) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/verify-otp-step', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify-otp-step`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, otp })
@@ -229,7 +264,7 @@ export function AuthProvider({ children }) {
   const loginWithOtp = async (identifier, otp) => {
     try {
       setLoginError('');
-      const response = await fetch('http://localhost:8080/api/auth/login-otp', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, otp })
@@ -247,7 +282,7 @@ export function AuthProvider({ children }) {
           setIsAdmin(false);
           setCustomerInfo({ email: data.username, firstName: 'User' });
           try {
-            const profileResponse = await fetch('http://localhost:8080/api/users/profile', {
+            const profileResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
               headers: { 'Authorization': `Bearer ${data.token}` }
             });
             if (profileResponse.ok) {
@@ -272,7 +307,7 @@ export function AuthProvider({ children }) {
 
   const resetPassword = async (identifier, otp, newPassword) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/reset-password', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, otp, newPassword })
@@ -311,7 +346,7 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -334,14 +369,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    setIsAdmin(false);
-    setIsCustomerLoggedIn(false);
-    setCustomerInfo(null);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(ROLE_KEY);
-    localStorage.removeItem(USERNAME_KEY);
-  }, []);
+  // Logout defined at the top
 
   const clearError = useCallback(() => setLoginError(''), []);
 

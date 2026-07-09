@@ -17,6 +17,7 @@ import java.util.List;
 
 @Component
 @Slf4j
+@SuppressWarnings("null")
 public class DatabaseInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;

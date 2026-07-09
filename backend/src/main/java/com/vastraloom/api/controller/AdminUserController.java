@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/users")
+@SuppressWarnings("null")
 public class AdminUserController {
 
     private final UserRepository userRepository;

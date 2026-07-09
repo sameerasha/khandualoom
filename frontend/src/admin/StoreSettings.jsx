@@ -40,7 +40,7 @@ export default function StoreSettings() {
 
   const fetchSocialLinks = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/social-media');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/social-media`);
       if (res.ok) {
         setSocialLinks(await res.json());
       }
@@ -55,8 +55,8 @@ export default function StoreSettings() {
     e.preventDefault();
     const token = getToken();
     const url = currentLink.id 
-      ? `http://localhost:8080/api/admin/social-media/${currentLink.id}`
-      : `http://localhost:8080/api/admin/social-media`;
+      ? `${import.meta.env.VITE_API_URL}/api/admin/social-media/${currentLink.id}`
+      : `${import.meta.env.VITE_API_URL}/api/admin/social-media`;
     const method = currentLink.id ? 'PUT' : 'POST';
 
     try {
@@ -90,7 +90,7 @@ export default function StoreSettings() {
     if (!itemToDelete) return;
     const token = getToken();
     try {
-      const res = await fetch(`http://localhost:8080/api/admin/social-media/${itemToDelete.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/social-media/${itemToDelete.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

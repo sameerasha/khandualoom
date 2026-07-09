@@ -15,7 +15,7 @@ export default function RecentViews({ onNavigate }) {
       return;
     }
 
-    fetch(`http://localhost:8080/api/products/recent?userId=${customerInfo.id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/products/recent?userId=${customerInfo.id}`)
       .then(res => {
         if (res.ok) return res.json();
         throw new Error('Failed to load recent products');

@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/products")
 @Slf4j
+@SuppressWarnings("null")
 public class ProductController {
 
     private final ProductRepository productRepository;

@@ -10,6 +10,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/admin/social-media")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@SuppressWarnings("null")
 public class AdminSocialMediaController {
 
     private final SocialMediaRepository socialMediaRepository;
