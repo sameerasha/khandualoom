@@ -1,9 +1,9 @@
-D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\config\DatabaseInitializer.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\config\WebSecurityConfig.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\AdminProductController.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\AdminSocialMediaController.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\AdminUserController.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\AuthController.java
+D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\ContactController.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\ProductController.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\SocialMediaController.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\controller\UserController.java
@@ -17,11 +17,13 @@ D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\dto\UserP
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\Address.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\AppConfig.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\AuthProvider.java
+D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\ContactMessage.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\Product.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\RecentView.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\SocialMedia.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\User.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\AppConfigRepository.java
+D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\ContactMessageRepository.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\ProductRepository.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\ProductSpecifications.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\RecentViewRepository.java

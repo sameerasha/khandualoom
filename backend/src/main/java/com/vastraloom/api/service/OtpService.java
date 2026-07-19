@@ -13,9 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OtpService {
 
     private final AppConfigRepository appConfigRepository;
-    @SuppressWarnings("unused")
     private final EmailService emailService;
-    @SuppressWarnings("unused")
     private final SmsService smsService;
 
     public OtpService(AppConfigRepository appConfigRepository, EmailService emailService, SmsService smsService) {
@@ -63,14 +61,12 @@ public class OtpService {
         
         otpCache.put(identifier, new OtpDetails(otp, expiry));
         log.info("=================================================");
-        log.info(">>> MOCK OTP DISPATCH (Bypassing Email/SMS) <<<");
+        log.info(">>> DISPATCHING OTP (Email) <<<");
         log.info("To: {}", identifier);
         log.info("OTP CODE: {}", otp);
         log.info("Expiry: {} minutes", ttlMinutes);
         log.info("=================================================");
 
-        // Bypassing actual email/SMS dispatch as requested by the user
-        /*
         if (identifier.contains("@")) {
             // It's an email
             emailService.sendOtpEmail(identifier, otp, ttlMinutes);
@@ -78,13 +74,12 @@ public class OtpService {
             // It's a phone number
             smsService.sendOtpSms(identifier, otp, ttlMinutes);
         }
-        */
 
         return Map.of(
             "message", "OTP sent successfully to " + identifier,
             "ttlSeconds", ttlMinutes * 60,
             "maxAttempts", maxAttempts,
-            "mockOtp", otp // Returning the mock OTP to easily display in UI toaster
+            "mockOtp", otp // Temporary fallback for SMTP testing
         );
     }
 

@@ -22,7 +22,7 @@ export default function ProductDetails({ productId, onNavigate }) {
 
   // Discover More State
   const [discoverProductsPool, setDiscoverProductsPool] = useState([]);
-  const [discoverDisplayCount, setDiscoverDisplayCount] = useState(8);
+  const [discoverDisplayCount, setDiscoverDisplayCount] = useState(9);
   const [loadingDiscover, setLoadingDiscover] = useState(false);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function ProductDetails({ productId, onNavigate }) {
       });
 
     // Reset and fetch Discover More products
-    setDiscoverDisplayCount(8);
+    setDiscoverDisplayCount(9);
     fetchDiscoverProducts(productId);
   }, [productId, products]);
 
@@ -95,7 +95,7 @@ export default function ProductDetails({ productId, onNavigate }) {
           // Exclude the current product and limit to exactly 20
           const filtered = data.content.filter(p => p.id !== currentProdId).slice(0, 20);
           setDiscoverProductsPool(filtered);
-          setDiscoverDisplayCount(8);
+          setDiscoverDisplayCount(9);
         }
       })
       .catch(err => console.error('Failed to load discover products', err))
@@ -103,7 +103,7 @@ export default function ProductDetails({ productId, onNavigate }) {
   };
 
   const handleLoadMoreDiscover = () => {
-    setDiscoverDisplayCount(prev => Math.min(prev + 8, 20));
+    setDiscoverDisplayCount(prev => Math.min(prev + 9, 27));
   };
 
   const displayedDiscoverProducts = discoverProductsPool.slice(0, discoverDisplayCount);
@@ -385,7 +385,7 @@ export default function ProductDetails({ productId, onNavigate }) {
             <h2 className="related-title">Related Masterpieces</h2>
             <div className="products-grid">
               {relatedProducts.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} onNavigate={onNavigate} />
+                <ProductCard key={`related-${p.id}-${i}`} product={p} index={i} onNavigate={onNavigate} />
               ))}
             </div>
           </div>
@@ -397,7 +397,7 @@ export default function ProductDetails({ productId, onNavigate }) {
             <h2 className="related-title">Discover More</h2>
             <div className="products-grid">
               {displayedDiscoverProducts.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} onNavigate={onNavigate} />
+                <ProductCard key={`discover-${p.id}-${i}`} product={p} index={i} onNavigate={onNavigate} />
               ))}
             </div>
             {hasMoreDiscover && (

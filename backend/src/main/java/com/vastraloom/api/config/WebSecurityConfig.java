@@ -42,9 +42,11 @@ public class WebSecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Auth APIs
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
                         .requestMatchers("/api/auth/signup-admin").permitAll()
@@ -59,6 +61,9 @@ public class WebSecurityConfig {
 
                         // Public Social Media
                         .requestMatchers(HttpMethod.GET, "/api/social-media").permitAll()
+
+                        // Public Contact Form
+                        .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
 
                         // User Profile APIs
                         .requestMatchers("/api/users/profile").hasAnyRole("USER", "ADMIN")

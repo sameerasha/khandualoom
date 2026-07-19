@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import './Footer.css';
 import { useAuth } from '../context/AuthContext';
 import SocialMediaModal from './SocialMediaModal';
+import LegalModal from './LegalModal';
 
 export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
   const { isCustomerLoggedIn } = useAuth();
   const [socialLinks, setSocialLinks] = useState([]);
   const [selectedSocialLink, setSelectedSocialLink] = useState(null);
+  const [legalDoc, setLegalDoc] = useState(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/social-media`)
@@ -95,12 +97,14 @@ export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
             <p className="footer__newsletter-text">
               Join our newsletter for exclusive previews, artisan stories, and special offers.
             </p>
-            <button className="footer__newsletter-btn" onClick={onSignUpClick} id="footer-signup">
-              <span>Sign Up Now</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
+            {!isCustomerLoggedIn && (
+              <button className="footer__newsletter-btn" onClick={onSignUpClick} id="footer-signup">
+                <span>Sign Up Now</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
@@ -110,15 +114,19 @@ export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
             © 2026 Vastra Loom. All rights reserved. Handcrafted with ❤ in India.
           </p>
           <div className="footer__bottom-links" id="policies">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Shipping Policy</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); setLegalDoc('privacy'); }}>Privacy Policy</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); setLegalDoc('terms'); }}>Terms of Service</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); setLegalDoc('deletion'); }}>Data Deletion</a>
           </div>
         </div>
       </div>
       
       {selectedSocialLink && (
         <SocialMediaModal socialLinks={[selectedSocialLink]} onClose={() => setSelectedSocialLink(null)} />
+      )}
+
+      {legalDoc && (
+        <LegalModal docType={legalDoc} onClose={() => setLegalDoc(null)} />
       )}
     </footer>
   );

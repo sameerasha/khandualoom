@@ -60,7 +60,7 @@ export default function ProductGrid({ onNavigate }) {
     try {
       const params = new URLSearchParams({
         page: currentPage,
-        size: 8,
+        size: 9,
         sort: currentFilters.sort
       });
       if (currentFilters.category !== 'All') params.append('category', currentFilters.category);
@@ -135,7 +135,7 @@ export default function ProductGrid({ onNavigate }) {
       <div className="container">
         {/* Header */}
         <div className="products-section__header">
-          <span className="products-section__label">Our Collections</span>
+          <span className="products-section__label">Our Categories</span>
           <h2 className="section-title">
             Curated <span className="gold-text">Masterpieces</span>
           </h2>
@@ -159,20 +159,20 @@ export default function ProductGrid({ onNavigate }) {
           </button>
           
           <div className="products-section__filters">
-            {badges.map((b) => (
+            {categories.map((c) => (
               <button
-                key={b}
-                className={`products-section__filter-btn ${activeBadge === b ? 'products-section__filter-btn--active' : ''}`}
+                key={c}
+                className={`products-section__filter-btn ${activeCategory === c ? 'products-section__filter-btn--active' : ''}`}
                 onClick={() => {
-                  setActiveCategory('All');
+                  setActiveBadge('All');
                   setActiveWeave('All');
                   setActiveFabric('All');
                   setActiveSort('id,desc');
-                  setActiveBadge(b);
+                  setActiveCategory(c);
                 }}
-                id={`filter-${b.toLowerCase().replace(' ', '-')}`}
+                id={`filter-${c.toLowerCase().replace(' ', '-')}`}
               >
-                {b}
+                {c}
               </button>
             ))}
           </div>
@@ -200,6 +200,7 @@ export default function ProductGrid({ onNavigate }) {
               </select>
             </div>
             
+
             {/* Badges */}
             <div className="filter-group">
               <h4>Collection</h4>

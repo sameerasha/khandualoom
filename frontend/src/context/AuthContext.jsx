@@ -224,15 +224,18 @@ export function AuthProvider({ children }) {
   }, []);
 
   // Send OTP
-  const sendOtp = async (identifier) => {
+  const sendOtp = async (identifier, intent = 'login') => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier })
+        body: JSON.stringify({ identifier, intent })
       });
       if (response.ok) {
         const data = await response.json();
+        if (data.mockOtp) {
+          console.log(`[DEBUG] Development OTP for ${identifier}: ${data.mockOtp}`);
+        }
         return { success: true, ...data };
       } else {
         const err = await response.text();
@@ -272,7 +275,7 @@ export function AuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem(TOKEN_KEY, data.token);
+        localStorage.setItem(TOKEN_KEY, data.accessToken);
         
         const role = data.role;
         if (role === 'ROLE_ADMIN') {
@@ -283,7 +286,7 @@ export function AuthProvider({ children }) {
           setCustomerInfo({ email: data.username, firstName: 'User' });
           try {
             const profileResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
-              headers: { 'Authorization': `Bearer ${data.token}` }
+              headers: { 'Authorization': `Bearer ${data.accessToken}` }
             });
             if (profileResponse.ok) {
               const profileData = await profileResponse.json();

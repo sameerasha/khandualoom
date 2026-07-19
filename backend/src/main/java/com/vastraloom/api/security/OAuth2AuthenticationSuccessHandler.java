@@ -50,6 +50,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             email = oAuth2User.getAttribute("email");
             name = oAuth2User.getAttribute("name");
             providerId = oAuth2User.getAttribute("id");
+            if (email == null || email.isEmpty()) {
+                email = providerId + "@facebook.mock.local";
+            }
         } else if ("instagram".equalsIgnoreCase(registrationId)) {
             // Instagram Basic Display API might not provide email easily.
             // Using username as fallback for email
@@ -58,6 +61,18 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             providerId = oAuth2User.getAttribute("id");
         }
         
+        String firstName = "User";
+        String lastName = "";
+        if (name != null && !name.trim().isEmpty()) {
+            String[] parts = name.trim().split("\\s+");
+            if (parts.length == 1) {
+                firstName = parts[0];
+            } else {
+                lastName = parts[parts.length - 1];
+                firstName = String.join(" ", java.util.Arrays.copyOfRange(parts, 0, parts.length - 1));
+            }
+        }
+
         // Check if user exists
         Optional<User> userOptional = userRepository.findByEmail(email);
         User user;
@@ -73,8 +88,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             // Create new user
             user = User.builder()
                     .email(email)
-                    .firstName(name != null ? name.split(" ")[0] : "User")
-                    .lastName(name != null && name.split(" ").length > 1 ? name.split(" ")[1] : "")
+                    .firstName(firstName)
+                    .lastName(lastName)
                     .role("ROLE_USER")
                     .provider(AuthProvider.valueOf(registrationId.toLowerCase()))
                     .providerId(providerId)

@@ -45,7 +45,7 @@ public class ProductController {
     @GetMapping("/paged")
     public Page<Product> getProductsPaged(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "8") int size,
+            @RequestParam(name = "size", defaultValue = "9") int size,
             @RequestParam(name = "category", required = false) String category,
             @RequestParam(name = "badge", required = false) String badge,
             @RequestParam(name = "weave", required = false) String weave,
@@ -116,7 +116,7 @@ public class ProductController {
         }
 
         return productRepository.findById(id).map(product -> {
-            RecentView recentView = recentViewRepository.findByUserIdAndProductId(userId, id).orElse(null);
+            RecentView recentView = recentViewRepository.findFirstByUserIdAndProductId(userId, id).orElse(null);
 
             if (recentView == null) {
                 recentView = RecentView.builder()
@@ -153,6 +153,8 @@ public class ProductController {
 
         List<Product> products = views.stream()
                 .map(RecentView::getProduct)
+                .filter(p -> p != null)
+                .distinct()
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(products);

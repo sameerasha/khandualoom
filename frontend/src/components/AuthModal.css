@@ -238,6 +238,22 @@
   cursor: not-allowed;
 }
 
+.auth-modal-btn.auth-modal-btn-secondary {
+  background: transparent;
+  color: #c3a27e;
+  border: 1px solid rgba(195, 162, 126, 0.5);
+  margin-top: 16px;
+  transition: all 0.3s ease;
+}
+
+.auth-modal-btn.auth-modal-btn-secondary:hover {
+  background: rgba(195, 162, 126, 0.12);
+  border-color: #c3a27e;
+  box-shadow: 0 4px 12px rgba(195, 162, 126, 0.15);
+  transform: translateY(-1px);
+  filter: none;
+}
+
 .auth-modal-error {
   background-color: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.15);
@@ -318,7 +334,7 @@
 
 .sso-buttons {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 

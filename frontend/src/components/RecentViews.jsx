@@ -21,7 +21,15 @@ export default function RecentViews({ onNavigate }) {
         throw new Error('Failed to load recent products');
       })
       .then(data => {
-        setRecentProducts(data || []);
+        const uniqueProducts = [];
+        const seenIds = new Set();
+        for (const p of data || []) {
+          if (!seenIds.has(p.id)) {
+            uniqueProducts.push(p);
+            seenIds.add(p.id);
+          }
+        }
+        setRecentProducts(uniqueProducts);
       })
       .catch(err => console.error('Failed to load recent views:', err))
       .finally(() => setLoading(false));

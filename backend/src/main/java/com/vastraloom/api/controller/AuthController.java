@@ -72,12 +72,28 @@ public class AuthController {
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
         String identifier = request.get("identifier");
+        String intent = request.get("intent"); // 'login' or 'signup'
+        
         if (identifier == null || identifier.isBlank()) {
             return ResponseEntity.badRequest().body("Identifier (email or phone) is required.");
         }
         
+        // Validate based on intent
+        boolean exists = userRepository.findByEmail(identifier).isPresent() || 
+                         userRepository.findByPhone(identifier).isPresent();
+                         
+        if ("login".equalsIgnoreCase(intent) || "forgot".equalsIgnoreCase(intent)) {
+            if (!exists) {
+                return ResponseEntity.badRequest().body("Email is not registered. Register first to login.");
+            }
+        } else if ("signup".equalsIgnoreCase(intent)) {
+            if (exists) {
+                return ResponseEntity.badRequest().body("Email is already registered.");
+            }
+        }
+        
         try {
-            log.info("Requesting OTP for identifier: {}", identifier);
+            log.info("Requesting OTP for identifier: {} with intent: {}", identifier, intent);
             Map<String, Object> result = otpService.generateAndSendOtp(identifier);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -115,9 +131,13 @@ public class AuthController {
                     .orElseThrow(() -> new RuntimeException("User not found")));
             
             // Generate token directly for the user
+            org.springframework.security.core.userdetails.UserDetails userDetails = 
+                new org.springframework.security.core.userdetails.User(
+                    user.getEmail(), "", 
+                    java.util.Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole()))
+                );
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user.getEmail(), null, 
-                java.util.Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole()))
+                userDetails, null, userDetails.getAuthorities()
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = tokenProvider.generateToken(authentication);

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import './ProfileDashboard.css';
 
 export default function ProfileDashboard({ onNavigate }) {
-  const { customerInfo, updateProfile, fetchProfile, sendOtp, getToken } = useAuth();
+  const { customerInfo, updateProfile, fetchProfile, sendOtp, getToken, logout } = useAuth();
 
   // Layout state
   const [activeTab, setActiveTab] = useState('profile');
@@ -69,6 +69,9 @@ export default function ProfileDashboard({ onNavigate }) {
 
   // Delete Address state
   const [addressToDelete, setAddressToDelete] = useState(null);
+
+  // Delete Account state
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
 
   // OTP Timer & Attempts state
   const [otpTimer, setOtpTimer] = useState(0);
@@ -215,6 +218,32 @@ export default function ProfileDashboard({ onNavigate }) {
     setFormErrors({});
     setError('');
     setOtpSentFor(null);
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      });
+      
+      if (response.ok) {
+        logout();
+      } else {
+        const text = await response.text();
+        showToast(text || "Failed to delete account", 'error');
+        setShowDeleteConfirmModal(false);
+      }
+    } catch (err) {
+      showToast("Server connection error.", 'error');
+      setShowDeleteConfirmModal(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerifyRequest = async (type, forcedIdentifier = null, openModal = true, isResend = false) => {
@@ -644,6 +673,22 @@ export default function ProfileDashboard({ onNavigate }) {
                   {isSavingSecurity ? 'Updating Password...' : 'Update Password'}
                 </button>
               </form>
+
+              <hr style={{ margin: '2rem 0', borderColor: 'var(--color-border)', opacity: 0.5 }} />
+              <div className="danger-zone-section" style={{ marginTop: '2rem' }}>
+                <h3 style={{ color: '#dc3545', marginBottom: '0.5rem' }}>Danger Zone</h3>
+                <p style={{ marginBottom: '1rem', color: 'var(--color-text-light)' }}>
+                  Once you delete your account, there is no going back. Please be certain.
+                </p>
+                <button 
+                  type="button" 
+                  onClick={() => setShowDeleteConfirmModal(true)}
+                  disabled={isLoading}
+                  style={{ background: 'transparent', color: '#dc3545', border: '1px solid #dc3545', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                  Delete Account...
+                </button>
+              </div>
             </div>
           )}
 
@@ -1007,6 +1052,35 @@ export default function ProfileDashboard({ onNavigate }) {
                 type="button" 
                 className="otp-modal-btn otp-modal-cancel" 
                 onClick={() => setAddressToDelete(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Confirm Modal */}
+      {showDeleteConfirmModal && (
+        <div className="otp-modal-overlay">
+          <div className="otp-modal-content">
+            <h3 style={{ color: '#ef4444' }}>Delete Account</h3>
+            <p>Are you absolutely sure you want to delete your account? This action is permanent and cannot be undone.</p>
+            <div className="otp-modal-actions">
+              <button 
+                type="button" 
+                className="otp-modal-btn otp-modal-verify" 
+                onClick={handleDeleteAccount}
+                disabled={isLoading}
+                style={{ background: '#ef4444', color: '#fff' }}
+              >
+                {isLoading ? 'Deleting...' : 'Confirm Delete'}
+              </button>
+              <button 
+                type="button" 
+                className="otp-modal-btn otp-modal-cancel" 
+                onClick={() => setShowDeleteConfirmModal(false)}
+                disabled={isLoading}
               >
                 Cancel
               </button>

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.vastraloom.api.service.OtpService;
 import java.util.Map;
+import com.vastraloom.api.repository.RecentViewRepository;
 
 @RestController
 @RequestMapping("/api/users")
@@ -19,11 +20,13 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
+    private final RecentViewRepository recentViewRepository;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService, RecentViewRepository recentViewRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
+        this.recentViewRepository = recentViewRepository;
     }
 
     // GET /api/users/profile
@@ -179,5 +182,21 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Invalid OTP"));
         }
+    }
+
+    // DELETE /api/users/profile
+    @DeleteMapping("/profile")
+    public ResponseEntity<?> deleteUserProfile() {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Delete dependencies loosely coupled by userId
+        recentViewRepository.deleteByUserId(user.getId());
+
+        // Delete the user (cascades to addresses)
+        userRepository.delete(user);
+        
+        return ResponseEntity.ok(Map.of("success", true, "message", "Account successfully deleted."));
     }
 }

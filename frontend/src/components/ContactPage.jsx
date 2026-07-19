@@ -1,8 +1,27 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import './ContactPage.css';
 
 export default function ContactPage() {
+  const { customerInfo } = useAuth();
   const [socialLinks, setSocialLinks] = useState([]);
+  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [subject, setSubject] = useState('general');
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState({ type: '', msg: '' });
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (customerInfo) {
+      if (!name) setName(customerInfo.firstName + (customerInfo.lastName ? ' ' + customerInfo.lastName : ''));
+      if (!email) setEmail(customerInfo.email || '');
+      if (!phone) setPhone(customerInfo.phone || '');
+    }
+  }, [customerInfo]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -11,6 +30,71 @@ export default function ContactPage() {
       .then(data => setSocialLinks(data))
       .catch(err => console.error('Failed to fetch social media links', err));
   }, []);
+
+  const showStatusWithTimeout = (type, msg) => {
+    setStatus({ type, msg });
+    setTimeout(() => {
+      setStatus({ type: '', msg: '' });
+    }, 3000);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Form Validation
+    const errors = {};
+    if (!name.trim()) {
+      errors.name = 'Full name is required.';
+    } else if (name.trim().length < 2) {
+      errors.name = 'Please enter a valid full name.';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      errors.email = 'Email address is required.';
+    } else if (!emailRegex.test(email)) {
+      errors.email = 'Please enter a valid email address.';
+    }
+
+    if (!message.trim()) {
+      errors.message = 'Message is required.';
+    } else if (message.trim().length < 10) {
+      errors.message = 'Message must be at least 10 characters long.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      showStatusWithTimeout('error', 'Please correct the highlighted errors.');
+      return;
+    }
+    
+    setFormErrors({});
+    setIsSubmitting(true);
+    setStatus({ type: '', msg: '' });
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, subject, message })
+      });
+      
+      if (response.ok) {
+        showStatusWithTimeout('success', 'Thank you! Your message has been sent successfully.');
+        setName(customerInfo ? customerInfo.firstName + (customerInfo.lastName ? ' ' + customerInfo.lastName : '') : '');
+        setEmail(customerInfo ? customerInfo.email || '' : '');
+        setPhone(customerInfo ? customerInfo.phone || '' : '');
+        setSubject('general');
+        setMessage('');
+      } else {
+        showStatusWithTimeout('error', 'Failed to send message. Please try again later.');
+      }
+    } catch (err) {
+      showStatusWithTimeout('error', 'Network error. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="contact-page">
@@ -97,18 +181,25 @@ export default function ContactPage() {
           {/* Right Column: Contact Form */}
           <div className="contact-page__form-container">
             <h2 className="contact-page__form-title">Send us a Message</h2>
-            <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
+            
+            <form className="contact-form" onSubmit={handleSubmit} noValidate>
               <div className="form-group">
-                <label htmlFor="name">Full Name</label>
-                <input type="text" id="name" placeholder="E.g., Ananya Sharma" />
+                <label htmlFor="name">Full Name *</label>
+                <input type="text" id="name" value={name} onChange={e => { setName(e.target.value); setFormErrors(prev => ({...prev, name: ''})); }} placeholder="E.g., Ananya Sharma" required className={formErrors.name ? 'input-error' : ''} />
+                {formErrors.name && <span className="field-error-message">{formErrors.name}</span>}
               </div>
               <div className="form-group">
-                <label htmlFor="email">Email Address</label>
-                <input type="email" id="email" placeholder="ananya@example.com" />
+                <label htmlFor="email">Email Address *</label>
+                <input type="email" id="email" value={email} onChange={e => { setEmail(e.target.value); setFormErrors(prev => ({...prev, email: ''})); }} placeholder="ananya@example.com" required className={formErrors.email ? 'input-error' : ''} />
+                {formErrors.email && <span className="field-error-message">{formErrors.email}</span>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="phone">Phone Number (Optional)</label>
+                <input type="tel" id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 98765 43210" />
               </div>
               <div className="form-group">
                 <label htmlFor="subject">Subject</label>
-                <select id="subject">
+                <select id="subject" value={subject} onChange={e => setSubject(e.target.value)}>
                   <option value="general">General Inquiry</option>
                   <option value="order">Order Status</option>
                   <option value="bespoke">Bespoke Design Request</option>
@@ -116,11 +207,19 @@ export default function ContactPage() {
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="message">Your Message</label>
-                <textarea id="message" rows="5" placeholder="How can we assist you today?"></textarea>
+                <label htmlFor="message">Your Message *</label>
+                <textarea id="message" value={message} onChange={e => { setMessage(e.target.value); setFormErrors(prev => ({...prev, message: ''})); }} rows="5" placeholder="How can we assist you today?" required className={formErrors.message ? 'input-error' : ''}></textarea>
+                {formErrors.message && <span className="field-error-message">{formErrors.message}</span>}
               </div>
-              <button type="submit" className="contact-form__submit">
-                <span>Send Message</span>
+              
+              {status.msg && (
+                <div className={`contact-status-message ${status.type}`}>
+                  {status.msg}
+                </div>
+              )}
+
+              <button type="submit" className="contact-form__submit" disabled={isSubmitting}>
+                <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"></line>
                   <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>

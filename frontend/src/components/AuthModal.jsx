@@ -36,6 +36,24 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     return () => clearTimeout(timer);
   }, [timeLeft]);
 
+  // Auto-dismiss success and error messages after 3 seconds
+  useEffect(() => {
+    if (error || loginError) {
+      const timer = setTimeout(() => {
+        setError('');
+        clearError();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, loginError, clearError]);
+
+  useEffect(() => {
+    if (successMsg) {
+      const timer = setTimeout(() => setSuccessMsg(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMsg]);
+
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -100,8 +118,9 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     e.preventDefault();
     setFieldErrors({});
     let errors = {};
-    const identifier = email || phone;
-    if (!identifier) errors.identifier = "Please enter an email or phone number";
+    if (!email.trim()) errors.email = "Email is required";
+    else if (!validateEmail(email)) errors.email = "Enter a valid email address";
+    
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
@@ -109,10 +128,11 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     
     setIsLoading(true);
     setError('');
-    const result = await sendOtp(identifier);
+    const intent = loginMode === 'forgot' ? 'forgot' : 'login';
+    const result = await sendOtp(email, intent);
     setIsLoading(false);
     if (result.success) {
-      setSuccessMsg(`OTP sent to ${identifier}`);
+      setSuccessMsg(`OTP sent to ${email}`);
       setTimeLeft(result.ttlSeconds || 120);
       setLoginStep(2);
     } else {
@@ -124,7 +144,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    const result = await loginWithOtp(email || phone, otp);
+    const result = await loginWithOtp(email, otp);
     setIsLoading(false);
     if (result.success) {
       if (result.role === 'ROLE_ADMIN') {
@@ -142,7 +162,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    const result = await resetPassword(email || phone, otp, password);
+    const result = await resetPassword(email, otp, password);
     setIsLoading(false);
     if (result.success) {
       setSuccessMsg('Password reset successfully! You can now log in.');
@@ -177,7 +197,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     setIsLoading(true);
     setError('');
     const identifier = email || phone;
-    const result = await sendOtp(identifier);
+    const result = await sendOtp(identifier, 'signup');
     setIsLoading(false);
     if (result.success) {
       setSuccessMsg(`OTP sent to ${identifier}`);
@@ -294,13 +314,13 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                 {loginMode === 'otp' && loginStep === 1 && (
                   <form className="auth-modal-form" onSubmit={handleOtpLoginRequest} noValidate>
                     <h4>Login via OTP</h4>
-                    <div className={`auth-modal-group ${fieldErrors.identifier ? 'has-error' : ''}`}>
-                      <label>Email or Phone Number <span className="required-star">*</span></label>
-                      <input type="text" value={email || phone} onChange={(e) => { setEmail(e.target.value); setPhone(e.target.value); setFieldErrors({...fieldErrors, identifier: null}); }} placeholder="Enter email or phone" />
-                      {fieldErrors.identifier && <small className="field-error-msg">{fieldErrors.identifier}</small>}
+                    <div className={`auth-modal-group ${fieldErrors.email ? 'has-error' : ''}`}>
+                      <label>Email Address <span className="required-star">*</span></label>
+                      <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setFieldErrors({...fieldErrors, email: null}); }} placeholder="Enter registered email" />
+                      {fieldErrors.email && <small className="field-error-msg">{fieldErrors.email}</small>}
                     </div>
                     <button type="submit" className="auth-modal-btn" disabled={isLoading}>{isLoading ? 'Sending...' : 'Send OTP'}</button>
-                    <button type="button" onClick={() => setLoginMode('normal')} className="auth-modal-btn auth-modal-btn-secondary" style={{ marginTop: '1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)' }}>Back to Password Login</button>
+                    <button type="button" onClick={() => setLoginMode('normal')} className="auth-modal-btn auth-modal-btn-secondary">Back to Password Login</button>
                   </form>
                 )}
 
@@ -318,19 +338,20 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                       )}
                     </div>
                     <button type="submit" className="auth-modal-btn" disabled={isLoading || timeLeft === 0}>{isLoading ? 'Verifying...' : 'Verify & Sign In'}</button>
+                    <button type="button" onClick={() => setLoginStep(1)} className="auth-modal-btn auth-modal-btn-secondary">Back</button>
                   </form>
                 )}
 
                 {loginMode === 'forgot' && loginStep === 1 && (
                   <form className="auth-modal-form" onSubmit={handleOtpLoginRequest} noValidate>
                     <h4>Reset Password</h4>
-                    <div className={`auth-modal-group ${fieldErrors.identifier ? 'has-error' : ''}`}>
-                      <label>Email or Phone Number <span className="required-star">*</span></label>
-                      <input type="text" value={email || phone} onChange={(e) => { setEmail(e.target.value); setPhone(e.target.value); setFieldErrors({...fieldErrors, identifier: null}); }} placeholder="Enter email or phone" />
-                      {fieldErrors.identifier && <small className="field-error-msg">{fieldErrors.identifier}</small>}
+                    <div className={`auth-modal-group ${fieldErrors.email ? 'has-error' : ''}`}>
+                      <label>Email Address <span className="required-star">*</span></label>
+                      <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setFieldErrors({...fieldErrors, email: null}); }} placeholder="Enter registered email" />
+                      {fieldErrors.email && <small className="field-error-msg">{fieldErrors.email}</small>}
                     </div>
                     <button type="submit" className="auth-modal-btn" disabled={isLoading}>{isLoading ? 'Sending...' : 'Send OTP'}</button>
-                    <button type="button" onClick={() => setLoginMode('normal')} className="auth-modal-btn auth-modal-btn-secondary" style={{ marginTop: '1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)' }}>Cancel</button>
+                    <button type="button" onClick={() => setLoginMode('normal')} className="auth-modal-btn auth-modal-btn-secondary">Cancel</button>
                   </form>
                 )}
 
@@ -353,6 +374,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                       {fieldErrors.password && <small className="field-error-msg">{fieldErrors.password}</small>}
                     </div>
                     <button type="submit" className="auth-modal-btn" disabled={isLoading || timeLeft === 0}>{isLoading ? 'Resetting...' : 'Reset Password'}</button>
+                    <button type="button" onClick={() => setLoginStep(1)} className="auth-modal-btn auth-modal-btn-secondary">Back</button>
                   </form>
                 )}
               </div>
@@ -403,7 +425,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                       )}
                     </div>
                     <button type="submit" className="auth-modal-btn" disabled={isLoading || timeLeft === 0}>{isLoading ? 'Verifying...' : 'Verify OTP'}</button>
-                    <button type="button" onClick={() => setSignupStep(1)} className="auth-modal-btn auth-modal-btn-secondary" style={{ marginTop: '1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)' }}>Back</button>
+                    <button type="button" onClick={() => setSignupStep(1)} className="auth-modal-btn auth-modal-btn-secondary">Back</button>
                   </form>
                 )}
 
@@ -438,14 +460,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                     </svg>
                     <span>Facebook</span>
                   </button>
-                  <button className="sso-btn sso-btn--instagram" onClick={() => handleSSO('instagram')} type="button" disabled={isLoading}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                    </svg>
-                    <span>Instagram</span>
-                  </button>
+
                 </div>
               </div>
             ) : null}
