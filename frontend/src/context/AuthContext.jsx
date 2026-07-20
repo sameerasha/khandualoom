@@ -50,6 +50,13 @@ export function AuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
+        
+        if (!data.email || data.email.trim() === '' || data.email === 'undefined') {
+          handleSessionExpired();
+          window.dispatchEvent(new Event('force-signup'));
+          return null;
+        }
+
         setCustomerInfo(data);
         return data;
       } else if (response.status === 401) {
@@ -60,13 +67,37 @@ export function AuthProvider({ children }) {
     }
     return null;
   }, [handleSessionExpired]);
+  // Global fetch interceptor for 401 handling
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async function () {
+      try {
+        const response = await originalFetch.apply(this, arguments);
+        if (response.status === 401) {
+          handleSessionExpired();
+        }
+        return response;
+      } catch (error) {
+        throw error;
+      }
+    };
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [handleSessionExpired]);
 
   // Initialize auth state on mount/reload
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem(TOKEN_KEY);
       const role = localStorage.getItem(ROLE_KEY);
-      const username = localStorage.getItem(USERNAME_KEY);
+      let username = localStorage.getItem(USERNAME_KEY);
+      
+      // Fix broken state from previous bug
+      if (username === 'undefined') {
+        username = '';
+        localStorage.removeItem(USERNAME_KEY);
+      }
 
       if (token) {
         // For mock tokens, enforce 24hr check immediately on load
@@ -83,8 +114,10 @@ export function AuthProvider({ children }) {
           setIsAdmin(true);
         } else if (role === 'ROLE_USER') {
           setIsCustomerLoggedIn(true);
-          setCustomerInfo({ firstName: username, email: username }); // username var holds email or original mock id
           
+          if (username && username.trim() !== '') {
+            setCustomerInfo({ firstName: username, email: username }); // username var holds email or original mock id
+          }
           if (!token.startsWith('mock-sso-token')) {
             await fetchProfile();
           } else {
@@ -128,6 +161,12 @@ export function AuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
+        if (!data.username || data.username.trim() === '' || data.username === 'undefined') {
+          handleSessionExpired();
+          window.dispatchEvent(new Event('force-signup'));
+          return { success: false, error: 'Email missing. Please sign up.' };
+        }
+
         localStorage.setItem(TOKEN_KEY, data.accessToken);
         localStorage.setItem(ROLE_KEY, data.role);
         localStorage.setItem(USERNAME_KEY, data.username);
@@ -275,7 +314,15 @@ export function AuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
+        if (!data.username || data.username.trim() === '' || data.username === 'undefined') {
+          handleSessionExpired();
+          window.dispatchEvent(new Event('force-signup'));
+          return { success: false, error: 'Email missing. Please sign up.' };
+        }
+
         localStorage.setItem(TOKEN_KEY, data.accessToken);
+        localStorage.setItem(ROLE_KEY, data.role);
+        localStorage.setItem(USERNAME_KEY, data.username);
         
         const role = data.role;
         if (role === 'ROLE_ADMIN') {
@@ -361,7 +408,7 @@ export function AuthProvider({ children }) {
       if (response.ok) {
         const data = await response.json();
         setCustomerInfo(data);
-        localStorage.setItem(USERNAME_KEY, data.username);
+        localStorage.setItem(USERNAME_KEY, data.email);
         return { success: true };
       } else {
         const errorText = await response.text();

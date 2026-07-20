@@ -49,24 +49,29 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("Attempting to authenticate user: {}", loginRequest.getEmail());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.generateToken(authentication);
-        org.springframework.security.core.userdetails.UserDetails userDetails = 
-                (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
-        String role = userDetails.getAuthorities().stream()
-                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
-                .findFirst()
-                .orElse("ROLE_USER");
-        log.info("User {} successfully authenticated with role {}", loginRequest.getEmail(), role);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, userDetails.getUsername(), role)); // username here actually holds the email
+            String jwt = tokenProvider.generateToken(authentication);
+            org.springframework.security.core.userdetails.UserDetails userDetails = 
+                    (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
+            String role = userDetails.getAuthorities().stream()
+                    .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                    .findFirst()
+                    .orElse("ROLE_USER");
+            log.info("User {} successfully authenticated with role {}", loginRequest.getEmail(), role);
+            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, userDetails.getUsername(), role)); // username here actually holds the email
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            log.error("Authentication failed for {}: {}", loginRequest.getEmail(), e.getMessage());
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
     }
 
     @PostMapping("/send-otp")

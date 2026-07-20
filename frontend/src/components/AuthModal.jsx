@@ -82,6 +82,26 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
   const validateEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
   const validatePhone = (val) => /^(?:\+91|91|0)?[6789]\d{9}$/.test(val);
 
+  const handleAuthSuccess = (role) => {
+    onClose();
+    if (role === 'ROLE_ADMIN') {
+      onNavigate('admin/dashboard');
+    } else {
+      const redirectTarget = sessionStorage.getItem('redirectAfterAuth');
+      if (redirectTarget) {
+        sessionStorage.removeItem('redirectAfterAuth');
+        onNavigate(redirectTarget);
+      } else {
+        const currentHash = window.location.hash.replace('#/', '');
+        if (currentHash && currentHash !== 'checkout') {
+          // Stay on current page
+        } else {
+          onNavigate('');
+        }
+      }
+    }
+  };
+
   // ------------------ LOGIN FLOW ------------------
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -103,12 +123,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     setIsLoading(false);
 
     if (result.success) {
-      if (result.role === 'ROLE_ADMIN') {
-        onNavigate('admin/dashboard');
-      } else {
-        onClose();
-        onNavigate('');
-      }
+      handleAuthSuccess(result.role);
     } else {
       setError(loginError || 'Authentication failed. Please verify credentials.');
     }
@@ -147,12 +162,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     const result = await loginWithOtp(email, otp);
     setIsLoading(false);
     if (result.success) {
-      if (result.role === 'ROLE_ADMIN') {
-        onNavigate('admin/dashboard');
-      } else {
-        onClose();
-        onNavigate('');
-      }
+      handleAuthSuccess(result.role);
     } else {
       setError(result.error || 'OTP Login failed.');
     }

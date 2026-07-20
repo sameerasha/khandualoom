@@ -295,10 +295,12 @@
 }
 
 .address-card {
+  position: relative;
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   padding: 20px;
+  padding-right: 150px;
   transition: border-color 0.3s ease;
 }
 
@@ -321,9 +323,9 @@
 
 .address-card__header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  gap: 12px;
 }
 
 .address-badge {
@@ -332,6 +334,7 @@
   padding: 3px 8px;
   border-radius: 4px;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .address-badge.home {
@@ -339,7 +342,7 @@
   color: #60a5fa;
 }
 
-.address-badge.office {
+.address-badge.office, .address-badge.work {
   background-color: rgba(16, 185, 129, 0.15);
   color: #34d399;
 }
@@ -350,34 +353,50 @@
 }
 
 .address-card__actions {
+  position: absolute;
+  top: 18px;
+  right: 18px;
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  align-items: center;
+  z-index: 2;
 }
 
 .edit-addr-btn, .delete-addr-btn {
   background: none;
-  border: none;
+  border: 1px solid transparent;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  padding: 0;
-  transition: color 0.2s ease;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .edit-addr-btn {
   color: #c3a27e;
+  border-color: rgba(195, 162, 126, 0.25);
+  background: rgba(195, 162, 126, 0.06);
 }
 
 .edit-addr-btn:hover {
   color: #dcbfa2;
+  border-color: rgba(195, 162, 126, 0.45);
+  background: rgba(195, 162, 126, 0.12);
 }
 
 .delete-addr-btn {
   color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.05);
 }
 
 .delete-addr-btn:hover {
   color: #f87171;
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .address-card__body {
@@ -836,4 +855,153 @@
   border: 1px solid rgba(16, 185, 129, 0.2);
   text-align: center;
   animation: fadeIn 0.3s ease;
+}
+
+/* Order History Styles */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.order-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.order-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-id {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+.order-date {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.order-status-badges {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.status-processing { background: rgba(33, 150, 243, 0.1); color: #2196f3; }
+.status-shipped { background: rgba(156, 39, 176, 0.1); color: #9c27b0; }
+.status-delivered { background: rgba(76, 175, 80, 0.1); color: #4caf50; }
+.status-cancelled { background: rgba(244, 67, 54, 0.1); color: #f44336; }
+.status-completed { background: rgba(76, 175, 80, 0.1); color: #4caf50; }
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.order-item {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.order-item img {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.order-item-details h4 {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.order-item-details p {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.order-item-price {
+  color: var(--color-gold-300) !important;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-top: var(--space-md);
+}
+
+.order-address {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.order-total {
+  font-size: 1.1rem;
+  color: var(--color-gold-400);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(195, 162, 126, 0.3);
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.empty-state p {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+}
+
+.empty-state .btn-primary {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #c3a27e, #a7835d);
+  color: #06070a;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.empty-state .btn-primary:hover {
+  filter: brightness(1.1);
 }

@@ -15,6 +15,7 @@ import ContactPage from './components/ContactPage';
 import ProfileDashboard from './admin/ProfileDashboard';
 import ProductDetails from './components/ProductDetails';
 import OAuth2RedirectHandler from './components/OAuth2RedirectHandler';
+import Checkout from './components/Checkout';
 
 // Admin Pages & Layouts
 import AdminLogin from './admin/AdminLogin';
@@ -24,6 +25,7 @@ import ProductManager from './admin/ProductManager';
 import ProductEditor from './admin/ProductEditor';
 import UserManager from './admin/UserManager';
 import StoreSettings from './admin/StoreSettings';
+import OrderManager from './admin/OrderManager';
 
 function ToastContainer() {
   const { toasts, dismissToast } = useCart();
@@ -57,6 +59,10 @@ function parseHashRoute() {
     const parts = cleanHash.split('/');
     const id = parts[parts.length - 1];
     return { path: 'product', id: parseInt(id, 10) };
+  }
+  
+  if (cleanHash === 'checkout') {
+    return { path: 'checkout', id: null };
   }
   
   return { path: cleanHash, id: null };
@@ -97,6 +103,34 @@ function AppContent() {
     setIsAuthOpen(true);
   };
 
+  useEffect(() => {
+    const handleForceSignup = () => {
+      openAuth('signup');
+    };
+    window.addEventListener('force-signup', handleForceSignup);
+    return () => window.removeEventListener('force-signup', handleForceSignup);
+  }, []);
+
+  useEffect(() => {
+    if (isCustomerLoggedIn) {
+      const redirectTarget = sessionStorage.getItem('redirectAfterAuth');
+      if (redirectTarget) {
+        sessionStorage.removeItem('redirectAfterAuth');
+        handleNavigate(redirectTarget);
+      }
+    }
+  }, [isCustomerLoggedIn]);
+
+  const handleCheckoutClick = () => {
+    setIsCartOpen(false);
+    if (!isCustomerLoggedIn) {
+      sessionStorage.setItem('redirectAfterAuth', 'checkout');
+      openAuth('login');
+    } else {
+      handleNavigate('checkout');
+    }
+  };
+
   // Check for OAuth2 Redirect via pathname (since backend redirects normally, not via hash)
   if (window.location.pathname.startsWith('/oauth2/redirect')) {
     return <OAuth2RedirectHandler />;
@@ -125,6 +159,8 @@ function AppContent() {
       adminChild = <UserManager />;
     } else if (route.path === 'admin/settings') {
       adminChild = <StoreSettings />;
+    } else if (route.path === 'admin/orders') {
+      adminChild = <OrderManager onNavigate={handleNavigate} />;
     }
 
     return (
@@ -160,7 +196,57 @@ function AppContent() {
 
         {/* Overlays */}
         <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
-        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onCheckout={handleCheckoutClick} />
+        <ToastContainer />
+      </div>
+    );
+  }
+
+  // Checkout Route
+  if (route.path === 'checkout') {
+    if (!isCustomerLoggedIn) {
+      sessionStorage.setItem('redirectAfterAuth', 'checkout');
+      return (
+        <div className="app">
+          <Navbar
+            onSignUpClick={() => openAuth('signup')}
+            onCartClick={() => setIsCartOpen(true)}
+            onContactClick={() => handleNavigate('contact')}
+            onNavigate={handleNavigate}
+            currentRoute={route.path}
+          />
+          <main className="container" style={{ padding: '120px 20px', textAlign: 'center', minHeight: '60vh' }}>
+            <h2 style={{ fontSize: '1.8rem', marginBottom: '16px', fontFamily: 'var(--font-display)' }}>Sign In Required</h2>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px' }}>Please sign in or register to complete your order checkout.</p>
+            <button onClick={() => openAuth('login')} className="checkout-btn primary" style={{ maxWidth: '240px', margin: '0 auto' }}>
+              Sign In to Checkout
+            </button>
+          </main>
+          <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
+          <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
+          <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onCheckout={handleCheckoutClick} />
+          <ToastContainer />
+        </div>
+      );
+    }
+
+    return (
+      <div className="app">
+        <Navbar
+          onSignUpClick={() => openAuth('signup')}
+          onCartClick={() => setIsCartOpen(true)}
+          onContactClick={() => handleNavigate('contact')}
+          onNavigate={handleNavigate}
+          currentRoute={route.path}
+        />
+        <main>
+          <Checkout onNavigate={handleNavigate} />
+        </main>
+        <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
+
+        {/* Overlays */}
+        <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
+        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onCheckout={handleCheckoutClick} />
         <ToastContainer />
       </div>
     );
@@ -178,7 +264,7 @@ function AppContent() {
           currentRoute={route.path}
         />
         <main>
-          <ProductDetails productId={route.id} onNavigate={handleNavigate} />
+          <ProductDetails productId={route.id} onNavigate={handleNavigate} onCheckout={handleCheckoutClick} />
         </main>
         <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
 
@@ -189,7 +275,7 @@ function AppContent() {
           defaultTab={authTab} 
           onNavigate={handleNavigate} 
         />
-        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onCheckout={handleCheckoutClick} />
         <ToastContainer />
       </div>
     );
@@ -218,7 +304,7 @@ function AppContent() {
           defaultTab={authTab} 
           onNavigate={handleNavigate} 
         />
-        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onCheckout={handleCheckoutClick} />
         <ToastContainer />
       </div>
     );
@@ -246,7 +332,7 @@ function AppContent() {
 
       {/* Overlays */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
-      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onCheckout={handleCheckoutClick} />
       <ToastContainer />
     </div>
   );

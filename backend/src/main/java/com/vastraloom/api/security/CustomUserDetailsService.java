@@ -22,15 +22,23 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.debug("Attempting to load user by email: {}", email);
-        User user = userRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        log.debug("Attempting to load user by identifier: {}", identifier);
+        
+        String query = identifier;
+        if ("admin".equalsIgnoreCase(identifier)) {
+            query = "admin@vastraloom.com";
+        }
+        
+        String finalQuery = query;
+        User user = userRepository.findByEmail(finalQuery)
+                .or(() -> userRepository.findByPhone(finalQuery))
                 .orElseThrow(() -> {
-                    log.error("User not found with email: {}", email);
-                    return new UsernameNotFoundException("User not found with email: " + email);
+                    log.error("User not found with identifier: {}", identifier);
+                    return new UsernameNotFoundException("User not found with identifier: " + identifier);
                 });
         
-        log.debug("User {} loaded successfully", email);
+        log.debug("User {} loaded successfully with role {}", user.getEmail(), user.getRole());
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

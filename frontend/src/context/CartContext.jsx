@@ -1,11 +1,29 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const CartContext = createContext();
+const CART_STORAGE_KEY = 'vastraloom_cart_items';
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem(CART_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error('Failed to load cart from localStorage', e);
+      return [];
+    }
+  });
+
   const [toasts, setToasts] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch (e) {
+      console.error('Failed to save cart to localStorage', e);
+    }
+  }, [cartItems]);
 
   const addToast = useCallback((message, type = 'success') => {
     const toastId = Date.now() + Math.random().toString(36).substring(2, 9);
@@ -28,7 +46,6 @@ export function CartProvider({ children }) {
       return [...prev, { ...product, quantity: 1 }];
     });
 
-    // Show toast
     addToast(`${product.name} added to cart`);
   }, [addToast]);
 
@@ -48,6 +65,15 @@ export function CartProvider({ children }) {
     );
   }, [removeFromCart]);
 
+  const clearCart = useCallback(() => {
+    setCartItems([]);
+    try {
+      localStorage.removeItem(CART_STORAGE_KEY);
+    } catch (e) {
+      console.error('Failed to clear cart storage', e);
+    }
+  }, []);
+
   const dismissToast = useCallback((toastId) => {
     setToasts((prev) => prev.filter((t) => t.id !== toastId));
   }, []);
@@ -66,6 +92,7 @@ export function CartProvider({ children }) {
         addToCart,
         removeFromCart,
         updateQuantity,
+        clearCart,
         dismissToast,
         totalItems,
         totalPrice,

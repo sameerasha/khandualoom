@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ProductCard from './ProductCard';
 import './ProductDetails.css';
 
-export default function ProductDetails({ productId, onNavigate }) {
+export default function ProductDetails({ productId, onNavigate, onCheckout }) {
   const { products } = useProducts();
   const { cartItems, addToCart, setIsCartOpen } = useCart();
   const { isCustomerLoggedIn, customerInfo } = useAuth();
@@ -178,6 +178,29 @@ export default function ProductDetails({ productId, onNavigate }) {
     }
   };
 
+  const handleBuyNow = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (product) {
+      if (!isAdded) {
+        addToCart(product);
+      }
+      
+      // Trigger the standard app checkout flow
+      if (onCheckout) {
+        onCheckout();
+      } else {
+        // Fallback if prop not provided
+        if (!isCustomerLoggedIn) {
+          sessionStorage.setItem('redirectAfterAuth', 'checkout');
+          setIsCartOpen(true); // Open cart as fallback
+        } else {
+          onNavigate('checkout');
+        }
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="product-details-loading">
@@ -317,6 +340,15 @@ export default function ProductDetails({ productId, onNavigate }) {
                     Add to Cart
                   </>
                 )}
+              </button>
+              <button 
+                onClick={handleBuyNow}
+                className="buy-now-btn"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                Buy Now
               </button>
             </div>
 

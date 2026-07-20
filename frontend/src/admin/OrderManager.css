@@ -1,0 +1,81 @@
+.order-manager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.order-manager-content {
+  background: var(--color-bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+}
+
+.order-filters {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+}
+
+.filter-btn.active {
+  background: var(--gradient-gold);
+  color: var(--color-bg-primary);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.order-table-wrapper {
+  overflow-x: auto;
+}
+
+.order-actions-dropdown select {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  color: var(--color-text-primary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.order-actions-dropdown select:focus {
+  outline: none;
+  border-color: var(--color-gold-400);
+}
+
+.order-actions-dropdown select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status badges for table (inherit from ProfileDashboard if possible, else define here) */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.status-pending { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.status-processing { background: rgba(33, 150, 243, 0.1); color: #2196f3; }
+.status-shipped { background: rgba(156, 39, 176, 0.1); color: #9c27b0; }
+.status-delivered { background: rgba(76, 175, 80, 0.1); color: #4caf50; }
+.status-cancelled { background: rgba(244, 67, 54, 0.1); color: #f44336; }
+.status-completed { background: rgba(76, 175, 80, 0.1); color: #4caf50; }

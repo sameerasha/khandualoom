@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
+import { useAuth } from '../context/AuthContext';
 import ProductCard from './ProductCard';
 import './ProductGrid.css';
 
 export default function ProductGrid({ onNavigate }) {
   const { categories, badges, weaves, fabrics } = useProducts();
+  const { isCustomerLoggedIn } = useAuth();
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeBadge, setActiveBadge] = useState('All');
   const [activeWeave, setActiveWeave] = useState('All');

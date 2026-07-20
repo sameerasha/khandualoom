@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
 import './Hero.css';
 
 export default function Hero({ onSignUpClick }) {
   const heroRef = useRef(null);
+  const { isCustomerLoggedIn } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,7 +30,7 @@ export default function Hero({ onSignUpClick }) {
       {/* Background */}
       <div className="hero__bg">
         <div className="hero__bg-image hero__parallax" data-speed="0.2">
-          <img src="/images/hero_banner.png" alt="Handloom Weaving" />
+          <img src={isCustomerLoggedIn ? "/images/hero_banner_loggedin.png" : "/images/hero_banner.png"} alt="Handloom Weaving" />
         </div>
         <div className="hero__bg-overlay"></div>
         <div className="hero__bg-grain"></div>
@@ -68,9 +70,11 @@ export default function Hero({ onSignUpClick }) {
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </button>
-          <button className="hero__cta hero__cta--secondary" onClick={onSignUpClick} id="join-now-btn">
-            <span>Join the Tradition</span>
-          </button>
+          {!isCustomerLoggedIn && (
+            <button className="hero__cta hero__cta--secondary" onClick={onSignUpClick} id="join-now-btn">
+              <span>Join the Tradition</span>
+            </button>
+          )}
         </div>
 
         {/* Stats */}

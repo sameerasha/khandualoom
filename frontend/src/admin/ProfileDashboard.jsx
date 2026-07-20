@@ -31,6 +31,10 @@ export default function ProfileDashboard({ onNavigate }) {
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null); // null if adding a new one
   
+  // Orders state
+  const [orders, setOrders] = useState([]);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
+  
   // Address form fields
   const [addressType, setAddressType] = useState('HOME');
   const [fullName, setFullName] = useState('');
@@ -110,7 +114,28 @@ export default function ProfileDashboard({ onNavigate }) {
         setIsStatesLoading(false);
       }
     };
+    
+    const fetchMyOrders = async () => {
+      setIsOrdersLoading(true);
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/my-orders`, {
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setOrders(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch orders', err);
+      } finally {
+        setIsOrdersLoading(false);
+      }
+    };
+
     fetchStates();
+    if (getToken()) {
+      fetchMyOrders();
+    }
   }, []);
 
   useEffect(() => {
@@ -407,6 +432,8 @@ export default function ProfileDashboard({ onNavigate }) {
     if (!state.trim()) errors.state = 'State is required';
     if (!pincode.trim()) errors.pincode = 'Pincode is required';
     if (!country.trim()) errors.country = 'Country is required';
+    if (!shippingPhone.trim()) errors.shippingPhone = 'Phone number is required';
+    else if (shippingPhone.trim().length !== 10) errors.shippingPhone = 'Phone number must be exactly 10 digits';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -416,14 +443,14 @@ export default function ProfileDashboard({ onNavigate }) {
     setEditingAddressId(null);
     setFormErrors({});
     setAddressType('HOME');
-    setFullName('');
+    setFullName(customerInfo?.firstName ? `${customerInfo.firstName} ${customerInfo.lastName || ''}`.trim() : '');
     setStreetAddress('');
     setLandmark('');
     setCity('');
     setState('');
     setPincode('');
     setCountry('India');
-    setShippingPhone('');
+    setShippingPhone(customerInfo?.phone || '');
     setIsPrimary(false);
   };
 
@@ -524,6 +551,9 @@ export default function ProfileDashboard({ onNavigate }) {
           </button>
           <button className={`profile-tab ${activeTab === 'addresses' ? 'active' : ''}`} onClick={() => switchTab('addresses')}>
             📍 Address Book
+          </button>
+          <button className={`profile-tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => switchTab('orders')}>
+            📦 Order History
           </button>
         </div>
 
@@ -823,14 +853,17 @@ export default function ProfileDashboard({ onNavigate }) {
                   </div>
 
                   <div className="profile-form__group">
-                    <label htmlFor="address-phone">Delivery Phone (Optional)</label>
+                    <label htmlFor="address-phone">Delivery Phone <span className="required-star">*</span></label>
                     <input
                       id="address-phone"
                       type="tel"
+                      maxLength="10"
                       value={shippingPhone}
-                      onChange={(e) => setShippingPhone(e.target.value)}
-                      placeholder="Alternate phone for delivery rider"
+                      onChange={(e) => setShippingPhone(e.target.value.replace(/\D/g, ''))}
+                      className={formErrors.shippingPhone ? 'input-error' : ''}
+                      placeholder="10-digit phone number"
                     />
+                    {formErrors.shippingPhone && <span className="error-message">{formErrors.shippingPhone}</span>}
                   </div>
                   
                   <div className="profile-form__group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
@@ -856,7 +889,7 @@ export default function ProfileDashboard({ onNavigate }) {
                       No shipping addresses saved yet. Click "+ Add Address" to populate your address book.
                     </div>
                   ) : (
-                    [...addresses].sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0)).map((addr) => (
+                    [...addresses].sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 0 : 1)).map((addr) => (
                       <div className={`address-card ${addr.isPrimary ? 'primary' : ''}`} key={addr.id}>
                         <div className="address-card__header">
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -889,6 +922,62 @@ export default function ProfileDashboard({ onNavigate }) {
                       </div>
                     ))
                   )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ORDERS TAB */}
+          {activeTab === 'orders' && (
+            <div className="profile-dashboard__card">
+              <h2>Order History</h2>
+              
+              {isOrdersLoading ? (
+                <div className="loading-spinner-container">
+                  <div className="spinner"></div>
+                  <p>Loading orders...</p>
+                </div>
+              ) : orders.length === 0 ? (
+                <div className="empty-state">
+                  <p>You haven't placed any orders yet.</p>
+                  <button className="btn-primary" onClick={() => onNavigate('home')}>Start Shopping</button>
+                </div>
+              ) : (
+                <div className="orders-list">
+                  {orders.map(order => (
+                    <div key={order.id} className="order-card">
+                      <div className="order-header">
+                        <div className="order-header-info">
+                          <span className="order-id">Order #{order.id}</span>
+                          <span className="order-date">{new Date(order.orderDate).toLocaleDateString()}</span>
+                        </div>
+                        <div className="order-status-badges">
+                          <span className={`status-badge status-${order.orderStatus.toLowerCase()}`}>{order.orderStatus}</span>
+                          <span className={`status-badge status-${order.paymentStatus.toLowerCase()}`}>{order.paymentStatus}</span>
+                        </div>
+                      </div>
+                      <div className="order-items">
+                        {order.items.map(item => (
+                          <div key={item.id} className="order-item">
+                            <img src={item.productImageUrl || '/assets/products/placeholder.jpg'} alt={item.productName} />
+                            <div className="order-item-details">
+                              <h4>{item.productName}</h4>
+                              <p>Qty: {item.quantity}</p>
+                              <p className="order-item-price">₹{item.priceAtTime.toLocaleString('en-IN')}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="order-footer">
+                        <div className="order-address">
+                          <strong>Shipped to:</strong> {order.address.fullName}, {order.address.city}
+                        </div>
+                        <div className="order-total">
+                          <strong>Total:</strong> ₹{order.totalAmount.toLocaleString('en-IN')}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
