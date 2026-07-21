@@ -277,7 +277,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
           <div className="auth-modal-visual" style={{ backgroundImage: "url('/images/saree_purple_gold.png')" }}>
             <div className="auth-modal-visual__overlay"></div>
             <div className="auth-modal-visual__content">
-              <span className="visual-logo-badge">✦</span>
+              <img src="/logo.svg" alt="Logo Badge" className="visual-logo-badge" />
               <h2>Vastra Loom</h2>
               <p>Wrap yourself in handcrafted heritage. Experience the finest pure silk handloom masterpieces created by master weavers.</p>
               <div className="visual-features">

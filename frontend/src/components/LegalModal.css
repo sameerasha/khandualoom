@@ -157,3 +157,13 @@
 [data-theme='dark'] .legal-delete-section hr {
   border-color: #333;
 }
+
+@media (max-width: 480px) {
+  .legal-modal {
+    padding: 16px;
+  }
+  .legal-delete-section {
+    margin-top: 24px;
+    padding-top: 12px;
+  }
+}

@@ -430,3 +430,13 @@ input, textarea, select {
   }
 }
 
+@media (max-width: 480px) {
+  .toast-container {
+    left: var(--space-md);
+    right: var(--space-md);
+  }
+  .toast {
+    min-width: 100%;
+    padding: 12px;
+  }
+}

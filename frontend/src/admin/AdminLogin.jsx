@@ -47,7 +47,7 @@ export default function AdminLogin({ onNavigate }) {
           <div className="admin-login__visual" style={{ backgroundImage: "url('/images/saree_navy_blue.png')" }}>
             <div className="admin-login__visual-overlay"></div>
             <div className="admin-login__visual-content">
-              <span className="admin-login__visual-logo">✦</span>
+              <img src="/logo.svg" alt="Logo Badge" className="admin-login__visual-logo" />
               <h2>Vastra Loom</h2>
               <p>Manager Portal</p>
               <span className="admin-login__visual-tag">Artisanal Saree Collections</span>
@@ -58,7 +58,7 @@ export default function AdminLogin({ onNavigate }) {
           <div className="admin-login__form-panel">
             <div className="admin-login__header">
               <div className="admin-login__logo">
-                <span className="admin-login__logo-icon">✦</span>
+                <img src="/logo.svg" alt="Logo" className="admin-login__logo-icon" />
                 <span className="admin-login__logo-text">Vastra Loom</span>
               </div>
               <h1 className="admin-login__title">Admin Sign In</h1>

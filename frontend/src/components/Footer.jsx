@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import './Footer.css';
 import { useAuth } from '../context/AuthContext';
+import { useProducts } from '../context/ProductContext';
 import SocialMediaModal from './SocialMediaModal';
 import LegalModal from './LegalModal';
 
 export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
   const { isCustomerLoggedIn } = useAuth();
+  const { categories } = useProducts();
   const [socialLinks, setSocialLinks] = useState([]);
   const [selectedSocialLink, setSelectedSocialLink] = useState(null);
   const [legalDoc, setLegalDoc] = useState(null);
@@ -36,7 +38,7 @@ export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
           {/* Brand */}
           <div className="footer__brand">
             <div className="footer__logo">
-              <span className="footer__logo-icon">✦</span>
+              <img src="/logo.svg" alt="Logo" className="footer__logo-icon" />
               <div>
                 <span className="footer__logo-main">Vastra Loom</span>
                 <span className="footer__logo-sub">Handcrafted Heritage</span>
@@ -83,11 +85,18 @@ export default function Footer({ onSignUpClick, onContactClick, onNavigate }) {
           <div className="footer__section">
             <h4 className="footer__section-title">Collections</h4>
             <ul className="footer__links">
-              <li><a href="#collections">Banarasi Silk</a></li>
-              <li><a href="#collections">Kanjeevaram</a></li>
-              <li><a href="#collections">Chanderi</a></li>
-              <li><a href="#collections">Patola</a></li>
-              <li><a href="#collections">Tussar Silk</a></li>
+              {categories.filter(c => c !== 'All').slice(0, 5).map((category, index) => (
+                <li key={index}><a href="#collections">{category}</a></li>
+              ))}
+              {categories.filter(c => c !== 'All').length === 0 && (
+                <>
+                  <li><a href="#collections">Banarasi Silk</a></li>
+                  <li><a href="#collections">Kanjeevaram</a></li>
+                  <li><a href="#collections">Chanderi</a></li>
+                  <li><a href="#collections">Patola</a></li>
+                  <li><a href="#collections">Tussar Silk</a></li>
+                </>
+              )}
             </ul>
           </div>
 

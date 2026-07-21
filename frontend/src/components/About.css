@@ -203,3 +203,30 @@
     bottom: 80px;
   }
 }
+
+@media (max-width: 480px) {
+  .about__visual {
+    height: auto;
+    min-height: 320px;
+    padding-bottom: 60px;
+  }
+  .about__image-main {
+    height: 280px;
+  }
+  .about__image-accent {
+    width: 120px;
+    height: 150px;
+  }
+  .about__exp-badge {
+    bottom: 40px;
+    right: 10px;
+    padding: var(--space-md);
+  }
+  .about__exp-number {
+    font-size: 1.5rem;
+  }
+  .about__bg-accent {
+    width: 250px;
+    height: 250px;
+  }
+}

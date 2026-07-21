@@ -28,7 +28,7 @@
 }
 
 .user-manager__count {
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: rgba(195, 162, 126, 0.15);
   border: 1px solid rgba(195, 162, 126, 0.25);
   color: #ffffff;
@@ -67,7 +67,7 @@
   border-radius: 8px;
   padding: 10px 14px 10px 42px;
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: all var(--transition-base);
 }
 
@@ -80,18 +80,33 @@
 
 /* User Table */
 .user-manager__table-wrap {
-  background: var(--color-bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  background: rgba(10, 9, 8, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(195, 162, 126, 0.2);
+  border-radius: 16px;
   overflow-x: auto;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(195, 162, 126, 0.3) rgba(255, 255, 255, 0.02);
+}
+
+.user-manager__table-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+.user-manager__table-wrap::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.user-manager__table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(195, 162, 126, 0.3);
+  border-radius: 3px;
 }
 
 .user-manager__table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .user-manager__table th {
@@ -101,7 +116,7 @@
   padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 0.6875rem;
   letter-spacing: 0.8px;
 }
 
@@ -113,7 +128,7 @@
 }
 
 .user-manager__table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.01);
+  background-color: rgba(195, 162, 126, 0.05);
 }
 
 .user-manager__id-badge {
@@ -141,7 +156,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .user-manager__phone {
@@ -153,7 +168,7 @@
 }
 
 .user-manager__role-badge {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 6px;
@@ -232,7 +247,7 @@
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   transition: all 0.2s ease;
 }
@@ -244,7 +259,7 @@
 }
 
 .ud-breadcrumb {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   opacity: 0.6;
 }
@@ -300,7 +315,7 @@
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-accent) 0%, #8b4a3a 100%);
   color: #06070a;
-  font-size: 30px;
+  font-size: 1.875rem;
   font-weight: 800;
   font-family: var(--font-display);
   display: flex;
@@ -328,7 +343,7 @@
 
 .ud-hero__id {
   font-family: monospace;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   background: rgba(255, 255, 255, 0.06);
   padding: 2px 8px;
@@ -346,7 +361,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: 0.71875rem;
   font-weight: 600;
   color: var(--color-accent);
   background: rgba(195, 162, 126, 0.1);
@@ -400,7 +415,7 @@
 .ud-contact-item__label {
   display: flex;
   align-items: center;
-  font-size: 10.5px;
+  font-size: 0.65625rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -409,7 +424,7 @@
 }
 
 .ud-contact-item__value {
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   font-weight: 500;
   color: #e2e8f0;
   word-break: break-all;
@@ -419,20 +434,20 @@
 .ud-contact-item__empty {
   font-style: normal;
   color: var(--color-text-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* Email & phone value emphasis */
 .ud-contact-item__value--email {
   color: #93c5fd;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   word-break: break-all;
 }
 
 .ud-contact-item__value--phone {
   color: #6ee7b7;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.3px;
 }
@@ -468,7 +483,7 @@
 }
 
 .ud-detail-key {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.7px;
@@ -476,7 +491,7 @@
 }
 
 .ud-detail-val {
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   font-weight: 500;
   color: #e2e8f0;
   line-height: 1.4;
@@ -485,7 +500,7 @@
 .ud-detail-val--pin {
   font-family: monospace;
   color: var(--color-accent);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 1px;
 }
@@ -500,7 +515,7 @@
 .ud-detail-landmark {
   color: var(--color-text-muted);
   font-style: italic;
-  font-size: 12.5px;
+  font-size: 0.78125rem;
 }
 
 /* ── ALL ADDRESSES TOGGLE ─────────────────────────── */
@@ -515,7 +530,7 @@
   background: rgba(195, 162, 126, 0.06);
   border: 1px solid rgba(195, 162, 126, 0.2);
   color: var(--color-accent);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   padding: 9px 18px;
   border-radius: 8px;
@@ -534,7 +549,7 @@
   border: 1px solid rgba(195, 162, 126, 0.2);
   border-radius: 10px;
   padding: 1px 7px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   margin-left: 2px;
 }
 
@@ -547,7 +562,7 @@
   border: 1px solid rgba(52, 211, 153, 0.2);
   border-radius: 4px;
   padding: 1px 9px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
@@ -561,7 +576,7 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #ffffff;
   text-transform: uppercase;
@@ -578,7 +593,7 @@
   border: 1px solid rgba(195, 162, 126, 0.2);
   border-radius: 10px;
   padding: 1px 8px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 
@@ -638,7 +653,7 @@
 }
 
 .ud-addr-type {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -649,7 +664,7 @@
 }
 
 .ud-addr-primary {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
@@ -660,13 +675,13 @@
 }
 
 .ud-address-card__name {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: #ffffff;
 }
 
 .ud-address-card__body {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-secondary);
   line-height: 1.65;
   margin: 0 0 10px 0;
@@ -679,7 +694,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -703,7 +718,7 @@
 }
 
 .ud-no-addresses svg { opacity: 0.3; }
-.ud-no-addresses p { margin: 0; font-size: 14px; }
+.ud-no-addresses p { margin: 0; font-size: 0.875rem; }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -714,6 +729,45 @@
   .ud-contact-item { padding: 14px 16px 14px 0; min-width: 130px; }
   .ud-contact-divider { margin: 10px 16px 10px 0; }
   .ud-body { padding: 20px; }
+  .ud-address-others { grid-template-columns: 1fr; }
+  .ud-address-card {
+    padding: 16px;
+  }
+  .ud-address-card__actions {
+    position: static;
+    margin-top: 16px;
+    justify-content: flex-end;
+  }
+  .ud-address-card__top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .ud-hero__content {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  .ud-hero__meta {
+    justify-content: center;
+  }
+  .ud-contact-strip {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 20px;
+  }
+  .ud-contact-item {
+    width: 100%;
+    padding: 12px 0;
+  }
+  .ud-contact-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+  }
 }
 
 /* Pagination */

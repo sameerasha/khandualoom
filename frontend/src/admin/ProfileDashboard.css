@@ -14,7 +14,7 @@
   background: none;
   border: none;
   color: #c3a27e;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   padding: 0;
@@ -29,7 +29,7 @@
 
 .profile-dashboard h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 36px;
+  font-size: 2.25rem;
   margin: 0 0 8px 0;
   letter-spacing: 0.5px;
 }
@@ -37,14 +37,14 @@
 .profile-dashboard__subtitle {
   color: var(--color-text-muted);
   margin: 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .profile-feedback {
   padding: 14px 20px;
   border-radius: 8px;
   margin-bottom: 24px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .profile-feedback.success {
@@ -81,7 +81,7 @@
 
 .profile-dashboard__card h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 24px;
+  font-size: 1.5rem;
   margin: 0 0 24px 0;
   color: #c3a27e;
   border-bottom: 1px solid rgba(195, 162, 126, 0.15);
@@ -101,7 +101,7 @@
 }
 
 .profile-form__group label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-muted);
   font-weight: 500;
 }
@@ -113,7 +113,7 @@
   border-radius: 8px;
   padding: 12px 16px;
   color: var(--color-text-primary);
-  font-size: 15px;
+  font-size: 0.9375rem;
   transition: all 0.3s ease;
 }
 
@@ -164,7 +164,7 @@
 }
 
 .profile-form__section-title {
-  font-size: 16px;
+  font-size: 1rem;
   color: #c3a27e;
   margin: 0;
   font-weight: 600;
@@ -176,7 +176,7 @@
   border: none;
   border-radius: 8px;
   padding: 14px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
@@ -213,7 +213,7 @@
   color: #c3a27e;
   border-radius: 8px;
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -236,7 +236,7 @@
 
 .address-form h3 {
   margin: 0 0 8px 0;
-  font-size: 18px;
+  font-size: 1.125rem;
   color: #c3a27e;
 }
 
@@ -262,7 +262,7 @@
   padding: 10px 20px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .cancel-addr-btn {
@@ -273,7 +273,7 @@
   padding: 10px 20px;
   font-weight: 500;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
 }
 
@@ -291,7 +291,7 @@
   color: #9ca3af;
   text-align: center;
   padding: 40px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .address-card {
@@ -329,7 +329,7 @@
 }
 
 .address-badge {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 4px;
@@ -365,7 +365,7 @@
 .edit-addr-btn, .delete-addr-btn {
   background: none;
   border: 1px solid transparent;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   padding: 6px 14px;
@@ -400,7 +400,7 @@
 }
 
 .address-card__body {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: #d1d5db;
 }
@@ -414,7 +414,7 @@
 }
 
 .address-recipient {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
   margin-bottom: 8px !important;
@@ -423,12 +423,12 @@
 .address-landmark {
   color: #9ca3af;
   font-style: italic;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .address-phone {
   margin-top: 8px !important;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* Tabs Layout Styles */
@@ -467,7 +467,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
-  font-size: 15px;
+  font-size: 0.9375rem;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -520,7 +520,7 @@
   color: #fff;
   padding: 16px 24px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   z-index: 1000;
   display: flex;
@@ -798,6 +798,72 @@
   border: 1px solid rgba(195, 162, 126, 0.2);
   box-shadow: 0 0 20px rgba(195, 162, 126, 0.15);
 }
+
+@media (max-width: 768px) {
+  .profile-dashboard {
+    padding-top: 100px;
+  }
+  
+  .profile-dashboard-layout {
+    gap: 20px;
+  }
+  
+  .profile-dashboard__card {
+    padding: 20px;
+  }
+  
+  .address-book-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .address-book-header button {
+    width: 100%;
+  }
+
+  .address-form__row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .address-card {
+    padding: 16px;
+  }
+
+  .address-card__actions {
+    position: static;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end; /* Align to the right instead of full width */
+    width: 100%;
+  }
+
+  .edit-addr-btn, .delete-addr-btn {
+    flex: 0 1 auto; /* Don't stretch */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 16px; /* Normal button padding */
+    font-size: 0.8125rem; /* Standard text size */
+    white-space: nowrap;
+  }
+
+  .profile-sidebar {
+    flex: none;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .side-panel {
+    max-width: 100%;
+    padding: 20px;
+  }
+}
+
 
 .premium-modal h3 {
   font-size: 1.8rem !important;

@@ -31,7 +31,7 @@ export function ProductProvider({ children }) {
 
   const addProduct = useCallback(async (product) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export function ProductProvider({ children }) {
 
   const updateProduct = useCallback(async (id, updates) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/products/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export function ProductProvider({ children }) {
 
   const deleteProduct = useCallback(async (id) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/products/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${getToken()}`,

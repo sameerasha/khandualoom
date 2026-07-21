@@ -114,15 +114,11 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
     if (product) {
       let gallery = [];
       if (product.images && product.images.length > 0) {
-        // Filter out empty images
-        const customImages = product.images.filter((img) => img && img.trim() !== '');
-        
-        // Ensure main product image is present at the front
-        if (customImages.includes(product.image)) {
-          gallery = customImages;
-        } else {
-          gallery = [product.image, ...customImages];
-        }
+        // Deduplicate and ensure main image is always first
+        gallery = Array.from(new Set([
+          product.image,
+          ...product.images
+        ])).filter((img) => img && img.trim() !== '');
       } else {
         // Fallback generator
         const otherImages = [

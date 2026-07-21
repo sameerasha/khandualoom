@@ -61,7 +61,7 @@
 /* Grid */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: var(--space-2xl);
   justify-content: center;
 }
@@ -701,5 +701,22 @@
 @media (max-width: 900px) {
   .products-section__filters {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-section {
+    padding: var(--space-xl) 0;
+  }
+  .filter-sidebar {
+    width: 100vw;
+    max-width: 100vw;
+    left: -100vw;
+  }
+  .filter-sidebar--open {
+    transform: translateX(100vw);
+  }
+  .product-card__info {
+    padding: var(--space-md);
   }
 }

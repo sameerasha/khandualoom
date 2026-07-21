@@ -906,10 +906,6 @@ export default function ProfileDashboard({ onNavigate }) {
                               </span>
                             )}
                           </div>
-                          <div className="address-card__actions">
-                            <button className="edit-addr-btn" onClick={() => handleEditAddressClick(addr)}>Edit</button>
-                            <button className="delete-addr-btn" onClick={() => setAddressToDelete(addr.id)}>Delete</button>
-                          </div>
                         </div>
                         <div className="address-card__body">
                           <p className="address-recipient">{addr.fullName}</p>
@@ -918,6 +914,10 @@ export default function ProfileDashboard({ onNavigate }) {
                           <p>{addr.city}, {addr.state} - {addr.pincode}</p>
                           <p>{addr.country}</p>
                           {addr.phone && <p className="address-phone">📞 {addr.phone}</p>}
+                        </div>
+                        <div className="address-card__actions">
+                          <button className="edit-addr-btn" onClick={() => handleEditAddressClick(addr)}>Edit</button>
+                          <button className="delete-addr-btn" onClick={() => setAddressToDelete(addr.id)}>Delete</button>
                         </div>
                       </div>
                     ))

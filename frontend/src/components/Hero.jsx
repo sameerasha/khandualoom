@@ -72,7 +72,8 @@ export default function Hero({ onSignUpClick }) {
           </button>
           {!isCustomerLoggedIn && (
             <button className="hero__cta hero__cta--secondary" onClick={onSignUpClick} id="join-now-btn">
-              <span>Join the Tradition</span>
+              <span className="hero__cta-text--desktop">Join the Tradition</span>
+              <span className="hero__cta-text--mobile">Sign In</span>
             </button>
           )}
         </div>

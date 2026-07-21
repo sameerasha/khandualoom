@@ -140,6 +140,16 @@
   border: none;
   transition: all var(--transition-base);
   padding: 0;
+  position: relative;
+}
+
+.testimonials__dot::before {
+  content: '';
+  position: absolute;
+  top: -18px;
+  bottom: -18px;
+  left: -18px;
+  right: -18px;
 }
 
 .testimonials__dot--active {
@@ -164,5 +174,12 @@
 
   .testimonial-card__stars {
     margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .testimonials__content {
+    min-height: auto;
+    padding-bottom: 2rem;
   }
 }

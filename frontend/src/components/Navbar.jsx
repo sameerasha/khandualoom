@@ -60,11 +60,11 @@ export default function Navbar({ onSignUpClick, onCartClick, onContactClick, onN
   };
 
   return (
-    <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`} id="navbar">
+    <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''} ${menuOpen ? 'navbar--menu-open' : ''}`} id="navbar">
       <div className="navbar__inner container">
         {/* Logo redirecting to storefront home */}
         <a href="#" className="navbar__logo" onClick={(e) => { e.preventDefault(); onNavigate(''); }}>
-          <span className="navbar__logo-icon">✦</span>
+          <img src="/logo.svg" alt="Logo" className="navbar__logo-icon" />
           <span className="navbar__logo-text">
             <span className="navbar__logo-main">Vastra Loom</span>
             <span className="navbar__logo-sub">Handcrafted Heritage</span>
@@ -168,8 +168,10 @@ export default function Navbar({ onSignUpClick, onCartClick, onContactClick, onN
           )}
 
           {/* Toggle Mobile Menu */}
-          <button className="navbar__toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle Navigation">
-            <span className={`navbar__toggle-bar ${menuOpen ? 'navbar__toggle-bar--open' : ''}`}></span>
+          <button className={`navbar__menu-toggle ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle Navigation">
+            <span></span>
+            <span></span>
+            <span></span>
           </button>
         </div>
       </div>
@@ -179,16 +181,17 @@ export default function Navbar({ onSignUpClick, onCartClick, onContactClick, onN
         <ul>
           {isCustomerLoggedIn ? (
             <>
+              <li className="navbar__mobile-user-block">
+                <div className="navbar__mobile-user-name">Hi, {customerInfo?.firstName || 'Profile'}</div>
+                <button className="navbar__logout-btn--mobile" onClick={() => { logout(); setMenuOpen(false); onNavigate(''); }}>
+                  Logout
+                </button>
+              </li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate(''); }}>Home</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('collections'); }}>Collections</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onNavigate('profile'); }}>My Profile</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); onContactClick(); }}>Contact Us</a></li>
               <li><a href="#policies" onClick={(e) => { e.preventDefault(); setMenuOpen(false); scrollToSection('policies'); }}>Policies</a></li>
-              <li>
-                <button className="navbar__signup-btn navbar__signup-btn--mobile" onClick={() => { logout(); setMenuOpen(false); onNavigate(''); }}>
-                  Logout
-                </button>
-              </li>
             </>
           ) : (
             <>

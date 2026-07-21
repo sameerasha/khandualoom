@@ -34,8 +34,9 @@
 }
 
 .footer__logo-icon {
-  font-size: 1.5rem;
-  color: var(--color-gold-400);
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
 }
 
 .footer__logo-main {
@@ -191,9 +192,37 @@
 }
 
 @media (max-width: 768px) {
+  .footer {
+    padding: var(--space-2xl) 0 0;
+  }
+
   .footer__grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-2xl);
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+
+  .footer__brand {
+    grid-column: 1 / -1;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .footer__description {
+    padding: 0 1rem;
+  }
+  
+  .footer__socials {
+    justify-content: center;
+  }
+
+  .footer__section:last-child {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .footer__newsletter-btn {
+    margin: 0 auto;
   }
 
   .footer__bottom {
@@ -204,6 +233,8 @@
 
   .footer__bottom-links {
     gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
 

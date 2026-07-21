@@ -97,7 +97,8 @@
 /* Split-Screen layout styles */
 .admin-login__split {
   display: flex;
-  min-height: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* Left Visual cover panel */
@@ -132,16 +133,16 @@
 }
 
 .admin-login__visual-logo {
-  font-size: 24px;
-  color: var(--color-accent);
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
   margin-bottom: 8px;
   display: inline-block;
-  text-shadow: 0 0 8px rgba(232, 168, 124, 0.4);
 }
 
 .admin-login__visual-content h2 {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 1.75rem;
   margin: 0;
   color: var(--color-accent);
   letter-spacing: 0.5px;
@@ -152,11 +153,11 @@
   font-style: italic;
   margin: 4px 0 16px 0;
   opacity: 0.85;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .admin-login__visual-tag {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 500;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -197,8 +198,9 @@
 }
 
 .admin-login__logo-icon {
-  font-size: 1.3rem;
-  color: var(--color-accent);
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
   animation: pulse-gold 3s infinite;
 }
 
@@ -384,4 +386,19 @@
 
 .admin-login__back:hover {
   color: var(--color-accent);
+}
+
+@media (max-width: 480px) {
+  .admin-login__bg-orb--1 {
+    width: 250px;
+    height: 250px;
+  }
+  .admin-login__bg-orb--2 {
+    width: 200px;
+    height: 200px;
+  }
+  .admin-login__bg-orb--3 {
+    width: 150px;
+    height: 150px;
+  }
 }

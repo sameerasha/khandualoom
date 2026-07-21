@@ -25,7 +25,8 @@
   box-shadow: var(--shadow-xl);
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   color: var(--color-text-primary);
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 .auth-modal-close {
@@ -35,7 +36,7 @@
   background: none;
   border: none;
   color: #9ca3af;
-  font-size: 28px;
+  font-size: 1.75rem;
   cursor: pointer;
   z-index: 10;
   transition: color 0.2s ease, transform 0.2s ease;
@@ -49,7 +50,7 @@
 /* Split Layout */
 .auth-modal-split {
   display: flex;
-  min-height: 560px;
+  min-height: min(560px, 90vh);
 }
 
 /* Left Side: Brand Visual Cover */
@@ -84,23 +85,23 @@
 }
 
 .visual-logo-badge {
-  font-size: 28px;
-  color: #c3a27e;
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
   margin-bottom: 12px;
   display: inline-block;
-  text-shadow: 0 0 10px rgba(195, 162, 126, 0.4);
 }
 
 .auth-modal-visual__content h2 {
   font-family: var(--font-display);
-  font-size: 32px;
+  font-size: 2rem;
   margin: 0 0 12px 0;
   letter-spacing: 0.5px;
   color: #c3a27e;
 }
 
 .auth-modal-visual__content p {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
   opacity: 0.85;
   margin: 0 0 28px 0;
@@ -113,7 +114,7 @@
 }
 
 .v-feat {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.5px;
   color: #c3a27e;
@@ -150,7 +151,7 @@
   border: none;
   color: var(--color-text-muted);
   padding: 12px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   position: relative;
@@ -190,7 +191,7 @@
 }
 
 .auth-modal-group label {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -202,7 +203,7 @@
   border-radius: 8px;
   padding: 11px 14px;
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 0.875rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -218,7 +219,7 @@
   border: none;
   border-radius: 8px;
   padding: 13px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease, filter 0.2s ease;
@@ -260,7 +261,7 @@
   color: #f87171;
   padding: 10px 14px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin-bottom: 16px;
 }
 
@@ -270,7 +271,7 @@
   color: #34d399;
   padding: 10px 14px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin-bottom: 16px;
 }
 
@@ -312,7 +313,7 @@
   align-items: center;
   text-align: center;
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 14px;
@@ -348,7 +349,7 @@
   border: 1px solid rgba(128, 128, 128, 0.15);
   background-color: rgba(255, 255, 255, 0.01);
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -394,4 +395,13 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-height: 600px) {
+  .auth-modal-content {
+    padding: 24px 16px;
+  }
+  .auth-modal-visual {
+    padding: 24px;
+  }
 }

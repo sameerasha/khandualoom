@@ -126,3 +126,15 @@
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+@media (max-width: 480px) {
+  .delete-modal {
+    padding: 1.25rem;
+  }
+  .delete-modal__actions {
+    flex-direction: column;
+  }
+  .delete-modal__btn {
+    width: 100%;
+  }
+}

@@ -33,7 +33,7 @@ export default function AdminLayout({ children, currentRoute, onNavigate }) {
       <aside className="admin-sidebar">
         <div className="admin-sidebar__header">
           <button className="admin-sidebar__logo" onClick={() => onNavigate('admin/dashboard')}>
-            <span className="admin-sidebar__logo-icon">✦</span>
+            <img src="/logo.svg" alt="Logo" className="admin-sidebar__logo-icon" />
             <div className="admin-sidebar__logo-text">
               <span className="admin-sidebar__logo-main">Vastra Loom</span>
               <span className="admin-sidebar__logo-sub">Admin Panel</span>

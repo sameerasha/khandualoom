@@ -43,7 +43,10 @@ export default function AdminDashboard({ onNavigate }) {
     <div className="admin-dashboard">
       <div className="admin-dashboard__header">
         <div>
-          <h1 className="admin-dashboard__title">Dashboard</h1>
+          <h1 className="admin-dashboard__title">
+            Dashboard
+            <span className="admin-dashboard__live-indicator" title="System Live"></span>
+          </h1>
           <p className="admin-dashboard__subtitle">Welcome back, Admin. Here's your store overview.</p>
         </div>
         <button className="admin-dashboard__add-btn" onClick={() => onNavigate('admin/products/new')}>
@@ -55,7 +58,7 @@ export default function AdminDashboard({ onNavigate }) {
       {/* Stats Grid */}
       <div className="admin-dashboard__stats">
         {stats.map((stat, i) => (
-          <div key={i} className="admin-stat-card" style={{ '--stat-color': stat.color }}>
+          <div key={i} className="admin-stat-card" style={{ '--stat-color': stat.color, animationDelay: `${i * 0.1}s` }}>
             <div className="admin-stat-card__icon">{stat.icon}</div>
             <div>
               <div className="admin-stat-card__value">{stat.value}</div>
@@ -66,7 +69,7 @@ export default function AdminDashboard({ onNavigate }) {
       </div>
 
       {/* Quick Actions */}
-      <div className="admin-dashboard__section">
+      <div className="admin-dashboard__section" style={{ animationDelay: '0.3s' }}>
         <h2 className="admin-dashboard__section-title">Quick Actions</h2>
         <div className="admin-dashboard__actions">
           <button className="admin-action-card" onClick={() => onNavigate('admin/products/new')}>
@@ -91,11 +94,11 @@ export default function AdminDashboard({ onNavigate }) {
       </div>
 
       {/* Recent Products */}
-      <div className="admin-dashboard__section">
+      <div className="admin-dashboard__section" style={{ animationDelay: '0.4s' }}>
         <h2 className="admin-dashboard__section-title">Recent Products</h2>
         <div className="admin-dashboard__recent">
-          {products.slice(-10).reverse().map((product) => (
-            <div key={product.id} className="admin-recent-item" onClick={() => onNavigate(`admin/products/edit/${product.id}`)}>
+          {products.slice(-10).reverse().map((product, i) => (
+            <div key={product.id} className="admin-recent-item" style={{ animationDelay: `${i * 0.05 + 0.5}s` }} onClick={() => onNavigate(`admin/products/edit/${product.id}`)}>
               <div className="admin-recent-item__image">
                 <img src={product.image} alt={product.name} />
               </div>

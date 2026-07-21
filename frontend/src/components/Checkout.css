@@ -775,7 +775,7 @@
 }
 
 /* ========== Responsive ========== */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .checkout-page {
     padding: calc(var(--nav-height) + var(--space-xl)) var(--space-md) var(--space-2xl);
   }
@@ -822,12 +822,24 @@
     padding: var(--space-md);
   }
 
+  .address-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
   .summary-item-full {
     padding: var(--space-md);
   }
 
   .payment-card {
     padding: var(--space-md);
+  }
+
+  .payment-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .step-actions,
@@ -875,7 +887,7 @@
     0 24px 80px rgba(0, 0, 0, 0.7),
     0 0 40px rgba(195, 162, 126, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  min-width: 340px;
+  min-width: min(340px, 90vw);
   max-width: 440px;
   text-align: center;
   animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);

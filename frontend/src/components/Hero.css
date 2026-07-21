@@ -203,6 +203,10 @@
   transform: translateY(-2px);
 }
 
+.hero__cta-text--mobile {
+  display: none;
+}
+
 /* Stats */
 .hero__stats {
   display: flex;
@@ -281,6 +285,14 @@
   .hero__actions {
     flex-direction: column;
     align-items: center;
+  }
+
+  .hero__cta-text--desktop {
+    display: none;
+  }
+
+  .hero__cta-text--mobile {
+    display: inline;
   }
 
   .hero__cta {

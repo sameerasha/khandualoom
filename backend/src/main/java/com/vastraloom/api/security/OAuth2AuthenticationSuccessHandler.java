@@ -101,8 +101,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // Generate JWT Token
         String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
 
+        // Ensure we only use the primary frontend URL if multiple are provided via CORS config
+        String primaryFrontendUrl = frontendUrl.contains(",") ? frontendUrl.split(",")[0] : frontendUrl;
+
         // Redirect to Frontend
-        String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/oauth2/redirect")
+        String targetUrl = UriComponentsBuilder.fromUriString(primaryFrontendUrl + "/oauth2/redirect")
                 .queryParam("token", token)
                 .build().toUriString();
 

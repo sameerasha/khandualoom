@@ -112,10 +112,10 @@ export default function ProductManager({ onNavigate }) {
   // 1. INLINE DETAILED VIEW
   if (selectedProduct) {
     const hasDiscount = selectedProduct.originalPrice > selectedProduct.price;
-    const allGalleryImages = [
+    const allGalleryImages = Array.from(new Set([
       selectedProduct.image,
       ...(selectedProduct.images || [])
-    ].filter(img => img && img.trim() !== '');
+    ])).filter(img => img && img.trim() !== '');
 
     return (
       <div className="product-manager">
