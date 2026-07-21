@@ -1,9 +1,10 @@
 version: '3.8'
 
+name: vastraloom
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: postgres
+    container_name: vastraloom-postgres
     environment:
       POSTGRES_DB: vastraloom_db
       POSTGRES_USER: postgres
@@ -19,7 +20,7 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     env_file:
-      - ./backend/.env
+      - ./backend/.env.dev
     ports:
       - "8080:8080"
     depends_on:
@@ -31,7 +32,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env.dev
     ports:
       - "5173:5173"
     volumes:

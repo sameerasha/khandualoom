@@ -22,6 +22,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void run(String... args) throws Exception {
         userRepository.findByEmail("admin@vastraloom.com").ifPresentOrElse(
             admin -> {

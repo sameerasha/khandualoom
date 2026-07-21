@@ -22,6 +22,7 @@ public class OrderService {
     private final AddressRepository addressRepository;
 
     @Transactional
+    @SuppressWarnings("null")
     public OrderResponse createOrder(User user, OrderRequest request) {
         Address address = addressRepository.findById(request.getAddressId())
                 .orElseThrow(() -> new RuntimeException("Address not found"));
@@ -87,6 +88,7 @@ public class OrderService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
