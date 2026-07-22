@@ -452,6 +452,31 @@
   font-size: 0.8125rem;
 }
 
+@media (max-width: 768px) {
+  .address-card {
+    padding-right: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .address-card__header {
+    order: 1;
+  }
+  
+  .address-card__body {
+    order: 2;
+  }
+  
+  .address-card__actions {
+    position: static;
+    order: 3;
+    margin-top: 16px;
+    justify-content: flex-end;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+  }
+}
+
 /* Tabs Layout Styles */
 .profile-dashboard-layout {
   display: flex;
@@ -531,14 +556,21 @@
     text-align: left;
     justify-content: flex-start;
     gap: 12px;
+    flex: 0 0 auto; /* Prevent awkward stretching in column view */
   }
   .profile-tab:hover {
-    transform: translateX(4px);
+    transform: none; /* Remove jittery transform */
+    padding-left: 24px; /* Move content smoothly without moving the clickable box */
+    background: rgba(195, 162, 126, 0.08);
   }
   .profile-tab.active {
     background: linear-gradient(90deg, rgba(195,162,126,0.15) 0%, transparent 100%);
-    border-top: none;
+    border-top: 1px solid transparent; /* Reset mobile border */
     border-left: 4px solid #c3a27e;
+    padding-left: 20px; /* Adjust padding to account for border */
+  }
+  .profile-tab.active:hover {
+    padding-left: 20px; /* Don't shift when already active */
   }
 }
 
