@@ -40,6 +40,27 @@
   font-size: 0.9375rem;
 }
 
+@media (max-width: 768px) {
+  .profile-dashboard {
+    padding-top: 90px;
+    padding-bottom: 40px;
+  }
+  .profile-dashboard__header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .profile-dashboard__back-btn {
+    display: block;
+    margin: 0 auto 12px auto;
+  }
+  .profile-dashboard h1 {
+    font-size: 1.8rem;
+  }
+  .profile-dashboard__subtitle {
+    font-size: 0.85rem;
+  }
+}
+
 .profile-feedback {
   padding: 14px 20px;
   border-radius: 8px;
@@ -445,45 +466,80 @@
 }
 
 .profile-sidebar {
-  flex: 0 0 250px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  overflow-x: auto;
   gap: 8px;
   background: rgba(25, 25, 25, 0.4);
   backdrop-filter: blur(10px);
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   border: 1px solid rgba(195, 162, 126, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.profile-sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+@media (min-width: 768px) {
+  .profile-sidebar {
+    flex: 0 0 250px;
+    flex-direction: column;
+    overflow-x: visible;
+    padding: 16px;
+  }
 }
 
 .profile-tab {
   background: transparent;
   border: 1px solid transparent;
   color: var(--color-text-secondary);
-  padding: 14px 20px;
+  padding: 10px 16px;
   border-radius: 8px;
-  text-align: left;
+  text-align: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
   font-size: 0.9375rem;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  white-space: nowrap;
+  flex: 1 0 auto;
 }
 
 .profile-tab:hover {
   background: rgba(195, 162, 126, 0.08);
   color: #c3a27e;
-  transform: translateX(4px);
 }
 
 .profile-tab.active {
-  background: linear-gradient(90deg, rgba(195,162,126,0.15) 0%, transparent 100%);
-  border-left: 4px solid #c3a27e;
+  background: linear-gradient(180deg, rgba(195,162,126,0.15) 0%, transparent 100%);
+  border-top: 3px solid #c3a27e;
+  border-left: none;
   color: #c3a27e;
   box-shadow: none;
+}
+
+@media (min-width: 768px) {
+  .profile-tab {
+    padding: 14px 20px;
+    text-align: left;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .profile-tab:hover {
+    transform: translateX(4px);
+  }
+  .profile-tab.active {
+    background: linear-gradient(90deg, rgba(195,162,126,0.15) 0%, transparent 100%);
+    border-top: none;
+    border-left: 4px solid #c3a27e;
+  }
 }
 
 .profile-content {

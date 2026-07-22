@@ -440,3 +440,15 @@ input, textarea, select {
     padding: 12px;
   }
 }
+
+
+/* Added for logged-in minimal view to clear fixed navbar */
+.main-minimal {
+  padding-top: var(--nav-height);
+}
+
+@media (min-width: 768px) {
+  .main-minimal {
+    padding-top: calc(var(--nav-height) - var(--space-4xl) + var(--space-md));
+  }
+}

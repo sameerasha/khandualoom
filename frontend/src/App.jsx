@@ -321,7 +321,7 @@ function AppContent() {
         onNavigate={handleNavigate}
         currentRoute={route.path}
       />
-      <main>
+      <main className={showMinimal ? "main-minimal" : ""}>
         {!showMinimal && <Hero onSignUpClick={() => openAuth('signup')} />}
         <ProductGrid onNavigate={handleNavigate} />
         {!showMinimal && <About />}

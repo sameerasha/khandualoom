@@ -1,8 +1,45 @@
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './AdminLayout.css';
 
 export default function AdminLayout({ children, currentRoute, onNavigate }) {
   const { logout } = useAuth();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [serverStatus, setServerStatus] = useState('checking');
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuRef]);
+
+  // Server Heartbeat Check
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const url = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+        const response = await fetch(`${url}/api/health`, { 
+          method: 'GET',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        if (response.ok) {
+          setServerStatus('online');
+        } else {
+          setServerStatus('offline');
+        }
+      } catch (err) {
+        setServerStatus('offline');
+      }
+    };
+    checkHealth();
+    const interval = setInterval(checkHealth, 60000); // Poll every 1 minute
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -52,6 +89,30 @@ export default function AdminLayout({ children, currentRoute, onNavigate }) {
               <span>{item.label}</span>
             </button>
           ))}
+          
+          {/* Mobile Profile Menu Button */}
+          <div className="admin-mobile-profile" ref={menuRef}>
+            <button 
+              className={`admin-sidebar__link ${showProfileMenu ? 'admin-sidebar__link--active' : ''}`}
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+              <span>Profile</span>
+            </button>
+            
+            {showProfileMenu && (
+              <div className="admin-mobile-profile-dropdown">
+                <button onClick={() => { setShowProfileMenu(false); onNavigate(''); }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{marginRight: '8px', verticalAlign: 'middle'}}><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" /></svg>
+                  View Store
+                </button>
+                <button className="danger" onClick={() => { setShowProfileMenu(false); handleLogout(); }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{marginRight: '8px', verticalAlign: 'middle'}}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="admin-sidebar__footer">
@@ -63,6 +124,11 @@ export default function AdminLayout({ children, currentRoute, onNavigate }) {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
             <span>Logout</span>
           </button>
+          
+          <div className="admin-server-health">
+            <div className={`health-pulse-dot ${serverStatus}`}></div>
+            <span>Server {serverStatus === 'checking' ? 'Checking...' : (serverStatus === 'online' ? 'Online' : 'Offline')}</span>
+          </div>
         </div>
       </aside>
 
