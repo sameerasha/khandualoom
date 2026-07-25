@@ -27,6 +27,7 @@ D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\dto\Reset
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\dto\SignupRequest.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\dto\UserBasicInfo.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\dto\UserProfileResponse.java
+D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\ActiveSession.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\Address.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\AppConfig.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\AuthProvider.java
@@ -40,6 +41,7 @@ D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\Pro
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\RecentView.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\SocialMedia.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\model\User.java
+D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\ActiveSessionRepository.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\AddressRepository.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\AppConfigRepository.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\repository\ContactMessageRepository.java
@@ -54,6 +56,7 @@ D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\security\
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\security\JwtAuthenticationFilter.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\security\JwtTokenProvider.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\security\OAuth2AuthenticationSuccessHandler.java
+D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\service\ActiveSessionService.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\service\EmailService.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\service\OrderService.java
 D:\Project\Antigravity\Sample\backend\src\main\java\com\vastraloom\api\service\OtpService.java

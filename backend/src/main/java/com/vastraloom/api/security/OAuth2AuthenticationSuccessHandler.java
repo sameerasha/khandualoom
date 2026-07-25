@@ -26,6 +26,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final com.vastraloom.api.service.ActiveSessionService activeSessionService;
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
@@ -100,6 +101,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // Generate JWT Token
         String token = jwtTokenProvider.generateTokenFromEmail(user.getEmail());
+        
+        // Track the session
+        activeSessionService.createSession(token, user.getEmail());
 
         // Ensure we only use the primary frontend URL if multiple are provided via CORS config
         String primaryFrontendUrl = frontendUrl.contains(",") ? frontendUrl.split(",")[0] : frontendUrl;

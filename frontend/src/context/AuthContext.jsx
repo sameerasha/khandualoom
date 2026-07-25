@@ -11,7 +11,18 @@ export function AuthProvider({ children }) {
   const [customerInfo, setCustomerInfo] = useState(null);
   const [loginError, setLoginError] = useState('');
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token && !token.startsWith('mock')) {
+      try {
+        await window.fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {
+        // Silently fail if network is down or already expired
+      }
+    }
     setIsAdmin(false);
     setIsCustomerLoggedIn(false);
     setCustomerInfo(null);
@@ -23,6 +34,7 @@ export function AuthProvider({ children }) {
   const handleSessionExpired = useCallback(() => {
     logout();
     setLoginError('Your session has expired. Please log in again.');
+    window.dispatchEvent(new Event('force-login'));
   }, [logout]);
 
   // Fetch the currently authenticated user's profile (for customer)
@@ -31,12 +43,6 @@ export function AuthProvider({ children }) {
     if (!token) return null;
     
     if (token.startsWith('mock-sso-token')) {
-      const parts = token.split('-');
-      const timestamp = parseInt(parts[parts.length - 1], 10);
-      if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
-        handleSessionExpired();
-        return null;
-      }
       return null; // Mock profile handled in initAuth
     }
 
@@ -96,70 +102,52 @@ export function AuthProvider({ children }) {
       }
 
       if (token) {
-        if (token.startsWith('mock-sso-token')) {
-          const parts = token.split('-');
-          const timestamp = parseInt(parts[parts.length - 1], 10);
-          if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
-            handleSessionExpired();
-            return;
+        if (username && username.trim() !== '') {
+          setCustomerInfo({ firstName: username, email: username }); // username var holds email or original mock id
+        }
+        if (!token.startsWith('mock-sso-token')) {
+          const profile = await fetchProfile();
+          if (profile) {
+            if (role === 'ROLE_ADMIN') {
+              setIsAdmin(true);
+            } else if (role === 'ROLE_USER') {
+              setIsCustomerLoggedIn(true);
+            }
+          } else {
+             // Invalid token, do not set logged in state
+             handleSessionExpired();
           }
         } else {
-          // Check standard JWT expiration
-          try {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            const payload = JSON.parse(jsonPayload);
-            if (payload.exp && (payload.exp * 1000) < Date.now()) {
-              handleSessionExpired();
-              return;
-            }
-          } catch (e) {
-            // Invalid token format
-            handleSessionExpired();
-            return;
+          if (role === 'ROLE_ADMIN') {
+            setIsAdmin(true);
+          } else if (role === 'ROLE_USER') {
+            setIsCustomerLoggedIn(true);
           }
-        }
-
-        if (role === 'ROLE_ADMIN') {
-          setIsAdmin(true);
-        } else if (role === 'ROLE_USER') {
-          setIsCustomerLoggedIn(true);
-          
-          if (username && username.trim() !== '') {
-            setCustomerInfo({ firstName: username, email: username }); // username var holds email or original mock id
-          }
-          if (!token.startsWith('mock-sso-token')) {
-            await fetchProfile();
-          } else {
-            // Re-inflate mock info for social SSO user session
-            setCustomerInfo({
-              firstName: username,
-              lastName: '',
-              email: `${username.toLowerCase()}@social.com`,
-              phone: '+91 99999 88888',
-              addresses: [
-                {
-                  id: 999,
-                  addressType: 'HOME',
-                  fullName: username,
-                  streetAddress: '123 Heritage Lane, Handloom Enclave',
-                  city: 'Varanasi',
-                  state: 'Uttar Pradesh',
-                  pincode: '221001',
-                  landmark: 'Near Kashi Vishwanath Temple',
-                  country: 'India'
-                }
-              ]
-            });
-          }
+          // Re-inflate mock info for social SSO user session
+          setCustomerInfo({
+            firstName: username,
+            lastName: '',
+            email: `${username.toLowerCase()}@social.com`,
+            phone: '+91 99999 88888',
+            addresses: [
+              {
+                id: 999,
+                addressType: 'HOME',
+                fullName: username,
+                streetAddress: '123 Heritage Lane, Handloom Enclave',
+                city: 'Varanasi',
+                state: 'Uttar Pradesh',
+                pincode: '221001',
+                landmark: 'Near Kashi Vishwanath Temple',
+                country: 'India'
+              }
+            ]
+          });
         }
       }
     };
     initAuth();
-  }, [fetchProfile, handleSessionExpired]);
+  }, [fetchProfile]);
 
   // Unified login handling both admins and customers based on role
   const login = useCallback(async (email, password) => {

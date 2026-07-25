@@ -99,7 +99,7 @@ function AppContent() {
     if (isAdmin && route.path === 'admin') {
       handleNavigate('admin/dashboard', true);
     }
-    if (route.path === 'profile' && !isCustomerLoggedIn) {
+    if ((route.path === 'profile' || route.path === 'checkout') && !isCustomerLoggedIn) {
       handleNavigate('', true);
     }
   }, [route.path, isAdmin, isCustomerLoggedIn]);
@@ -114,8 +114,15 @@ function AppContent() {
     const handleForceSignup = () => {
       openAuth('signup');
     };
+    const handleForceLogin = () => {
+      openAuth('login');
+    };
     window.addEventListener('force-signup', handleForceSignup);
-    return () => window.removeEventListener('force-signup', handleForceSignup);
+    window.addEventListener('force-login', handleForceLogin);
+    return () => {
+      window.removeEventListener('force-signup', handleForceSignup);
+      window.removeEventListener('force-login', handleForceLogin);
+    };
   }, []);
 
   useEffect(() => {
@@ -123,7 +130,7 @@ function AppContent() {
       const redirectTarget = sessionStorage.getItem('redirectAfterAuth');
       if (redirectTarget) {
         sessionStorage.removeItem('redirectAfterAuth');
-        handleNavigate(redirectTarget);
+        handleNavigate(redirectTarget, true);
       }
     }
   }, [isCustomerLoggedIn]);
@@ -211,29 +218,7 @@ function AppContent() {
   // Checkout Route
   if (route.path === 'checkout') {
     if (!isCustomerLoggedIn) {
-      sessionStorage.setItem('redirectAfterAuth', 'checkout');
-      return (
-        <div className="app">
-          <Navbar
-            onSignUpClick={() => openAuth('signup')}
-            onCartClick={() => setIsCartOpen(true)}
-            onContactClick={() => handleNavigate('contact')}
-            onNavigate={handleNavigate}
-            currentRoute={route.path}
-          />
-          <main className="container" style={{ padding: '120px 20px', textAlign: 'center', minHeight: '60vh' }}>
-            <h2 style={{ fontSize: '1.8rem', marginBottom: '16px', fontFamily: 'var(--font-display)' }}>Sign In Required</h2>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px' }}>Please sign in or register to complete your order checkout.</p>
-            <button onClick={() => openAuth('login')} className="checkout-btn primary" style={{ maxWidth: '240px', margin: '0 auto' }}>
-              Sign In to Checkout
-            </button>
-          </main>
-          <Footer onContactClick={() => handleNavigate('contact')} onSignUpClick={() => openAuth('signup')} onNavigate={handleNavigate} />
-          <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} onNavigate={handleNavigate} />
-          <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onCheckout={handleCheckoutClick} />
-          <ToastContainer />
-        </div>
-      );
+      return null;
     }
 
     return (

@@ -32,18 +32,32 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
+    private final com.vastraloom.api.service.ActiveSessionService activeSessionService;
 
     public AuthController(
             AuthenticationManager authenticationManager,
             JwtTokenProvider tokenProvider,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            OtpService otpService) {
+            OtpService otpService,
+            com.vastraloom.api.service.ActiveSessionService activeSessionService) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
+        this.activeSessionService = activeSessionService;
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(jakarta.servlet.http.HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (org.springframework.util.StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            String jwt = bearerToken.substring(7);
+            activeSessionService.removeSession(jwt);
+            log.info("Token successfully removed from active sessions during logout.");
+        }
+        return ResponseEntity.ok("Successfully logged out");
     }
 
     @PostMapping("/login")
@@ -66,6 +80,9 @@ public class AuthController {
                     .map(org.springframework.security.core.GrantedAuthority::getAuthority)
                     .findFirst()
                     .orElse("ROLE_USER");
+                    
+            activeSessionService.createSession(jwt, userDetails.getUsername());
+            
             log.info("User {} successfully authenticated with role {}", loginRequest.getEmail(), role);
             return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, userDetails.getUsername(), role)); // username here actually holds the email
         } catch (org.springframework.security.core.AuthenticationException e) {
@@ -146,6 +163,8 @@ public class AuthController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = tokenProvider.generateToken(authentication);
+            
+            activeSessionService.createSession(jwt, user.getEmail());
             
             log.info("User {} successfully logged in via OTP", user.getEmail());
             return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user.getEmail(), user.getRole()));

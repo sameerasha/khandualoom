@@ -1,7 +1,6 @@
 com\vastraloom\api\controller\ContactController.class
 com\vastraloom\api\dto\LoginRequest.class
 com\vastraloom\api\model\Order.class
-com\vastraloom\api\controller\AuthController.class
 com\vastraloom\api\security\JwtTokenProvider.class
 com\vastraloom\api\model\Product.class
 com\vastraloom\api\controller\AdminUserController.class

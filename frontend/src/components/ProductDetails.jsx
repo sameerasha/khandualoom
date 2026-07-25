@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import ProductCard from './ProductCard';
 import './ProductDetails.css';
 
@@ -13,17 +14,39 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [images, setImages] = useState([]);
   const [activeImage, setActiveImage] = useState('');
+
   const [zoomStyle, setZoomStyle] = useState({
     transformOrigin: 'center center',
     transform: 'scale(1)'
   });
+  const [mobileZoomed, setMobileZoomed] = useState(false);
+  const lastTap = useRef(0);
 
   // Discover More State
   const [discoverProductsPool, setDiscoverProductsPool] = useState([]);
   const [discoverDisplayCount, setDiscoverDisplayCount] = useState(9);
   const [loadingDiscover, setLoadingDiscover] = useState(false);
+
+  const fetchDiscoverProducts = (currentProdId = productId) => {
+    setLoadingDiscover(true);
+    fetch(`${import.meta.env.VITE_API_URL}/api/products/paged?page=0&size=21`)
+      .then(res => {
+        if (res.ok) return res.json();
+        throw new Error('Failed to load paged products');
+      })
+      .then(data => {
+        if (data && data.content) {
+          const filtered = data.content.filter(p => p.id !== currentProdId).slice(0, 20);
+          setDiscoverProductsPool(filtered);
+          setDiscoverDisplayCount(9);
+        }
+      })
+      .catch(err => console.error('Failed to load discover products', err))
+      .finally(() => setLoadingDiscover(false));
+  };
 
   useEffect(() => {
     // Reset state when product ID changes
@@ -72,6 +95,8 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
     fetchDiscoverProducts(productId);
   }, [productId, products]);
 
+
+
   // Track product view if customer is logged in
   useEffect(() => {
     if (!productId || !isCustomerLoggedIn || !customerInfo?.id) return;
@@ -82,25 +107,7 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
 
   }, [productId, isCustomerLoggedIn, customerInfo]);
 
-  const fetchDiscoverProducts = (currentProdId = productId) => {
-    setLoadingDiscover(true);
-    // Fetch 21 to account for potential exclusion of the current product, ensuring we get up to 20
-    fetch(`${import.meta.env.VITE_API_URL}/api/products/paged?page=0&size=21`)
-      .then(res => {
-        if (res.ok) return res.json();
-        throw new Error('Failed to load paged products');
-      })
-      .then(data => {
-        if (data && data.content) {
-          // Exclude the current product and limit to exactly 20
-          const filtered = data.content.filter(p => p.id !== currentProdId).slice(0, 20);
-          setDiscoverProductsPool(filtered);
-          setDiscoverDisplayCount(9);
-        }
-      })
-      .catch(err => console.error('Failed to load discover products', err))
-      .finally(() => setLoadingDiscover(false));
-  };
+
 
   const handleLoadMoreDiscover = () => {
     setDiscoverDisplayCount(prev => Math.min(prev + 9, 27));
@@ -142,23 +149,96 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
     }
   }, [product]);
 
-  // Handle Zoom tracking coordinates
+  const longPressTimer = useRef(null);
+
+  const startLongPress = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    longPressTimer.current = setTimeout(() => {
+      setIsLightboxOpen(true);
+      longPressTimer.current = null;
+    }, 500);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  // Desktop Hover
   const handleMouseMove = (e) => {
+    if (mobileZoomed) return;
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
     setZoomStyle({
-      transformOrigin: `${x}% ${y}%`,
-      transform: 'scale(2)'
+      transformOrigin: `${Math.max(0, Math.min(100, x))}% ${Math.max(0, Math.min(100, y))}%`,
+      transform: 'scale(2.5)'
     });
   };
 
   const handleMouseLeave = () => {
+    cancelLongPress();
+    if (mobileZoomed) return;
     setZoomStyle({
       transformOrigin: 'center center',
       transform: 'scale(1)'
     });
   };
+
+  // Mobile Double Tap & Pan
+  const handleTouchStart = (e) => {
+    startLongPress();
+
+    const now = Date.now();
+    if (now - lastTap.current < 300) {
+      // Double tap detected!
+      cancelLongPress();
+      
+      // Compute safe values synchronously to avoid React synthetic event pooling / async crashes
+      const touch = e.touches[0];
+      const rect = e.currentTarget.getBoundingClientRect();
+      
+      setMobileZoomed(prev => {
+        const nextZoomed = !prev;
+        if (!nextZoomed) {
+          setZoomStyle({ transformOrigin: 'center center', transform: 'scale(1)' });
+        } else {
+          if (touch && rect) {
+            const x = ((touch.clientX - rect.left) / rect.width) * 100;
+            const y = ((touch.clientY - rect.top) / rect.height) * 100;
+            setZoomStyle({
+              transformOrigin: `${Math.max(0, Math.min(100, x))}% ${Math.max(0, Math.min(100, y))}%`,
+              transform: 'scale(2.5)'
+            });
+          }
+        }
+        return nextZoomed;
+      });
+      lastTap.current = 0;
+    } else {
+      lastTap.current = now;
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    cancelLongPress(); // Cancel long press if they start dragging
+
+    if (!mobileZoomed) return;
+    const touch = e.touches[0];
+    if (touch) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((touch.clientX - rect.left) / rect.width) * 100;
+      const y = ((touch.clientY - rect.top) / rect.height) * 100;
+      setZoomStyle({
+        transformOrigin: `${Math.max(0, Math.min(100, x))}% ${Math.max(0, Math.min(100, y))}%`,
+        transform: 'scale(2.5)'
+      });
+    }
+  };
+
+
 
   const isAdded = product ? cartItems.some(item => item.id === product.id) : false;
 
@@ -260,12 +340,20 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
               className="product-gallery__main-wrap"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
+              onMouseDown={startLongPress}
+              onMouseUp={cancelLongPress}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={cancelLongPress}
+              onTouchCancel={cancelLongPress}
+              style={{ touchAction: mobileZoomed ? 'none' : 'auto' }}
             >
               <img 
                 src={activeImage} 
                 alt={product.name} 
                 className="product-gallery__main-image"
                 style={zoomStyle}
+                draggable="false"
               />
               <span className="zoom-hint">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -274,7 +362,7 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
                   <line x1="11" y1="8" x2="11" y2="14"></line>
                   <line x1="8" y1="11" x2="14" y2="11"></line>
                 </svg>
-                Hover to Zoom
+                {mobileZoomed ? 'Double-tap to Zoom Out' : 'Hover / Double-tap to Zoom'}
               </span>
             </div>
           </div>
@@ -467,6 +555,34 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
         )}
 
       </div>
+      
+      {/* Fullscreen Image Lightbox */}
+      {isLightboxOpen && (
+        <div className="product-lightbox" onClick={() => setIsLightboxOpen(false)}>
+          <button className="product-lightbox__close" onClick={() => setIsLightboxOpen(false)}>&times;</button>
+          <div 
+            className="product-lightbox__image-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <TransformWrapper
+              initialScale={1}
+              minScale={1}
+              maxScale={4}
+              doubleClick={{ mode: "toggle" }}
+              wheel={{ step: 0.1 }}
+            >
+              <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }}>
+                <img 
+                  src={activeImage} 
+                  alt={product.name} 
+                  className="product-lightbox__image" 
+                  draggable="false"
+                />
+              </TransformComponent>
+            </TransformWrapper>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

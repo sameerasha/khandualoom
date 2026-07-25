@@ -22,9 +22,9 @@ export default function AdminLogin({ onNavigate }) {
     setIsLoading(false);
     
     if (result && result.success && result.role === 'ROLE_ADMIN') {
-      onNavigate('admin/dashboard');
+      onNavigate('admin/dashboard', true);
     } else if (result && result.success) {
-      onNavigate('');
+      onNavigate('', true);
     } else {
       setError(loginError || 'Authentication failed. Please verify credentials.');
     }

@@ -20,10 +20,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
+    private final com.vastraloom.api.service.ActiveSessionService activeSessionService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService, com.vastraloom.api.service.ActiveSessionService activeSessionService) {
         this.tokenProvider = tokenProvider;
         this.customUserDetailsService = customUserDetailsService;
+        this.activeSessionService = activeSessionService;
     }
 
     @Override
@@ -35,6 +37,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+                if (!activeSessionService.isValidSession(jwt)) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session is no longer active");
+                    return;
+                }
+                
                 String email = tokenProvider.getEmailFromJWT(jwt);
 
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
@@ -45,7 +52,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
-            // Log error
+            System.err.println("Exception in JwtAuthenticationFilter:");
+            ex.printStackTrace();
         }
 
         filterChain.doFilter(request, response);

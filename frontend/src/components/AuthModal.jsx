@@ -85,18 +85,18 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
   const handleAuthSuccess = (role) => {
     onClose();
     if (role === 'ROLE_ADMIN') {
-      onNavigate('admin/dashboard');
+      onNavigate('admin/dashboard', true);
     } else {
       const redirectTarget = sessionStorage.getItem('redirectAfterAuth');
       if (redirectTarget) {
         sessionStorage.removeItem('redirectAfterAuth');
-        onNavigate(redirectTarget);
+        onNavigate(redirectTarget, true);
       } else {
         const currentHash = window.location.hash.replace('#/', '');
         if (currentHash && currentHash !== 'checkout') {
           // Stay on current page
         } else {
-          onNavigate('');
+          onNavigate('', true);
         }
       }
     }
