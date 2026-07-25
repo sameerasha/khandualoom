@@ -71,15 +71,11 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const originalFetch = window.fetch;
     window.fetch = async function () {
-      try {
-        const response = await originalFetch.apply(this, arguments);
-        if (response.status === 401) {
-          handleSessionExpired();
-        }
-        return response;
-      } catch (error) {
-        throw error;
+      const response = await originalFetch.apply(this, arguments);
+      if (response.status === 401) {
+        handleSessionExpired();
       }
+      return response;
     };
     return () => {
       window.fetch = originalFetch;
@@ -115,7 +111,7 @@ export function AuthProvider({ children }) {
               handleSessionExpired();
               return;
             }
-          } catch (e) {
+          } catch {
             // Invalid token format
             handleSessionExpired();
             return;
@@ -214,11 +210,11 @@ export function AuthProvider({ children }) {
         setLoginError(errorMsg || 'Invalid username or password');
         return { success: false };
       }
-    } catch (error) {
+    } catch {
       setLoginError('Server connection error. Please make sure the backend is running.');
       return { success: false };
     }
-  }, []);
+  }, [handleSessionExpired]);
 
   // Mock SSO Login for Social Networks (Gmail, Facebook, Instagram)
   const socialLogin = useCallback((provider, username) => {
@@ -269,7 +265,7 @@ export function AuthProvider({ children }) {
         const errorText = await response.text();
         return { success: false, error: errorText || 'Registration failed' };
       }
-    } catch (e) {
+    } catch {
       return { success: false, error: 'Server connection error. Please try again.' };
     }
   }, []);
@@ -292,7 +288,7 @@ export function AuthProvider({ children }) {
         const err = await response.text();
         return { success: false, error: err };
       }
-    } catch (err) {
+    } catch {
       return { success: false, error: 'Connection error while sending OTP.' };
     }
   };
@@ -310,7 +306,7 @@ export function AuthProvider({ children }) {
         const err = await response.text();
         return { success: false, error: err };
       }
-    } catch (err) {
+    } catch {
       return { success: false, error: 'Connection error while verifying OTP.' };
     }
   };
@@ -361,7 +357,7 @@ export function AuthProvider({ children }) {
         setLoginError(err || 'OTP Login failed.');
         return { success: false, error: err };
       }
-    } catch (err) {
+    } catch {
       setLoginError('Connection error during OTP login.');
       return { success: false, error: 'Connection error during OTP login.' };
     }
@@ -380,7 +376,7 @@ export function AuthProvider({ children }) {
         const err = await response.text();
         return { success: false, error: err };
       }
-    } catch (err) {
+    } catch {
       return { success: false, error: 'Connection error while resetting password.' };
     }
   };
@@ -426,7 +422,7 @@ export function AuthProvider({ children }) {
         const errorText = await response.text();
         return { success: false, error: errorText || 'Failed to update profile' };
       }
-    } catch (e) {
+    } catch {
       return { success: false, error: 'Server connection error. Please try again.' };
     }
   }, []);
@@ -463,6 +459,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

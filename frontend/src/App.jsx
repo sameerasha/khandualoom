@@ -83,20 +83,24 @@ function AppContent() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const handleNavigate = (path) => {
-    window.location.hash = path ? `#/${path}` : '#/';
+  const handleNavigate = (path, replace = false) => {
+    if (replace) {
+      window.location.replace(window.location.pathname + window.location.search + (path ? `#/${path}` : '#/'));
+    } else {
+      window.location.hash = path ? `#/${path}` : '#/';
+    }
   };
 
   // Route Guard for admin portal & expired customer sessions
   useEffect(() => {
     if (!isAdmin && route.path.startsWith('admin') && route.path !== 'admin') {
-      handleNavigate('admin');
+      handleNavigate('admin', true);
     }
     if (isAdmin && route.path === 'admin') {
-      handleNavigate('admin/dashboard');
+      handleNavigate('admin/dashboard', true);
     }
     if (route.path === 'profile' && !isCustomerLoggedIn) {
-      handleNavigate('');
+      handleNavigate('', true);
     }
   }, [route.path, isAdmin, isCustomerLoggedIn]);
 

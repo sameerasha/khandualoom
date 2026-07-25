@@ -258,6 +258,7 @@ export default function ProfileDashboard({ onNavigate }) {
       
       if (response.ok) {
         logout();
+        onNavigate('', true);
       } else {
         const text = await response.text();
         showToast(text || "Failed to delete account", 'error');

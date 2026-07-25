@@ -143,7 +143,7 @@ export default function Navbar({ onSignUpClick, onCartClick, onContactClick, onN
               }}>
                 Hi, {customerInfo?.firstName || 'Profile'}
               </button>
-              <button className="navbar__logout-btn" onClick={() => { logout(); onNavigate(''); }} id="logout-nav-button" title="Logout" style={{
+              <button className="navbar__logout-btn" onClick={() => { logout(); onNavigate('', true); }} id="logout-nav-button" title="Logout" style={{
                 background: 'none',
                 border: 'none',
                 color: '#ef4444',
@@ -183,7 +183,7 @@ export default function Navbar({ onSignUpClick, onCartClick, onContactClick, onN
             <>
               <li className="navbar__mobile-user-block">
                 <div className="navbar__mobile-user-name">Hi, {customerInfo?.firstName || 'Profile'}</div>
-                <button className="navbar__logout-btn--mobile" onClick={() => { logout(); setMenuOpen(false); onNavigate(''); }}>
+                <button className="navbar__logout-btn--mobile" onClick={() => { logout(); setMenuOpen(false); onNavigate('', true); }}>
                   Logout
                 </button>
               </li>

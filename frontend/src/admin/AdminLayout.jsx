@@ -43,7 +43,7 @@ export default function AdminLayout({ children, currentRoute, onNavigate }) {
 
   const handleLogout = () => {
     logout();
-    onNavigate('');
+    onNavigate('', true);
   };
 
   const navItems = [

@@ -120,6 +120,7 @@ export function ProductProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useProducts() {
   const context = useContext(ProductContext);
   if (!context) {
