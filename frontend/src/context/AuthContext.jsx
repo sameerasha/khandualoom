@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
-      } catch (e) {
+      } catch {
         // Silently fail if network is down or already expired
       }
     }
@@ -147,7 +147,7 @@ export function AuthProvider({ children }) {
       }
     };
     initAuth();
-  }, [fetchProfile]);
+  }, [fetchProfile, handleSessionExpired]);
 
   // Unified login handling both admins and customers based on role
   const login = useCallback(async (email, password) => {

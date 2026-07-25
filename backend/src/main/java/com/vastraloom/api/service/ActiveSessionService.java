@@ -27,15 +27,20 @@ public class ActiveSessionService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public void createSession(String token, String email) {
         try {
             // Remove existing sessions for this email to maintain 1 active session per user
             List<ActiveSession> existingSessions = activeSessionRepository.findByEmail(email);
+            org.springframework.cache.Cache activeSessionsCache = cacheManager.getCache("activeSessions");
+            
             for (ActiveSession existing : existingSessions) {
-                if (cacheManager.getCache("activeSessions") != null) {
-                    cacheManager.getCache("activeSessions").evict(existing.getToken());
+                if (activeSessionsCache != null && existing.getToken() != null) {
+                    activeSessionsCache.evict(existing.getToken());
                 }
-                activeSessionRepository.delete(existing);
+                if (existing != null) {
+                    activeSessionRepository.delete(existing);
+                }
             }
             activeSessionRepository.flush();
 
@@ -45,7 +50,9 @@ public class ActiveSessionService {
                     .email(email)
                     .expiryDate(expiryDate)
                     .build();
-            activeSessionRepository.save(session);
+            if (session != null) {
+                activeSessionRepository.save(session);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to create session: " + e.getMessage());
