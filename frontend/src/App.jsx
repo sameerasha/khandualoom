@@ -87,7 +87,7 @@ function AppContent() {
     window.location.hash = path ? `#/${path}` : '#/';
   };
 
-  // Route Guard for admin portal
+  // Route Guard for admin portal & expired customer sessions
   useEffect(() => {
     if (!isAdmin && route.path.startsWith('admin') && route.path !== 'admin') {
       handleNavigate('admin');
@@ -95,7 +95,10 @@ function AppContent() {
     if (isAdmin && route.path === 'admin') {
       handleNavigate('admin/dashboard');
     }
-  }, [route.path, isAdmin]);
+    if (route.path === 'profile' && !isCustomerLoggedIn) {
+      handleNavigate('');
+    }
+  }, [route.path, isAdmin, isCustomerLoggedIn]);
 
   // Handle open auth modal
   const openAuth = (tabName = 'login') => {
@@ -176,7 +179,6 @@ function AppContent() {
   // Profile Route
   if (route.path === 'profile') {
     if (!isCustomerLoggedIn) {
-      handleNavigate('');
       return null;
     }
 

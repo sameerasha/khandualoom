@@ -20,9 +20,7 @@
 }
 
 .social-modal {
-  background: rgba(11, 13, 23, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: #0b0d17;
   border: 1px solid rgba(232, 168, 124, 0.15);
   border-radius: 24px;
   padding: 3rem 2.5rem;

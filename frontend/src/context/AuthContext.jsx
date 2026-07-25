@@ -100,11 +100,23 @@ export function AuthProvider({ children }) {
       }
 
       if (token) {
-        // For mock tokens, enforce 24hr check immediately on load
         if (token.startsWith('mock-sso-token')) {
           const parts = token.split('-');
           const timestamp = parseInt(parts[parts.length - 1], 10);
           if (Date.now() - timestamp > 24 * 60 * 60 * 1000) {
+            handleSessionExpired();
+            return;
+          }
+        } else {
+          // Check standard JWT expiration
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.exp && (payload.exp * 1000) < Date.now()) {
+              handleSessionExpired();
+              return;
+            }
+          } catch (e) {
+            // Invalid token format
             handleSessionExpired();
             return;
           }
