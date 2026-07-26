@@ -3,6 +3,7 @@ com\vastraloom\api\dto\LoginRequest.class
 com\vastraloom\api\model\ActiveSession.class
 com\vastraloom\api\model\Order.class
 com\vastraloom\api\model\ContactMessage$ContactMessageBuilder.class
+com\vastraloom\api\controller\SuperAdminController.class
 com\vastraloom\api\controller\AuthController.class
 com\vastraloom\api\security\JwtTokenProvider.class
 com\vastraloom\api\model\Product.class
@@ -32,6 +33,7 @@ com\vastraloom\api\model\User.class
 com\vastraloom\api\config\DataInitializer.class
 com\vastraloom\api\dto\PaymentResponse$PaymentResponseBuilder.class
 com\vastraloom\api\controller\OrderController.class
+com\vastraloom\api\dto\RefreshTokenRequest.class
 com\vastraloom\api\model\ContactMessage.class
 com\vastraloom\api\security\CustomUserDetailsService.class
 com\vastraloom\api\model\RecentView.class

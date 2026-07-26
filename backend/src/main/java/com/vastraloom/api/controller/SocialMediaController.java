@@ -6,16 +6,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/social-media")
 @CrossOrigin(origins = "*", maxAge = 3600)
+@RequiredArgsConstructor
 public class SocialMediaController {
 
     private final SocialMediaRepository socialMediaRepository;
 
-    public SocialMediaController(SocialMediaRepository socialMediaRepository) {
-        this.socialMediaRepository = socialMediaRepository;
-    }
 
     // Public endpoint for the storefront
     @GetMapping

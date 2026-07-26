@@ -31,4 +31,11 @@ public class ActiveSession {
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date expiryDate;
+
+    @Column(name = "refresh_token", length = 1024)
+    private String refreshToken;
+
+    @Column(name = "refresh_expiry_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date refreshExpiryDate;
 }

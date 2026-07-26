@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import './AdminLayout.css';
 
 export default function AdminLayout({ children, currentRoute, onNavigate }) {
-  const { logout } = useAuth();
+  const { logout, isSuperAdmin } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [serverStatus, setServerStatus] = useState('checking');
   const menuRef = useRef(null);
@@ -59,10 +59,21 @@ export default function AdminLayout({ children, currentRoute, onNavigate }) {
     { id: 'admin/orders', label: 'Orders', icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
     )},
-    { id: 'admin/settings', label: 'Social Media', icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    { id: 'admin/settings', label: 'Social Media', hideOnMobile: true, icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
     )}
   ];
+
+  if (isSuperAdmin) {
+    navItems.push({
+      id: 'admin/admins',
+      label: 'Manage Admins',
+      hideOnMobile: true,
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      )
+    });
+  }
 
   return (
     <div className="admin-layout">
@@ -82,7 +93,7 @@ export default function AdminLayout({ children, currentRoute, onNavigate }) {
           {navItems.map((item) => (
             <button
               key={item.id}
-              className={`admin-sidebar__link ${currentRoute === item.id ? 'admin-sidebar__link--active' : ''}`}
+              className={`admin-sidebar__link ${currentRoute === item.id ? 'admin-sidebar__link--active' : ''} ${item.hideOnMobile ? 'admin-sidebar__link--desktop-only' : ''}`}
               onClick={() => onNavigate(item.id)}
             >
               {item.icon}
@@ -102,6 +113,17 @@ export default function AdminLayout({ children, currentRoute, onNavigate }) {
             
             {showProfileMenu && (
               <div className="admin-mobile-profile-dropdown">
+                <button onClick={() => { setShowProfileMenu(false); onNavigate('admin/settings'); }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{marginRight: '8px', verticalAlign: 'middle'}}><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                  Social Media
+                </button>
+                {isSuperAdmin && (
+                  <button onClick={() => { setShowProfileMenu(false); onNavigate('admin/admins'); }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{marginRight: '8px', verticalAlign: 'middle'}}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    Manage Admins
+                  </button>
+                )}
+                <div style={{height: '1px', background: 'rgba(255,255,255,0.1)', margin: '4px 0'}}></div>
                 <button onClick={() => { setShowProfileMenu(false); onNavigate(''); }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{marginRight: '8px', verticalAlign: 'middle'}}><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" /></svg>
                   View Store

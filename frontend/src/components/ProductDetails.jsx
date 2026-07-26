@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import ProductCard from './ProductCard';
 import './ProductDetails.css';
+import './ProductGrid.css';
 
 export default function ProductDetails({ productId, onNavigate, onCheckout }) {
   const { products } = useProducts();
@@ -14,15 +14,14 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [images, setImages] = useState([]);
   const [activeImage, setActiveImage] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const [zoomStyle, setZoomStyle] = useState({
     transformOrigin: 'center center',
     transform: 'scale(1)'
   });
-  const [mobileZoomed, setMobileZoomed] = useState(false);
   const lastTap = useRef(0);
 
   // Discover More State
@@ -149,26 +148,11 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
     }
   }, [product]);
 
-  const longPressTimer = useRef(null);
-
-  const startLongPress = () => {
-    if (longPressTimer.current) clearTimeout(longPressTimer.current);
-    longPressTimer.current = setTimeout(() => {
-      setIsLightboxOpen(true);
-      longPressTimer.current = null;
-    }, 500);
-  };
-
-  const cancelLongPress = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  };
-
-  // Desktop Hover
+  // Desktop Hover Zoom
   const handleMouseMove = (e) => {
-    if (mobileZoomed) return;
+    // Only zoom if it's not a touch device
+    if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) return;
+    
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
@@ -179,62 +163,21 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
   };
 
   const handleMouseLeave = () => {
-    cancelLongPress();
-    if (mobileZoomed) return;
     setZoomStyle({
       transformOrigin: 'center center',
       transform: 'scale(1)'
     });
   };
 
-  // Mobile Double Tap & Pan
-  const handleTouchStart = (e) => {
-    startLongPress();
-
-    const now = Date.now();
-    if (now - lastTap.current < 300) {
-      // Double tap detected!
-      cancelLongPress();
-      
-      // Compute safe values synchronously to avoid React synthetic event pooling / async crashes
-      const touch = e.touches[0];
-      const rect = e.currentTarget.getBoundingClientRect();
-      
-      setMobileZoomed(prev => {
-        const nextZoomed = !prev;
-        if (!nextZoomed) {
-          setZoomStyle({ transformOrigin: 'center center', transform: 'scale(1)' });
-        } else {
-          if (touch && rect) {
-            const x = ((touch.clientX - rect.left) / rect.width) * 100;
-            const y = ((touch.clientY - rect.top) / rect.height) * 100;
-            setZoomStyle({
-              transformOrigin: `${Math.max(0, Math.min(100, x))}% ${Math.max(0, Math.min(100, y))}%`,
-              transform: 'scale(2.5)'
-            });
-          }
-        }
-        return nextZoomed;
-      });
-      lastTap.current = 0;
-    } else {
-      lastTap.current = now;
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    cancelLongPress(); // Cancel long press if they start dragging
-
-    if (!mobileZoomed) return;
-    const touch = e.touches[0];
-    if (touch) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = ((touch.clientX - rect.left) / rect.width) * 100;
-      const y = ((touch.clientY - rect.top) / rect.height) * 100;
-      setZoomStyle({
-        transformOrigin: `${Math.max(0, Math.min(100, x))}% ${Math.max(0, Math.min(100, y))}%`,
-        transform: 'scale(2.5)'
-      });
+  const handleScroll = (e) => {
+    const scrollLeft = e.target.scrollLeft;
+    const width = e.target.clientWidth;
+    if (width > 0) {
+      const index = Math.round(scrollLeft / width);
+      setActiveIndex(index);
+      if (images[index] && images[index] !== activeImage) {
+        setActiveImage(images[index]);
+      }
     }
   };
 
@@ -323,7 +266,7 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
           
           {/* Left Column: Image Gallery */}
           <div className="product-gallery">
-            <div className="product-gallery__thumbnails">
+            <div className="product-gallery__thumbnails desktop-only">
               {images.map((img, i) => (
                 <div 
                   key={i} 
@@ -340,21 +283,19 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
               className="product-gallery__main-wrap"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onMouseDown={startLongPress}
-              onMouseUp={cancelLongPress}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={cancelLongPress}
-              onTouchCancel={cancelLongPress}
-              style={{ touchAction: mobileZoomed ? 'none' : 'auto' }}
             >
-              <img 
-                src={activeImage} 
-                alt={product.name} 
-                className="product-gallery__main-image"
-                style={zoomStyle}
-                draggable="false"
-              />
+              <div className="product-gallery__slider" onScroll={handleScroll}>
+                {images.map((img, i) => (
+                  <img 
+                    key={i}
+                    src={img} 
+                    alt={`${product.name} - View ${i+1}`} 
+                    className={`product-gallery__main-image ${activeImage === img ? 'active' : ''}`}
+                    style={zoomStyle}
+                    draggable="false"
+                  />
+                ))}
+              </div>
               <span className="zoom-hint">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -362,8 +303,13 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
                   <line x1="11" y1="8" x2="11" y2="14"></line>
                   <line x1="8" y1="11" x2="14" y2="11"></line>
                 </svg>
-                {mobileZoomed ? 'Double-tap to Zoom Out' : 'Hover / Double-tap to Zoom'}
+                Hover to Zoom
               </span>
+              <div className="product-gallery__dots mobile-only">
+                {images.map((_, i) => (
+                  <div key={i} className={`product-gallery__dot ${i === activeIndex ? 'active' : ''}`} />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -555,34 +501,6 @@ export default function ProductDetails({ productId, onNavigate, onCheckout }) {
         )}
 
       </div>
-      
-      {/* Fullscreen Image Lightbox */}
-      {isLightboxOpen && (
-        <div className="product-lightbox" onClick={() => setIsLightboxOpen(false)}>
-          <button className="product-lightbox__close" onClick={() => setIsLightboxOpen(false)}>&times;</button>
-          <div 
-            className="product-lightbox__image-container"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <TransformWrapper
-              initialScale={1}
-              minScale={1}
-              maxScale={4}
-              doubleClick={{ mode: "toggle" }}
-              wheel={{ step: 0.1 }}
-            >
-              <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }}>
-                <img 
-                  src={activeImage} 
-                  alt={product.name} 
-                  className="product-lightbox__image" 
-                  draggable="false"
-                />
-              </TransformComponent>
-            </TransformWrapper>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

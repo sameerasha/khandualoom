@@ -249,6 +249,10 @@
     flex: 1;
   }
 
+  .admin-sidebar__link--desktop-only {
+    display: none !important;
+  }
+
   .admin-main {
     margin-left: 0;
     margin-bottom: 0;

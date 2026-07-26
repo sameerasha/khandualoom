@@ -11,28 +11,22 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
         log.debug("Attempting to load user by identifier: {}", identifier);
         
-        String query = identifier;
-        if ("admin".equalsIgnoreCase(identifier)) {
-            query = "admin@vastraloom.com";
-        }
-        
-        String finalQuery = query;
-        User user = userRepository.findByEmail(finalQuery)
-                .or(() -> userRepository.findByPhone(finalQuery))
+        User user = userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByPhone(identifier))
                 .orElseThrow(() -> {
                     log.error("User not found with identifier: {}", identifier);
                     return new UsernameNotFoundException("User not found with identifier: " + identifier);

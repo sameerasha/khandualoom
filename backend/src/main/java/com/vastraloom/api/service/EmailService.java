@@ -10,9 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Slf4j
 @SuppressWarnings("null")
+@RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
@@ -20,9 +23,6 @@ public class EmailService {
     @Value("${vastraloom.mail.from:vastraloom@example.com}")
     private String fromEmail;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
 
     public void sendOtpEmail(String toEmail, String otp, int ttlMinutes) {
         CompletableFuture.runAsync(() -> {

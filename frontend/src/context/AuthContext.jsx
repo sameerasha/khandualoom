@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 
 const AuthContext = createContext();
 const TOKEN_KEY = 'vastra_token';
+const REFRESH_TOKEN_KEY = 'vastra_refresh_token';
 const ROLE_KEY = 'vastra_role';
 const USERNAME_KEY = 'vastra_username';
 
@@ -27,6 +28,7 @@ export function AuthProvider({ children }) {
     setIsCustomerLoggedIn(false);
     setCustomerInfo(null);
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(ROLE_KEY);
     localStorage.removeItem(USERNAME_KEY);
   }, []);
@@ -73,13 +75,67 @@ export function AuthProvider({ children }) {
     }
     return null;
   }, [handleSessionExpired]);
-  // Global fetch interceptor for 401 handling
+  // Global fetch interceptor for 401 handling with automatic token refresh
   useEffect(() => {
+    let isRefreshing = false;
+    let refreshSubscribers = [];
+
+    const subscribeTokenRefresh = (cb) => refreshSubscribers.push(cb);
+    const onRefreshed = (token) => refreshSubscribers.forEach(cb => cb(token));
+
     const originalFetch = window.fetch;
     window.fetch = async function () {
-      const response = await originalFetch.apply(this, arguments);
+      const originalRequestArgs = arguments;
+      const response = await originalFetch.apply(this, originalRequestArgs);
+      
       if (response.status === 401) {
-        handleSessionExpired();
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+        if (!refreshToken) {
+          handleSessionExpired();
+          return response;
+        }
+
+        if (!isRefreshing) {
+          isRefreshing = true;
+          try {
+            const refreshRes = await originalFetch(`${import.meta.env.VITE_API_URL}/api/auth/refresh`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refreshToken })
+            });
+            
+            if (refreshRes.ok) {
+              const data = await refreshRes.json();
+              localStorage.setItem(TOKEN_KEY, data.accessToken);
+              localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
+              isRefreshing = false;
+              onRefreshed(data.accessToken);
+              refreshSubscribers = [];
+            } else {
+              isRefreshing = false;
+              handleSessionExpired();
+              return response;
+            }
+          } catch (e) {
+            isRefreshing = false;
+            handleSessionExpired();
+            return response;
+          }
+        }
+        
+        // Wait for refresh to complete, then replay request
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((newToken) => {
+            const newArgs = [...originalRequestArgs];
+            // Update Authorization header in newArgs
+            if (newArgs[1]) {
+              newArgs[1].headers = { ...newArgs[1].headers, 'Authorization': `Bearer ${newToken}` };
+            } else {
+              newArgs[1] = { headers: { 'Authorization': `Bearer ${newToken}` } };
+            }
+            resolve(originalFetch.apply(this, newArgs));
+          });
+        });
       }
       return response;
     };
@@ -108,7 +164,7 @@ export function AuthProvider({ children }) {
         if (!token.startsWith('mock-sso-token')) {
           const profile = await fetchProfile();
           if (profile) {
-            if (role === 'ROLE_ADMIN') {
+            if (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN') {
               setIsAdmin(true);
             } else if (role === 'ROLE_USER') {
               setIsCustomerLoggedIn(true);
@@ -118,7 +174,7 @@ export function AuthProvider({ children }) {
              handleSessionExpired();
           }
         } else {
-          if (role === 'ROLE_ADMIN') {
+          if (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN') {
             setIsAdmin(true);
           } else if (role === 'ROLE_USER') {
             setIsCustomerLoggedIn(true);
@@ -149,6 +205,31 @@ export function AuthProvider({ children }) {
     initAuth();
   }, [fetchProfile, handleSessionExpired]);
 
+  // Proactive token expiration check for admins
+  useEffect(() => {
+    const checkExpiration = () => {
+      // Check the refresh token so we don't accidentally log out active users when the short-lived access token expires
+      const token = localStorage.getItem(REFRESH_TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
+      const role = localStorage.getItem(ROLE_KEY);
+      
+      if (token && (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN') && !token.startsWith('mock')) {
+        try {
+          const payloadBase64 = token.split('.')[1];
+          const decoded = JSON.parse(atob(payloadBase64));
+          if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+            console.log('Admin token expired, logging out immediately.');
+            handleSessionExpired();
+          }
+        } catch (e) {
+          // invalid token
+        }
+      }
+    };
+
+    const interval = setInterval(checkExpiration, 10000); // Check every 10 seconds
+    return () => clearInterval(interval);
+  }, [handleSessionExpired]);
+
   // Unified login handling both admins and customers based on role
   const login = useCallback(async (email, password) => {
     try {
@@ -169,10 +250,11 @@ export function AuthProvider({ children }) {
         }
 
         localStorage.setItem(TOKEN_KEY, data.accessToken);
+        localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
         localStorage.setItem(ROLE_KEY, data.role);
         localStorage.setItem(USERNAME_KEY, data.username);
 
-        if (data.role === 'ROLE_ADMIN') {
+        if (data.role === 'ROLE_ADMIN' || data.role === 'ROLE_SUPER_ADMIN') {
           setIsAdmin(true);
           setIsCustomerLoggedIn(false);
           setCustomerInfo(null);
@@ -322,11 +404,12 @@ export function AuthProvider({ children }) {
         }
 
         localStorage.setItem(TOKEN_KEY, data.accessToken);
+        localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
         localStorage.setItem(ROLE_KEY, data.role);
         localStorage.setItem(USERNAME_KEY, data.username);
         
         const role = data.role;
-        if (role === 'ROLE_ADMIN') {
+        if (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN') {
           setIsAdmin(true);
         } else {
           setIsCustomerLoggedIn(true);
@@ -428,9 +511,11 @@ export function AuthProvider({ children }) {
     return localStorage.getItem(TOKEN_KEY);
   }, []);
 
+  const role = localStorage.getItem(ROLE_KEY);
   return (
     <AuthContext.Provider value={{
       isAdmin,
+      isSuperAdmin: role === 'ROLE_SUPER_ADMIN',
       isCustomerLoggedIn,
       customerInfo,
       login,

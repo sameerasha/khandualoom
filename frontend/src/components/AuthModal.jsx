@@ -11,6 +11,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
   
   // OTP states
@@ -80,7 +81,10 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
   };
 
   const validateEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-  const validatePhone = (val) => /^(?:\+91|91|0)?[6789]\d{9}$/.test(val);
+  const validatePhone = (val) => {
+    const cleanPhone = val.replace(/[\s-]/g, '');
+    return /^(?:\+91|91|0)?[6789]\d{9}$/.test(cleanPhone);
+  };
 
   const handleAuthSuccess = (role) => {
     onClose();
@@ -168,8 +172,27 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     }
   };
 
+  const handleForgotOtpVerify = async (e) => {
+    e.preventDefault();
+    if (!otp) { setFieldErrors({ otp: "OTP is required" }); return; }
+    setIsLoading(true);
+    setError('');
+    const result = await verifyOtpStep(email, otp);
+    setIsLoading(false);
+    if (result.success) {
+      setSuccessMsg('OTP Verified! Please set your new password.');
+      setLoginStep(3);
+    } else {
+      setError(result.error || 'Invalid OTP');
+    }
+  };
+
   const handleResetPasswordSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setFieldErrors({ confirmPassword: "Passwords do not match" });
+      return;
+    }
     setIsLoading(true);
     setError('');
     const result = await resetPassword(email, otp, password);
@@ -179,12 +202,32 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
       setTimeout(() => {
         setLoginMode('normal');
         setLoginStep(1);
+        setEmail('');
         setPassword('');
+        setConfirmPassword('');
         setOtp('');
-        setSuccessMsg('');
       }, 2000);
     } else {
       setError(result.error || 'Password reset failed.');
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setIsLoading(true);
+    setError('');
+    let intent = 'login';
+    if (activeTab === 'signup') {
+      intent = 'signup';
+    } else if (loginMode === 'forgot') {
+      intent = 'forgot';
+    }
+    const result = await sendOtp(email, intent);
+    setIsLoading(false);
+    if (result.success) {
+      setSuccessMsg(`OTP resent to ${email}`);
+      setTimeLeft(result.ttlSeconds || 120);
+    } else {
+      setError(result.error || 'Failed to resend OTP.');
     }
   };
 
@@ -242,6 +285,10 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
     setFieldErrors({});
     if (!password || password.length < 6) {
       setFieldErrors({ password: "Password must be at least 6 characters" });
+      return;
+    }
+    if (password !== confirmPassword) {
+      setFieldErrors({ confirmPassword: "Passwords do not match" });
       return;
     }
     setIsLoading(true);
@@ -344,7 +391,10 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                       {timeLeft > 0 ? (
                         <small style={{ color: 'var(--primary-color)', display: 'block', marginTop: '0.5rem' }}>Time remaining: {formatTime(timeLeft)}</small>
                       ) : (
-                        <small style={{ color: 'red', display: 'block', marginTop: '0.5rem' }}>OTP Expired</small>
+                        <small style={{ color: 'red', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                          OTP Expired
+                          <button type="button" onClick={handleResendOtp} disabled={isLoading} style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: 'inherit' }}>Resend OTP</button>
+                        </small>
                       )}
                     </div>
                     <button type="submit" className="auth-modal-btn" disabled={isLoading || timeLeft === 0}>{isLoading ? 'Verifying...' : 'Verify & Sign In'}</button>
@@ -366,8 +416,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                 )}
 
                 {loginMode === 'forgot' && loginStep === 2 && (
-                  <form className="auth-modal-form" onSubmit={handleResetPasswordSubmit} noValidate>
-                    <h4>Set New Password</h4>
+                  <form className="auth-modal-form" onSubmit={handleForgotOtpVerify} noValidate>
+                    <h4>Verify OTP</h4>
                     <div className={`auth-modal-group ${fieldErrors.otp ? 'has-error' : ''}`}>
                       <label>OTP <span className="required-star">*</span></label>
                       <input type="text" value={otp} onChange={(e) => { setOtp(e.target.value); setFieldErrors({...fieldErrors, otp: null}); }} placeholder="6-digit OTP" />
@@ -375,16 +425,36 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                       {timeLeft > 0 ? (
                         <small style={{ color: 'var(--primary-color)', display: 'block', marginTop: '0.5rem' }}>Time remaining: {formatTime(timeLeft)}</small>
                       ) : (
-                        <small style={{ color: 'red', display: 'block', marginTop: '0.5rem' }}>OTP Expired</small>
+                        <small style={{ color: 'red', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                          OTP Expired
+                          <button type="button" onClick={handleResendOtp} disabled={isLoading} style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: 'inherit' }}>Resend OTP</button>
+                        </small>
                       )}
                     </div>
+                    <button type="submit" className="auth-modal-btn" disabled={isLoading || timeLeft === 0}>{isLoading ? 'Verifying...' : 'Verify OTP'}</button>
+                    <button type="button" onClick={() => setLoginStep(1)} className="auth-modal-btn auth-modal-btn-secondary">Back</button>
+                  </form>
+                )}
+
+                {loginMode === 'forgot' && loginStep === 3 && (
+                  <form className="auth-modal-form" onSubmit={handleResetPasswordSubmit} noValidate>
+                    <h4>Set New Password</h4>
                     <div className={`auth-modal-group ${fieldErrors.password ? 'has-error' : ''}`}>
                       <label>New Password <span className="required-star">*</span></label>
                       <input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors({...fieldErrors, password: null}); }} placeholder="Min 6 characters" />
                       {fieldErrors.password && <small className="field-error-msg">{fieldErrors.password}</small>}
                     </div>
-                    <button type="submit" className="auth-modal-btn" disabled={isLoading || timeLeft === 0}>{isLoading ? 'Resetting...' : 'Reset Password'}</button>
-                    <button type="button" onClick={() => setLoginStep(1)} className="auth-modal-btn auth-modal-btn-secondary">Back</button>
+                    <div className={`auth-modal-group ${fieldErrors.confirmPassword ? 'has-error' : ''}`}>
+                      <label>Confirm Password <span className="required-star">*</span></label>
+                      <div style={{ position: 'relative' }}>
+                        <input type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors({...fieldErrors, confirmPassword: null}); }} placeholder="Confirm your password" style={{ width: '100%', paddingRight: '2.5rem', boxSizing: 'border-box' }} />
+                        {confirmPassword.length > 0 && password === confirmPassword && (
+                          <svg style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-success)', pointerEvents: 'none' }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        )}
+                      </div>
+                      {fieldErrors.confirmPassword && <small className="field-error-msg">{fieldErrors.confirmPassword}</small>}
+                    </div>
+                    <button type="submit" className="auth-modal-btn" disabled={isLoading}>{isLoading ? 'Resetting...' : 'Reset Password'}</button>
                   </form>
                 )}
               </div>
@@ -431,7 +501,10 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                       {timeLeft > 0 ? (
                         <small style={{ color: 'var(--primary-color)', display: 'block', marginTop: '0.5rem' }}>Time remaining: {formatTime(timeLeft)}</small>
                       ) : (
-                        <small style={{ color: 'red', display: 'block', marginTop: '0.5rem' }}>OTP Expired</small>
+                        <small style={{ color: 'red', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                          OTP Expired
+                          <button type="button" onClick={handleResendOtp} disabled={isLoading} style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontSize: 'inherit' }}>Resend OTP</button>
+                        </small>
                       )}
                     </div>
                     <button type="submit" className="auth-modal-btn" disabled={isLoading || timeLeft === 0}>{isLoading ? 'Verifying...' : 'Verify OTP'}</button>
@@ -447,7 +520,17 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'login', onNav
                       <input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setFieldErrors({...fieldErrors, password: null}); }} placeholder="Min 6 characters" />
                       {fieldErrors.password && <small className="field-error-msg">{fieldErrors.password}</small>}
                     </div>
-                    <button type="submit" className="auth-modal-btn" disabled={isLoading}>{isLoading ? 'Creating...' : 'Create Account'}</button>
+                    <div className={`auth-modal-group ${fieldErrors.confirmPassword ? 'has-error' : ''}`}>
+                      <label>Confirm Password <span className="required-star">*</span></label>
+                      <div style={{ position: 'relative' }}>
+                        <input type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors({...fieldErrors, confirmPassword: null}); }} placeholder="Confirm your password" style={{ width: '100%', paddingRight: '2.5rem', boxSizing: 'border-box' }} />
+                        {confirmPassword.length > 0 && password === confirmPassword && (
+                          <svg style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-success)', pointerEvents: 'none' }} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        )}
+                      </div>
+                      {fieldErrors.confirmPassword && <small className="field-error-msg">{fieldErrors.confirmPassword}</small>}
+                    </div>
+                    <button type="submit" className="auth-modal-btn" disabled={isLoading}>{isLoading ? 'Creating Account...' : 'Complete Sign Up'}</button>
                   </form>
                 )}
               </div>

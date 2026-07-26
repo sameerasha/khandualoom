@@ -84,10 +84,10 @@ export default function AdminLogin({ onNavigate }) {
                   Email Address
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   id="admin-email"
                   className="admin-login__input"
-                  placeholder="admin@vastraloom.com or admin"
+                  placeholder="admin@vastraloom.com"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError(''); }}
                   required

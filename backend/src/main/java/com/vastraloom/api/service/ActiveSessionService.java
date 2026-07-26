@@ -13,22 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ActiveSessionService {
 
     private final ActiveSessionRepository activeSessionRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final CacheManager cacheManager;
 
-    public ActiveSessionService(ActiveSessionRepository activeSessionRepository, JwtTokenProvider jwtTokenProvider, CacheManager cacheManager) {
-        this.activeSessionRepository = activeSessionRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.cacheManager = cacheManager;
-    }
 
     @Transactional
     @SuppressWarnings("null")
-    public void createSession(String token, String email) {
+    public void createSession(String token, String refreshToken, String email) {
         try {
             // Remove existing sessions for this email to maintain 1 active session per user
             List<ActiveSession> existingSessions = activeSessionRepository.findByEmail(email);
@@ -45,10 +43,13 @@ public class ActiveSessionService {
             activeSessionRepository.flush();
 
             Date expiryDate = jwtTokenProvider.getExpirationDateFromJWT(token);
+            Date refreshExpiryDate = refreshToken != null ? jwtTokenProvider.getExpirationDateFromJWT(refreshToken) : null;
             ActiveSession session = ActiveSession.builder()
                     .token(token)
+                    .refreshToken(refreshToken)
                     .email(email)
                     .expiryDate(expiryDate)
+                    .refreshExpiryDate(refreshExpiryDate)
                     .build();
             if (session != null) {
                 activeSessionRepository.save(session);
@@ -64,7 +65,7 @@ public class ActiveSessionService {
         return activeSessionRepository.findByToken(token)
                 .map(session -> {
                     long nowMillis = System.currentTimeMillis();
-                    long maxAllowedExpiry = nowMillis + (24 * 60 * 60 * 1000L); // 24 hours from now
+                    long maxAllowedExpiry = nowMillis + (24 * 60 * 60 * 1000L); // Max sanity check
 
                     boolean isNotExpired = session.getExpiryDate().after(new Date(nowMillis));
                     boolean isNotSuspicious = session.getExpiryDate().before(new Date(maxAllowedExpiry));
@@ -74,11 +75,32 @@ public class ActiveSessionService {
                 .orElse(false);
     }
 
+    public ActiveSession findByRefreshToken(String refreshToken) {
+        return activeSessionRepository.findByRefreshToken(refreshToken).orElse(null);
+    }
+
     @Transactional
     @Scheduled(fixedRate = 3600000) // Runs every 1 hour (3,600,000 ms)
     public void cleanupExpiredSessions() {
         System.out.println("Running scheduled cleanup for expired sessions...");
-        activeSessionRepository.deleteByExpiryDateBefore(new Date());
+        Date now = new Date();
+        // Delete sessions where both access token AND refresh token (if it exists) are expired
+        // But for simplicity, we'll just check if refreshExpiryDate is not null and before now, 
+        // OR (refreshExpiryDate is null AND expiryDate before now)
+        activeSessionRepository.findAll().forEach(session -> {
+            boolean accessExpired = session.getExpiryDate() != null && session.getExpiryDate().before(now);
+            boolean refreshExpired = session.getRefreshExpiryDate() == null || session.getRefreshExpiryDate().before(now);
+            
+            if (accessExpired && refreshExpired) {
+                if (session.getToken() != null) {
+                    org.springframework.cache.Cache activeSessionsCache = cacheManager.getCache("activeSessions");
+                    if (activeSessionsCache != null) {
+                        activeSessionsCache.evict(session.getToken());
+                    }
+                }
+                activeSessionRepository.delete(session);
+            }
+        });
     }
 
     @Transactional
@@ -87,5 +109,19 @@ public class ActiveSessionService {
         if (token != null) {
             activeSessionRepository.deleteByToken(token);
         }
+    }
+    @Transactional
+    public void rotateSessionTokens(ActiveSession session, String newAccessToken, String newRefreshToken) {
+        if (session.getToken() != null) {
+            org.springframework.cache.Cache activeSessionsCache = cacheManager.getCache("activeSessions");
+            if (activeSessionsCache != null) {
+                activeSessionsCache.evict(session.getToken());
+            }
+        }
+        session.setToken(newAccessToken);
+        session.setRefreshToken(newRefreshToken);
+        session.setExpiryDate(jwtTokenProvider.getExpirationDateFromJWT(newAccessToken));
+        session.setRefreshExpiryDate(jwtTokenProvider.getExpirationDateFromJWT(newRefreshToken));
+        activeSessionRepository.save(session);
     }
 }

@@ -26,6 +26,7 @@ import ProductEditor from './admin/ProductEditor';
 import UserManager from './admin/UserManager';
 import StoreSettings from './admin/StoreSettings';
 import OrderManager from './admin/OrderManager';
+import AdminManager from './admin/AdminManager';
 
 function ToastContainer() {
   const { toasts, dismissToast } = useCart();
@@ -72,7 +73,7 @@ function AppContent() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState('login');
   const { isCartOpen, setIsCartOpen } = useCart();
-  const { isAdmin, isCustomerLoggedIn } = useAuth();
+  const { isAdmin, isSuperAdmin, isCustomerLoggedIn } = useAuth();
   const [route, setRoute] = useState(() => parseHashRoute());
 
   useEffect(() => {
@@ -175,6 +176,12 @@ function AppContent() {
       adminChild = <StoreSettings />;
     } else if (route.path === 'admin/orders') {
       adminChild = <OrderManager onNavigate={handleNavigate} />;
+    } else if (route.path === 'admin/admins') {
+      if (isSuperAdmin) {
+        adminChild = <AdminManager />;
+      } else {
+        adminChild = <AdminDashboard onNavigate={handleNavigate} />;
+      }
     }
 
     return (

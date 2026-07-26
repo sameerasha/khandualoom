@@ -36,24 +36,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                if (!activeSessionService.isValidSession(jwt)) {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session is no longer active");
+            if (StringUtils.hasText(jwt)) {
+                if (tokenProvider.validateToken(jwt)) {
+                    if (!activeSessionService.isValidSession(jwt)) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session is no longer active");
+                        return;
+                    }
+                    
+                    String email = tokenProvider.getEmailFromJWT(jwt);
+
+                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    // Token is present but completely invalid (e.g., bad signature)
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token signature or token expired");
                     return;
                 }
-                
-                String email = tokenProvider.getEmailFromJWT(jwt);
-
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
             System.err.println("Exception in JwtAuthenticationFilter:");
             ex.printStackTrace();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+            return;
         }
 
         filterChain.doFilter(request, response);

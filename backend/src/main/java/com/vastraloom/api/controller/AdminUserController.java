@@ -4,16 +4,16 @@ import com.vastraloom.api.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/admin/users")
 @SuppressWarnings("null")
+@RequiredArgsConstructor
 public class AdminUserController {
 
     private final UserRepository userRepository;
 
-    public AdminUserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @GetMapping
     public ResponseEntity<?> getAllUsers() {

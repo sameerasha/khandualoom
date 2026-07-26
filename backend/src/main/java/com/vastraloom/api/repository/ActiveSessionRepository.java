@@ -11,6 +11,8 @@ public interface ActiveSessionRepository extends JpaRepository<ActiveSession, Lo
     boolean existsByToken(String token);
     java.util.Optional<ActiveSession> findByToken(String token);
     void deleteByToken(String token);
+    java.util.Optional<ActiveSession> findByRefreshToken(String refreshToken);
+    void deleteByRefreshToken(String refreshToken);
     java.util.List<ActiveSession> findByEmail(String email);
     void deleteByExpiryDateBefore(Date now);
 }

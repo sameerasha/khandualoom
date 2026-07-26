@@ -727,10 +727,10 @@
 .otp-modal-content {
   background: var(--bg-dark);
   border: 1px solid rgba(195, 162, 126, 0.4);
-  border-radius: 16px;
-  padding: 50px 40px;
+  border-radius: 12px;
+  padding: 30px 24px;
   width: 95%;
-  max-width: 600px;
+  max-width: 360px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 20px rgba(195, 162, 126, 0.1);
   text-align: center;
   animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -738,27 +738,27 @@
 
 .otp-modal-content h3 {
   color: #c3a27e;
-  margin-bottom: 12px;
-  font-size: 1.5rem;
+  margin-bottom: 8px;
+  font-size: 1.3rem;
 }
 
 .otp-modal-content p {
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: 24px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
 }
 
 .otp-modal-input {
   width: 100%;
-  padding: 12px;
-  font-size: 1.2rem;
+  padding: 10px;
+  font-size: 1.1rem;
   text-align: center;
-  letter-spacing: 4px;
+  letter-spacing: 2px;
   background: rgba(0,0,0,0.2);
   border: 1px solid rgba(195,162,126,0.3);
   color: #fff;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  border-radius: 6px;
+  margin-bottom: 16px;
 }
 
 .otp-modal-input:focus {
@@ -877,14 +877,21 @@
 }
 
 .premium-modal-icon {
-  font-size: 3rem;
-  margin-bottom: 20px;
-  display: inline-block;
+  margin: 0 auto 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
   background: rgba(195, 162, 126, 0.1);
-  padding: 16px;
   border-radius: 50%;
   border: 1px solid rgba(195, 162, 126, 0.2);
   box-shadow: 0 0 20px rgba(195, 162, 126, 0.15);
+}
+
+.premium-modal-icon svg {
+  width: 28px;
+  height: 28px;
 }
 
 @media (max-width: 768px) {

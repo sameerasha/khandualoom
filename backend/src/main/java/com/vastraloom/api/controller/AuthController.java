@@ -3,6 +3,7 @@ package com.vastraloom.api.controller;
 import com.vastraloom.api.dto.JwtAuthenticationResponse;
 import com.vastraloom.api.dto.LoginRequest;
 import com.vastraloom.api.dto.OtpLoginRequest;
+import com.vastraloom.api.dto.RefreshTokenRequest;
 import com.vastraloom.api.dto.ResetPasswordRequest;
 import com.vastraloom.api.dto.SignupRequest;
 import com.vastraloom.api.model.User;
@@ -21,10 +22,13 @@ import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/auth")
 @Slf4j
 @SuppressWarnings("null")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -34,20 +38,6 @@ public class AuthController {
     private final OtpService otpService;
     private final com.vastraloom.api.service.ActiveSessionService activeSessionService;
 
-    public AuthController(
-            AuthenticationManager authenticationManager,
-            JwtTokenProvider tokenProvider,
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            OtpService otpService,
-            com.vastraloom.api.service.ActiveSessionService activeSessionService) {
-        this.authenticationManager = authenticationManager;
-        this.tokenProvider = tokenProvider;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.otpService = otpService;
-        this.activeSessionService = activeSessionService;
-    }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(jakarta.servlet.http.HttpServletRequest request) {
@@ -76,15 +66,16 @@ public class AuthController {
             String jwt = tokenProvider.generateToken(authentication);
             org.springframework.security.core.userdetails.UserDetails userDetails = 
                     (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
+            String refreshToken = tokenProvider.generateRefreshToken(userDetails.getUsername());
             String role = userDetails.getAuthorities().stream()
                     .map(org.springframework.security.core.GrantedAuthority::getAuthority)
                     .findFirst()
                     .orElse("ROLE_USER");
                     
-            activeSessionService.createSession(jwt, userDetails.getUsername());
+            activeSessionService.createSession(jwt, refreshToken, userDetails.getUsername());
             
             log.info("User {} successfully authenticated with role {}", loginRequest.getEmail(), role);
-            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, userDetails.getUsername(), role)); // username here actually holds the email
+            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, refreshToken, userDetails.getUsername(), role)); // username here actually holds the email
         } catch (org.springframework.security.core.AuthenticationException e) {
             log.error("Authentication failed for {}: {}", loginRequest.getEmail(), e.getMessage());
             return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Invalid credentials");
@@ -163,11 +154,12 @@ public class AuthController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = tokenProvider.generateToken(authentication);
+            String refreshToken = tokenProvider.generateRefreshToken(user.getEmail());
             
-            activeSessionService.createSession(jwt, user.getEmail());
+            activeSessionService.createSession(jwt, refreshToken, user.getEmail());
             
             log.info("User {} successfully logged in via OTP", user.getEmail());
-            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user.getEmail(), user.getRole()));
+            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, refreshToken, user.getEmail(), user.getRole()));
         } catch (Exception e) {
             log.error("OTP Login failed for {}: {}", request.getIdentifier(), e.getMessage());
             return ResponseEntity.badRequest().body("OTP Login failed: " + e.getMessage());
@@ -264,5 +256,36 @@ public class AuthController {
         
         log.info("Admin user registered successfully: {}", signupRequest.getEmail());
         return ResponseEntity.ok("Admin registered successfully!");
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        try {
+            if (org.springframework.util.StringUtils.hasText(requestRefreshToken) && tokenProvider.validateToken(requestRefreshToken)) {
+                String email = tokenProvider.getEmailFromJWT(requestRefreshToken);
+                
+                com.vastraloom.api.model.ActiveSession session = activeSessionService.findByRefreshToken(requestRefreshToken);
+                if (session == null) {
+                    return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Refresh token not found in database. Please log in again.");
+                }
+
+                // Generate new tokens
+                String newAccessToken = tokenProvider.generateTokenFromEmail(email);
+                String newRefreshToken = tokenProvider.generateRefreshToken(email);
+
+                activeSessionService.rotateSessionTokens(session, newAccessToken, newRefreshToken);
+
+                User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+                log.info("Access token successfully refreshed for user: {}", email);
+                return ResponseEntity.ok(new JwtAuthenticationResponse(newAccessToken, newRefreshToken, email, user.getRole()));
+            }
+        } catch (Exception ex) {
+            log.error("Failed to refresh token: {}", ex.getMessage());
+        }
+        
+        return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Invalid Refresh Token");
     }
 }

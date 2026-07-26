@@ -9,10 +9,14 @@ export default function OAuth2RedirectHandler() {
     // Extract token from URL query params manually
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+    const refreshToken = params.get('refreshToken');
 
     if (token) {
       // Save token to localStorage using AuthContext keys
       localStorage.setItem('vastra_token', token);
+      if (refreshToken) {
+        localStorage.setItem('vastra_refresh_token', refreshToken);
+      }
       localStorage.setItem('vastra_role', 'ROLE_USER');
       
       // Redirect to root safely without react-router-dom

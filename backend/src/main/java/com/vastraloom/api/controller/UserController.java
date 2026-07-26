@@ -13,8 +13,11 @@ import com.vastraloom.api.service.OtpService;
 import java.util.Map;
 import com.vastraloom.api.repository.RecentViewRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserRepository userRepository;
@@ -22,12 +25,6 @@ public class UserController {
     private final OtpService otpService;
     private final RecentViewRepository recentViewRepository;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService, RecentViewRepository recentViewRepository) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.otpService = otpService;
-        this.recentViewRepository = recentViewRepository;
-    }
 
     // GET /api/users/profile
     @GetMapping("/profile")
@@ -57,6 +54,11 @@ public class UserController {
 
         User user = userRepository.findByEmail(currentEmail)
                 .orElseThrow(() -> new RuntimeException("User not found: " + currentEmail));
+
+        // Prevent Super Admin from changing credentials via profile API
+        if ("ROLE_SUPER_ADMIN".equals(user.getRole())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Super Admin credentials can only be managed via environment variables."));
+        }
 
         // 1. Update Name
         if (request.getFirstName() != null && !request.getFirstName().trim().isEmpty()) {

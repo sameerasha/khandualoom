@@ -7,15 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/admin/products")
+@RequiredArgsConstructor
 public class AdminProductController {
 
     private final ProductRepository productRepository;
 
-    public AdminProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@NonNull @RequestBody Product product) {

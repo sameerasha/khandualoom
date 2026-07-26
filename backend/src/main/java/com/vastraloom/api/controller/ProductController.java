@@ -19,19 +19,18 @@ import org.springframework.data.jpa.domain.Specification;
 import com.vastraloom.api.repository.ProductSpecifications;
 import lombok.extern.slf4j.Slf4j;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/products")
 @Slf4j
 @SuppressWarnings("null")
+@RequiredArgsConstructor
 public class ProductController {
 
     private final ProductRepository productRepository;
     private final RecentViewRepository recentViewRepository;
 
-    public ProductController(ProductRepository productRepository, RecentViewRepository recentViewRepository) {
-        this.productRepository = productRepository;
-        this.recentViewRepository = recentViewRepository;
-    }
 
     // GET /api/products
     // GET /api/products

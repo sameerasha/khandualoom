@@ -208,6 +208,7 @@ export default function ProfileDashboard({ onNavigate }) {
     } else {
       setOtpErrorMsg('Invalid security code. Please try again.');
     }
+    setTimeout(() => setOtpErrorMsg(''), 3000);
 
     const match = errorString.match(/Attempts remaining: (\d+)/);
     if (match) {
@@ -276,7 +277,7 @@ export default function ProfileDashboard({ onNavigate }) {
     setIsLoading(true);
     const identifier = forcedIdentifier || (type === 'email' ? email : phone);
     try {
-      const result = await sendOtp(identifier);
+      const result = await sendOtp(identifier, 'verify');
       setIsLoading(false);
       
       if (result.success) {
@@ -331,12 +332,17 @@ export default function ProfileDashboard({ onNavigate }) {
   };
 
   const handleEditPhoneContinue = async () => {
-    if (!newPhone || !/^(?:\+91|91|0)?[6789]\d{9}$/.test(newPhone)) {
-      setFormErrors({ ...formErrors, newPhone: 'Valid 10-digit phone required' });
+    const cleanPhone = newPhone.replace(/[\s-]/g, '');
+    if (!cleanPhone || !/^(?:\+91|91|0)?[6789]\d{9}$/.test(cleanPhone)) {
+      setFormErrors({ ...formErrors, newPhone: 'Valid 10-digit Indian phone number required' });
+      setTimeout(() => {
+        setFormErrors(prev => ({ ...prev, newPhone: null }));
+      }, 3000);
       return;
     }
     setFormErrors({});
-    await handleVerifyRequest('phone', newPhone, false); // Send OTP to the NEW phone number
+    setNewPhone(cleanPhone);
+    await handleVerifyRequest('phone', cleanPhone, false); // Send OTP to the NEW phone number
     setEditPhoneStep(2);
   };
 
@@ -371,7 +377,7 @@ export default function ProfileDashboard({ onNavigate }) {
     const errors = {};
     if (!firstName.trim()) errors.firstName = 'First name is required';
     if (!lastName.trim()) errors.lastName = 'Last name is required';
-    if (phone && !/^(?:\+91|91|0)?[6789]\d{9}$/.test(phone)) {
+    if (phone && !/^(?:\+91|91|0)?[6789]\d{9}$/.test(phone.replace(/[\s-]/g, ''))) {
       errors.phone = 'Please enter a valid 10-digit Indian phone number';
     }
     setFormErrors(errors);
@@ -611,10 +617,10 @@ export default function ProfileDashboard({ onNavigate }) {
                     Mobile Phone
                     {phone && phoneVerified ? (
                       <span className="verified-chip">✓ Verified</span>
-                    ) : phone ? (
+                    ) : phone && /^(?:\+91|91|0)?[6789]\d{9}$/.test(phone.replace(/[\s-]/g, '')) ? (
                       <>
                         <span className="unverified-chip">⚠ Unverified</span>
-                        <button type="button" onClick={() => handleVerifyRequest('phone', phone)} className="verify-now-btn">Verify Now</button>
+                        <button type="button" onClick={() => handleVerifyRequest('phone', phone.replace(/[\s-]/g, ''))} className="verify-now-btn">Verify Now</button>
                       </>
                     ) : null}
                     
@@ -998,7 +1004,10 @@ export default function ProfileDashboard({ onNavigate }) {
         <div className="otp-modal-overlay">
           <div className="otp-modal-content premium-modal">
             <div className="premium-modal-icon">
-              {otpSentFor === 'email' ? '✉️' : '📱'}
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="rgba(195,162,126,0.2)"/>
+                <path d="M9 12l2 2 4-4" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
             <h3>Verify Your Identity</h3>
             <p>We've sent a 6-digit security code to your {otpSentFor}.</p>
@@ -1050,71 +1059,75 @@ export default function ProfileDashboard({ onNavigate }) {
           </div>
         </div>
       )}
-      {/* Edit Phone Number Panel */}
+      {/* Edit Phone Number Panel (Compact Modal) */}
       {showEditPhonePanel && (
-        <div className="side-panel-overlay">
-          <div className="side-panel">
-            <div className="side-panel-header">
-              <h3>Change Mobile Number</h3>
-              <button className="close-panel-btn" onClick={() => setShowEditPhonePanel(false)}>×</button>
+        <div className="otp-modal-overlay">
+          <div className="otp-modal-content premium-modal">
+            <div className="premium-modal-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="rgba(195,162,126,0.2)"/>
+                <path d="M9 12l2 2 4-4" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
+            <h3>Change Mobile Number</h3>
             
             {editPhoneStep === 1 && (
               <div className="profile-form">
-                <p style={{ color: 'var(--color-text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>
-                  Please enter your new mobile number. We will send a security code to this new number to verify it.
+                <p style={{ color: 'var(--color-text-secondary)', marginBottom: '16px', fontSize: '0.85rem', textAlign: 'center', lineHeight: '1.4' }}>
+                  Enter your new 10-digit mobile number.
                 </p>
-                <div className="profile-form__group">
-                  <label>New Mobile Number</label>
-                  <input 
-                    type="tel" 
-                    value={newPhone} 
-                    onChange={e => setNewPhone(e.target.value)}
-                    placeholder="+91 99999 99999"
-                    className={formErrors.newPhone ? 'input-error' : ''}
-                  />
-                  {formErrors.newPhone && <span className="error-message">{formErrors.newPhone}</span>}
+                <input 
+                  type="tel" 
+                  value={newPhone} 
+                  onChange={e => setNewPhone(e.target.value)}
+                  placeholder="99999 99999"
+                  className={`otp-modal-input ${formErrors.newPhone ? 'input-error' : ''}`}
+                  style={{ padding: '12px', fontSize: '1rem', letterSpacing: '1px' }}
+                />
+                {formErrors.newPhone && <span className="error-message" style={{display: 'block', textAlign: 'center', marginTop: '8px'}}>{formErrors.newPhone}</span>}
+                <div className="otp-modal-actions" style={{ flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
+                  {/^(?:\+91|91|0)?[6789]\d{9}$/.test(newPhone.replace(/[\s-]/g, '')) && (
+                    <button type="button" className="otp-modal-btn premium-btn-verify animate-scale-in" onClick={handleEditPhoneContinue} disabled={isLoading}>
+                      {isLoading ? 'Sending...' : 'Send Security Code'}
+                    </button>
+                  )}
+                  <button type="button" className="otp-modal-btn premium-btn-cancel" onClick={() => setShowEditPhonePanel(false)}>Cancel</button>
                 </div>
-                <button type="button" className="profile-save-btn" onClick={handleEditPhoneContinue} disabled={isLoading}>
-                  {isLoading ? 'Sending...' : 'Send Security Code'}
-                </button>
               </div>
             )}
 
             {editPhoneStep === 2 && (
               <div className="profile-form">
-                <p style={{ color: 'var(--color-text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>
-                 We've sent a 6-digit security code to your new mobile number: <strong>{newPhone}</strong>. Enter it below to verify and update your phone number.
+                <p style={{ color: 'var(--color-text-secondary)', marginBottom: '16px', fontSize: '0.85rem', textAlign: 'center' }}>
+                 Code sent to <strong>{newPhone}</strong>
                 </p>
-                {resendMessage && <div className="resend-success-msg">{resendMessage}</div>}
-                {otpErrorMsg && <div className="profile-feedback error" style={{ padding: '8px', fontSize: '0.85rem', marginBottom: '15px' }}>{otpErrorMsg}</div>}
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '0.85rem', color: otpTimer === 0 || otpAttemptsLeft === 0 ? '#ef4444' : '#10b981', fontWeight: '500' }}>
+                {resendMessage && <div className="resend-success-msg" style={{textAlign: 'center'}}>{resendMessage}</div>}
+                {otpErrorMsg && <div className="profile-feedback error" style={{ padding: '8px', fontSize: '0.85rem', marginBottom: '15px', textAlign: 'center' }}>{otpErrorMsg}</div>}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '0.9rem', color: otpTimer === 0 || otpAttemptsLeft === 0 ? '#ef4444' : '#c3a27e', fontWeight: '500' }}>
                   <span>⏱️ {formatTimer(otpTimer)}</span>
                   <span>Attempts left: {otpAttemptsLeft}</span>
                 </div>
-                <div className="profile-form__group">
-                  <label>Mobile OTP</label>
-                  <input 
-                    type="text" 
-                    className="otp-modal-input"
-                    value={otp} 
-                    onChange={e => setOtp(e.target.value.replace(/\D/g, ''))} 
-                    placeholder="••••••" 
-                    maxLength="6"
-                    disabled={otpTimer === 0 || otpAttemptsLeft === 0}
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button type="button" className="profile-cancel-btn" onClick={() => setEditPhoneStep(1)} style={{ flex: 1 }}>Back</button>
+                <input 
+                  type="text" 
+                  className="otp-modal-input"
+                  value={otp} 
+                  onChange={e => setOtp(e.target.value.replace(/\D/g, ''))} 
+                  placeholder="••••••" 
+                  maxLength="6"
+                  disabled={otpTimer === 0 || otpAttemptsLeft === 0}
+                  style={{ padding: '12px', fontSize: '1.2rem', letterSpacing: '6px', fontWeight: 'bold' }}
+                />
+                <div className="otp-modal-actions" style={{ flexDirection: 'column', gap: '16px', marginTop: '20px' }}>
                   {otpTimer === 0 || otpAttemptsLeft === 0 ? (
-                    <button type="button" className="profile-save-btn" onClick={() => handleVerifyRequest('phone', newPhone, false, true)} disabled={isLoading} style={{ flex: 1 }}>
-                      {isLoading ? 'Sending...' : 'Resend'}
+                    <button type="button" className="otp-modal-btn premium-btn-verify" onClick={() => handleVerifyRequest('phone', newPhone, false, true)} disabled={isLoading}>
+                      {isLoading ? 'Sending...' : 'Resend Code'}
                     </button>
                   ) : (
-                    <button type="button" className="profile-save-btn" onClick={handleEditPhoneSubmit} disabled={isLoading || otp.length !== 6} style={{ flex: 1 }}>
+                    <button type="button" className="otp-modal-btn premium-btn-verify" onClick={handleEditPhoneSubmit} disabled={isLoading || otp.length !== 6}>
                       {isLoading ? 'Verifying...' : 'Verify'}
                     </button>
                   )}
+                  <button type="button" className="otp-modal-btn premium-btn-cancel" onClick={() => setEditPhoneStep(1)}>Back</button>
                 </div>
               </div>
             )}

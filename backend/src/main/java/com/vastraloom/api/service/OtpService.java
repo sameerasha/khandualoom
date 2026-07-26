@@ -8,19 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class OtpService {
 
     private final AppConfigRepository appConfigRepository;
     private final EmailService emailService;
     private final SmsService smsService;
 
-    public OtpService(AppConfigRepository appConfigRepository, EmailService emailService, SmsService smsService) {
-        this.appConfigRepository = appConfigRepository;
-        this.emailService = emailService;
-        this.smsService = smsService;
-    }
 
     // Stores OtpDetails keyed by email or phone
     private final Map<String, OtpDetails> otpCache = new ConcurrentHashMap<>();

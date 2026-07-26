@@ -18,12 +18,15 @@ public class JwtTokenProvider {
 
     private final SecretKey jwtSecretKey;
     private final long jwtExpirationInMs;
+    private final long jwtRefreshExpirationInMs;
 
     public JwtTokenProvider(
             @Value("${vastraloom.jwt.secret}") String jwtSecret,
-            @Value("${vastraloom.jwt.expiration-ms}") long jwtExpirationInMs) {
+            @Value("${vastraloom.jwt.expiration-ms}") long jwtExpirationInMs,
+            @Value("${vastraloom.jwt.refresh-expiration-ms:604800000}") long jwtRefreshExpirationInMs) {
         this.jwtSecretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         this.jwtExpirationInMs = jwtExpirationInMs;
+        this.jwtRefreshExpirationInMs = jwtRefreshExpirationInMs;
     }
 
     public String generateToken(Authentication authentication) {
@@ -42,6 +45,18 @@ public class JwtTokenProvider {
     public String generateTokenFromEmail(String email) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(jwtSecretKey)
+                .compact();
+    }
+
+    public String generateRefreshToken(String email) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtRefreshExpirationInMs);
 
         return Jwts.builder()
                 .subject(email)

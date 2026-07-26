@@ -7,17 +7,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/admin/social-media")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @SuppressWarnings("null")
+@RequiredArgsConstructor
 public class AdminSocialMediaController {
 
     private final SocialMediaRepository socialMediaRepository;
 
-    public AdminSocialMediaController(SocialMediaRepository socialMediaRepository) {
-        this.socialMediaRepository = socialMediaRepository;
-    }
 
     @PostMapping
     public ResponseEntity<?> addSocialMedia(@RequestBody SocialMedia socialMedia) {

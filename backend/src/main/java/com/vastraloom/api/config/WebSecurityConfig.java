@@ -67,10 +67,13 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
 
                         // User Profile APIs
-                        .requestMatchers("/api/users/profile").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/users/profile").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
 
                         // Admin Restricted APIs
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+
+                        // Super Admin Restricted APIs
+                        .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
 
                         // Any other requests require authentication
                         .anyRequest().authenticated())
