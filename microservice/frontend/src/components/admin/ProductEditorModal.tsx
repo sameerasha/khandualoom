@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Trash2, Sparkles, ChevronDown, Upload, ArrowLeft } from 'lucide-react';
+import {
+  X,
+  Trash2,
+  Sparkles,
+  ChevronDown,
+  Upload,
+  ArrowLeft,
+  Crown,
+  Tag,
+  Layers,
+  CheckCircle2,
+  Percent,
+  Check,
+  ShieldCheck,
+  Image as ImageIcon,
+} from 'lucide-react';
 import { Product } from '@/types';
 
 interface ProductEditorModalProps {
@@ -13,15 +28,24 @@ interface ProductEditorModalProps {
   inline?: boolean;
 }
 
-const CATEGORIES = ['Banarasi', 'Kanjeevaram', 'Chanderi', 'Tussar', 'Patola', 'Paithani', 'Mysore'];
-const BADGES = ['Bestseller', 'Premium', 'Exclusive', 'Heirloom', 'New Arrival', 'Trending', 'Popular', 'Limited Edition'];
+const CATEGORIES = [
+  { name: 'Banarasi', region: 'Varanasi, UP' },
+  { name: 'Kanjeevaram', region: 'Tamil Nadu' },
+  { name: 'Chanderi', region: 'Madhya Pradesh' },
+  { name: 'Tussar', region: 'Bengal / Bihar' },
+  { name: 'Patola', region: 'Patan, Gujarat' },
+  { name: 'Paithani', region: 'Yeola, Maharashtra' },
+  { name: 'Mysore', region: 'Karnataka' },
+];
+
+const BADGES = ['Bestseller', 'Heirloom', 'Exclusive', 'Limited Edition', 'New Arrival', 'Trending', 'Artisan Guild'];
 
 const ANGLE_METADATA = [
-  { id: 1, name: 'Angle 1 (Cover)', label: 'Master Front View / Catalog Cover', placeholder: 'https://... or /images/saree_front.png' },
-  { id: 2, name: 'Angle 2 (Pallu)', label: 'Pallu & Grand Zari Artistry', placeholder: 'https://... or /images/saree_pallu.png' },
-  { id: 3, name: 'Angle 3 (Border)', label: 'Border & Selvedge Close-Up', placeholder: 'https://... or /images/saree_border.png' },
-  { id: 4, name: 'Angle 4 (Pleats)', label: 'Pleats & Drape Silhouette', placeholder: 'https://... or /images/saree_pleats.png' },
-  { id: 5, name: 'Angle 5 (Detail)', label: 'Blouse Piece & Reverse Texture', placeholder: 'https://... or /images/saree_blouse.png' },
+  { id: 1, name: 'Angle 01 (Cover)', label: 'Master Front View & 3D Canvas Anchor', placeholder: 'https://... or /images/saree_front.png', desc: 'Primary thumbnail in catalog & hero cards' },
+  { id: 2, name: 'Angle 02 (Pallu)', label: 'Grand Pallu & 24K Zari Artistry', placeholder: 'https://... or /images/saree_pallu.png', desc: 'Detailed ornamental weave & metallic lustre' },
+  { id: 3, name: 'Angle 03 (Border)', label: 'Border, Selvedge & Motif Close-Up', placeholder: 'https://... or /images/saree_border.png', desc: 'High-res macro shot of zari weft density' },
+  { id: 4, name: 'Angle 04 (Pleats)', label: 'Pleats Silhouette & Architectural Fall', placeholder: 'https://... or /images/saree_pleats.png', desc: 'Full length drape fluidity & fall dynamics' },
+  { id: 5, name: 'Angle 05 (Lookbook)', label: 'Model Lookbook & Styling Ensemble', placeholder: 'https://... or /images/saree_blouse.png', desc: 'Editorial drape aesthetic with bespoke blouse' },
 ];
 
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
@@ -160,18 +184,40 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     });
   };
 
-  if (!isOpen) return null;
+  const price = Number(formData.price) || 0;
+  const originalPrice = Number(formData.originalPrice) || 0;
+  const hasDiscount = originalPrice > price && price > 0;
+  const discountPercent = hasDiscount ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+  const savings = hasDiscount ? originalPrice - price : 0;
+  const configuredAnglesCount = angleSlots.filter((s) => s.trim().length > 0).length;
 
   const renderFormFields = () => (
     <>
-      {/* Section 1: Core Nomenclature */}
-      <div className="p-5 rounded-2xl bg-white/[0.02] border border-brand-gold/15 space-y-4">
-        <div className="text-xs font-mono uppercase tracking-wider text-brand-gold/90 border-b border-white/5 pb-2">
-          1. Identification & Nomenclature
+      {/* Section 1: Identification & Weave Lineage */}
+      <div className="p-6 rounded-3xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-brand-gold/30 shadow-lg space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/10 gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
+              <Crown className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold">
+                PHASE 01 • WEAVE NOMENCLATURE
+              </span>
+              <h3 className="font-serif text-base sm:text-lg font-bold text-white tracking-tight">
+                Identification & Tradition Lineage
+              </h3>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold-light w-fit">
+            Master Registry
+          </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="sm:col-span-2">
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Saree Title */}
+          <div className="lg:col-span-7">
+            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
               Saree Masterpiece Title *
             </label>
             <input
@@ -181,94 +227,153 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               onChange={handleChange}
               required
               placeholder="e.g. Royal Shikargah Kadwa Silk Saree"
-              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none transition-colors"
+              className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-colors shadow-inner"
             />
+            <p className="text-[11px] text-brand-ivory/50 font-sans mt-1.5">
+              Enter the imperial curatorial title incorporating tradition and motif architecture.
+            </p>
           </div>
 
-          <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
-              Weave Tradition *
+          {/* Category / Tradition Selector */}
+          <div className="lg:col-span-5">
+            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
+              Weave Tradition & Provenance *
             </label>
             <div className="relative">
               <select
                 name="category"
                 value={formData.category || 'Banarasi'}
                 onChange={handleChange}
-                className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors appearance-none cursor-pointer"
+                className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat} className="bg-[#120622] text-white">
-                    {cat}
+                  <option key={cat.name} value={cat.name} className="bg-[#120622] text-white">
+                    {cat.name} — {cat.region}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-brand-gold/50 absolute right-3 top-3 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-brand-gold absolute right-3.5 top-3.5 pointer-events-none" />
+            </div>
+            <p className="text-[11px] text-brand-gold/70 font-mono mt-1.5">
+              Origin: {CATEGORIES.find((c) => c.name === formData.category)?.region || 'Indian Handloom Enclave'}
+            </p>
+          </div>
+        </div>
+
+        {/* Real-time Pricing & Privilege Valuation Breakdown */}
+        <div className="p-5 rounded-2xl bg-[#0B0314]/90 border border-brand-gold/25 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
+            <div className="flex items-center gap-2">
+              <Percent className="w-4 h-4 text-brand-gold" />
+              <span className="text-xs font-mono uppercase tracking-wider text-brand-gold font-bold">
+                Live Pricing & Valuation Matrix
+              </span>
+            </div>
+            {hasDiscount && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold animate-pulse">
+                  {discountPercent}% PRIVILEGE ADVANTAGE
+                </span>
+                <span className="text-[11px] font-mono text-brand-gold">
+                  (Save ₹{savings.toLocaleString('en-IN')})
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
+                Curated Acquisition Price (₹) *
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-3 text-brand-gold font-mono text-sm font-bold">₹</span>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price || 0}
+                  onChange={handleChange}
+                  required
+                  min={0}
+                  className="w-full bg-[#120620] border border-brand-gold/30 focus:border-brand-gold rounded-xl pl-9 pr-4 py-2.5 text-sm text-white focus:outline-none transition-colors font-mono font-bold"
+                />
+              </div>
+              <span className="text-[10px] text-brand-ivory/50 font-mono mt-1 block">
+                Actual price charged to patron during acquisition
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
+                Original Vault Valuation (₹)
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-3 text-brand-gold/60 font-mono text-sm">₹</span>
+                <input
+                  type="number"
+                  name="originalPrice"
+                  value={formData.originalPrice || 0}
+                  onChange={handleChange}
+                  min={0}
+                  placeholder="e.g. 29999"
+                  className="w-full bg-[#120620] border border-brand-gold/30 focus:border-brand-gold rounded-xl pl-9 pr-4 py-2.5 text-sm text-white focus:outline-none transition-colors font-mono"
+                />
+              </div>
+              <span className="text-[10px] text-brand-ivory/50 font-mono mt-1 block">
+                Benchmark valuation struck through on storefront
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
-              Acquisition Price (₹) *
-            </label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price || 0}
-              onChange={handleChange}
-              required
-              min={0}
-              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors font-mono"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
-              Original Valuation (₹)
-            </label>
-            <input
-              type="number"
-              name="originalPrice"
-              value={formData.originalPrice || 0}
-              onChange={handleChange}
-              min={0}
-              placeholder="e.g. 29999"
-              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors font-mono"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
-              Curatorial Badge
-            </label>
-            <div className="relative">
-              <select
-                name="badge"
-                value={formData.badge || 'Bestseller'}
-                onChange={handleChange}
-                className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors appearance-none cursor-pointer"
-              >
-                {BADGES.map((b) => (
-                  <option key={b} value={b} className="bg-[#120622] text-white">
-                    {b}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-4 h-4 text-brand-gold/50 absolute right-3 top-3 pointer-events-none" />
-            </div>
+        {/* Curatorial Badge Selector (Interactive Luxury Radio Pills) */}
+        <div>
+          <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2.5 flex items-center gap-2">
+            <Tag className="w-3.5 h-3.5 text-brand-gold" />
+            <span>Curatorial Badge & Storefront Distinction</span>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {BADGES.map((b) => {
+              const isSelected = formData.badge === b;
+              return (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, badge: b }))}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-1.5 border cursor-pointer ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-brand-gold/30 via-brand-gold/20 to-amber-400/20 border-brand-gold text-brand-gold-light ring-1 ring-brand-gold/50 shadow-[0_0_15px_rgba(223,191,122,0.2)] font-bold scale-[1.03]'
+                      : 'bg-black/30 border-white/10 text-brand-ivory/70 hover:border-brand-gold/30 hover:text-white'
+                  }`}
+                >
+                  {isSelected ? <Check className="w-3.5 h-3.5 text-brand-gold" /> : <span className="w-1.5 h-1.5 rounded-full bg-white/20" />}
+                  <span>{b}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Section 2: Material & Loom Attributes */}
-      <div className="p-5 rounded-2xl bg-white/[0.02] border border-brand-gold/15 space-y-4">
-        <div className="text-xs font-mono uppercase tracking-wider text-brand-gold/90 border-b border-white/5 pb-2">
-          2. Material Composition & Handloom Architecture
+      {/* Section 2: Material & Handloom Architecture */}
+      <div className="p-6 rounded-3xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-brand-gold/30 shadow-lg space-y-5">
+        <div className="flex items-center gap-2.5 pb-3 border-b border-white/10">
+          <div className="w-7 h-7 rounded-lg bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
+            <Layers className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold">
+              PHASE 02 • MATERIAL ARCHITECTURE
+            </span>
+            <h3 className="font-serif text-base sm:text-lg font-bold text-white tracking-tight">
+              Silk Composition & Loom Craftsmanship
+            </h3>
+          </div>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
               Silk & Warp Composition *
             </label>
             <input
@@ -277,13 +382,14 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               value={formData.fabric || ''}
               onChange={handleChange}
               required
-              placeholder="e.g. Pure Katan Silk"
-              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
+              placeholder="e.g. Pure Katan Silk (Mulberry 4-Ply)"
+              className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
             />
+            <span className="text-[10px] text-brand-ivory/50 font-mono mt-1 block">Warp & Weft Yarn Standard</span>
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
               Weaving Technique *
             </label>
             <input
@@ -293,12 +399,13 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               onChange={handleChange}
               required
               placeholder="e.g. Kadwa Handloom Zari"
-              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
+              className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
             />
+            <span className="text-[10px] text-brand-ivory/50 font-mono mt-1 block">Loom Apparatus & Shuttle Type</span>
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+            <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
               Heritage Colorway *
             </label>
             <input
@@ -306,47 +413,82 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               name="color"
               value={formData.color || ''}
               onChange={handleChange}
-              placeholder="e.g. Crimson & 24K Gold"
-              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
+              placeholder="e.g. Imperial Burgundy & 24K Gold"
+              className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
             />
+            <span className="text-[10px] text-brand-ivory/50 font-mono mt-1 block">Botanical / Metallic Hue Palette</span>
           </div>
         </div>
       </div>
 
-      {/* Section 3: Narrative Provenance */}
-      <div className="p-5 rounded-2xl bg-white/[0.02] border border-brand-gold/15 space-y-3">
-        <div className="text-xs font-mono uppercase tracking-wider text-brand-gold/90 border-b border-white/5 pb-2">
-          3. Curatorial Storytelling & Historical Motif
+      {/* Section 3: Curatorial Storytelling & Historical Motif */}
+      <div className="p-6 rounded-3xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-brand-gold/30 shadow-lg space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold">
+                PHASE 03 • CURATORIAL LORE
+              </span>
+              <h3 className="font-serif text-base sm:text-lg font-bold text-white tracking-tight">
+                Provenance & Storytelling Narrative
+              </h3>
+            </div>
+          </div>
+          <span className="text-[11px] font-mono text-brand-ivory/50">
+            {formData.description?.length || 0} characters
+          </span>
         </div>
+
         <textarea
           name="description"
-          rows={3}
+          rows={4}
           value={formData.description || ''}
           onChange={handleChange}
-          placeholder="Narrate the ancestral loom origin, mythological motifs, zari purity, and draping character..."
-          className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-colors resize-none leading-relaxed"
+          placeholder="Narrate the ancestral loom lineage, mythological flora/fauna motifs, real electroplated gold zari purity, and architectural drape weight..."
+          className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-colors resize-none leading-relaxed shadow-inner"
         />
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-brand-gold/80 font-mono">
+          <span className="px-2 py-0.5 rounded bg-brand-gold/10 border border-brand-gold/20">#AncestralLoom</span>
+          <span className="px-2 py-0.5 rounded bg-brand-gold/10 border border-brand-gold/20">#ShikargahMotif</span>
+          <span className="px-2 py-0.5 rounded bg-brand-gold/10 border border-brand-gold/20">#24KElectroplatedZari</span>
+          <span className="px-2 py-0.5 rounded bg-brand-gold/10 border border-brand-gold/20">#SilkMarkCertified</span>
+        </div>
       </div>
 
       {/* Section 4: Imagery Showcase (5 Curated Angles with Direct Upload & URL) */}
-      <div className="p-5 rounded-2xl bg-white/[0.02] border border-brand-gold/15 space-y-4">
-        <div className="border-b border-white/5 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h4 className="text-xs font-mono uppercase tracking-wider text-brand-gold/90 flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-              <span>4. Master Showcase Angles (Up to 5 Angles)</span>
-            </h4>
-            <p className="text-[11px] text-brand-ivory/60 mt-0.5 font-sans">
-              Upload image files directly or paste valid HTTP/HTTPS URLs for each perspective of the drape.
-            </p>
+      <div className="p-6 rounded-3xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-brand-gold/30 shadow-lg space-y-5">
+        <div className="border-b border-white/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-gold/30 to-brand-gold/10 border border-brand-gold/50 flex items-center justify-center text-brand-gold">
+              <ImageIcon className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold">
+                PHASE 04 • CINEMATIC VISUAL SHOWCASE
+              </span>
+              <h3 className="font-serif text-base sm:text-lg font-bold text-white tracking-tight">
+                Master 5-Perspective High-Definition Angles
+              </h3>
+            </div>
           </div>
-          <div className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold-light w-fit">
-            {angleSlots.filter((s) => s.trim().length > 0).length} / 5 Angles Configured
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono px-3 py-1 rounded-full bg-brand-gold/15 border border-brand-gold/40 text-brand-gold-light font-bold">
+              {configuredAnglesCount} / 5 Angles Configured
+            </span>
+            {configuredAnglesCount >= 3 && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                Drape Complete
+              </span>
+            )}
           </div>
         </div>
 
-        {/* 5 Dedicated Angle Cards */}
-        <div className="space-y-3.5">
+        {/* 5 Dedicated Luxury Angle Cards */}
+        <div className="space-y-4">
           {ANGLE_METADATA.map((angle, idx) => {
             const currentUrl = angleSlots[idx] || '';
             const hasImage = currentUrl.trim().length > 0;
@@ -354,58 +496,74 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             return (
               <div
                 key={angle.id}
-                className={`p-3.5 rounded-xl border transition-all ${
+                className={`p-4 rounded-2xl border transition-all ${
                   hasImage
-                    ? 'bg-black/40 border-brand-gold/35 shadow-sm'
-                    : 'bg-black/20 border-white/10 hover:border-brand-gold/25'
+                    ? 'bg-[#10051C]/90 border-brand-gold/40 shadow-[0_4px_20px_rgba(0,0,0,0.3)]'
+                    : 'bg-black/25 border-white/10 hover:border-brand-gold/30'
                 }`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-brand-gold/20 text-brand-gold border border-brand-gold/30">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-brand-gold/20 text-brand-gold border border-brand-gold/30">
                       {angle.name}
                     </span>
-                    <span className="text-xs text-brand-ivory font-medium font-serif">
-                      {angle.label}
-                    </span>
+                    <div>
+                      <h4 className="text-xs sm:text-sm text-brand-ivory font-serif font-bold">
+                        {angle.label}
+                      </h4>
+                      <p className="text-[11px] text-brand-ivory/50 font-sans">
+                        {angle.desc}
+                      </p>
+                    </div>
                   </div>
-                  {hasImage && (
-                    <button
-                      type="button"
-                      onClick={() => handleClearAngle(idx)}
-                      className="text-[11px] text-red-400/80 hover:text-red-300 flex items-center gap-1 self-start sm:self-auto transition-colors"
-                      title="Remove this angle"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      <span>Clear Angle</span>
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    {hasImage ? (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-center gap-1">
+                        <Check className="w-3 h-3" />
+                        Active
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-brand-ivory/40">
+                        Awaiting Image
+                      </span>
+                    )}
+                    {hasImage && (
+                      <button
+                        type="button"
+                        onClick={() => handleClearAngle(idx)}
+                        className="text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1 bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded-lg border border-red-500/30 transition-colors cursor-pointer"
+                        title="Remove this perspective"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Clear</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-start gap-3.5">
-                  {/* Live Image Preview / Empty Slot */}
-                  <div className="w-20 h-24 sm:w-24 sm:h-28 rounded-xl border border-brand-gold/30 bg-[#0E0518] overflow-hidden shrink-0 flex items-center justify-center relative group shadow-md">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  {/* Live Thumbnail Preview */}
+                  <div className="w-24 h-28 sm:w-28 sm:h-32 rounded-xl border border-brand-gold/35 bg-[#0A0214] overflow-hidden shrink-0 flex items-center justify-center relative group shadow-md">
                     {hasImage ? (
                       <img
                         src={currentUrl}
                         alt={angle.label}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
                       <div className="flex flex-col items-center justify-center p-2 text-center text-brand-ivory/30">
-                        <Upload className="w-5 h-5 mb-1 text-brand-gold/40" />
-                        <span className="text-[9px] font-mono uppercase">Empty</span>
+                        <Upload className="w-6 h-6 mb-1 text-brand-gold/40" />
+                        <span className="text-[9px] font-mono uppercase tracking-wider">No Angle</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Dual Input Controls: File Upload + URL Input */}
-                  <div className="flex-1 space-y-2.5">
-                    {/* Upload File Button */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-gold/15 hover:bg-brand-gold/25 border border-brand-gold/40 text-brand-gold text-xs font-mono uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98]">
+                  {/* Dual Controls: File Upload & URL */}
+                  <div className="flex-1 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-transparent hover:from-brand-gold/30 hover:to-brand-gold/20 border border-brand-gold/45 text-brand-gold text-xs font-mono uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm">
                         <Upload className="w-3.5 h-3.5" />
-                        <span>{hasImage ? 'Replace Image File' : 'Upload Image File'}</span>
+                        <span>{hasImage ? 'Replace Image File' : 'Upload Angle File'}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -416,22 +574,19 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                           className="hidden"
                         />
                       </label>
-                      <span className="text-[10px] text-brand-ivory/40 font-mono">
-                        PNG, JPG, WebP (Instant Preview)
+                      <span className="text-[11px] text-brand-ivory/50 font-mono">
+                        Supports high-res PNG, JPG, WebP
                       </span>
                     </div>
 
-                    {/* HTTP URL input */}
-                    <div>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={currentUrl}
-                          onChange={(e) => handleAngleUrlChange(idx, e.target.value)}
-                          placeholder={angle.placeholder}
-                          className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/25 focus:outline-none transition-colors font-mono"
-                        />
-                      </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={currentUrl}
+                        onChange={(e) => handleAngleUrlChange(idx, e.target.value)}
+                        placeholder={angle.placeholder}
+                        className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-3.5 py-2 text-xs text-white placeholder-white/30 focus:outline-none transition-colors font-mono"
+                      />
                     </div>
                   </div>
                 </div>
@@ -443,76 +598,111 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     </>
   );
 
-  // INLINE VIEW MODE (Opened in the same page component, without dialog modal)
+  // INLINE VIEW MODE (Rendered directly in the page without modal popup)
   if (inline) {
     return (
       <div className="product-editor-inline-view w-full space-y-6 pb-12 animate-fadeIn">
-        {/* Breadcrumbs & Navigation Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-brand-gold/25 gap-4">
-          <div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-brand-gold-light/90 hover:text-white mb-2 transition-colors group cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1 text-brand-gold" />
-              <span>Back to Masterpiece Catalog</span>
-            </button>
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {product ? `Edit Masterpiece: ${product.name}` : 'Curate New Handloom Masterpiece'}
-              </h1>
-              <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-brand-gold/15 border border-brand-gold/40 text-brand-gold font-bold">
-                {product ? `WEAVE #${product.id}` : 'NEW COMMISSION'}
-              </span>
-            </div>
-            <p className="text-xs text-brand-ivory/60 mt-1 font-sans">
-              Update curatorial details, zari specifications, storytelling provenance, and 5-angle imagery directly on this page.
-            </p>
-          </div>
+        {/* Executive Studio Header */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#1E0D33] via-[#140624] to-[#0D0317] border border-brand-gold/40 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="flex items-center gap-3 self-end sm:self-auto">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border border-white/20 hover:border-white/40 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark font-serif font-bold text-sm shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>{loading ? 'Saving Changes...' : product ? 'Save Masterpiece' : 'Publish to Catalog'}</span>
-            </button>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+            <div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-brand-gold-light/90 hover:text-white mb-3 transition-colors group cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1 text-brand-gold" />
+                <span>Return to Masterpiece Catalog</span>
+              </button>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
+                  {product ? `Edit Masterpiece: ${product.name}` : 'Curate New Handloom Commission'}
+                </h1>
+                <span className="text-xs font-mono px-3 py-1 rounded-full bg-brand-gold/20 border border-brand-gold/45 text-brand-gold font-bold">
+                  {product ? `WEAVE #${product.id}` : 'NEW COMMISSION'}
+                </span>
+              </div>
+
+              {/* Executive KPI Ribbon */}
+              <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t border-brand-gold/20 text-xs font-mono">
+                <div className="flex items-center gap-1.5 text-brand-gold-light">
+                  <span className="text-brand-ivory/50">Price:</span>
+                  <span className="font-bold">₹{price.toLocaleString('en-IN')}</span>
+                </div>
+                {hasDiscount && (
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <span className="text-brand-ivory/50">Advantage:</span>
+                    <span className="font-bold">{discountPercent}% OFF</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5 text-brand-ivory/80">
+                  <span className="text-brand-ivory/50">Tradition:</span>
+                  <span className="text-white font-medium">{formData.category || 'Banarasi'}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-brand-ivory/80">
+                  <span className="text-brand-ivory/50">Curatorial Badge:</span>
+                  <span className="text-brand-gold font-medium">{formData.badge || 'Bestseller'}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-brand-ivory/80">
+                  <span className="text-brand-ivory/50">Lookbook Angles:</span>
+                  <span className="text-emerald-400 font-bold">{configuredAnglesCount} / 5 Ready</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Action Pinned Buttons */}
+            <div className="flex items-center gap-3 self-end lg:self-center shrink-0">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2.5 rounded-xl border border-white/20 hover:border-white/40 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="px-7 py-3 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-amber-400 text-brand-purple-dark font-serif font-bold text-sm shadow-xl shadow-brand-gold/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2.5 cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-brand-purple-dark" />
+                <span>{loading ? 'Saving Masterpiece...' : product ? 'Save Masterpiece Changes' : 'Publish to Catalog'}</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* In-Page Form Container */}
+        {/* In-Page Form Body */}
         <div className="bg-gradient-to-b from-[#180A26] via-[#11041D] to-[#0A0212] border border-brand-gold/30 rounded-3xl p-6 sm:p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {renderFormFields()}
 
             {/* Bottom Actions Bar */}
-            <div className="pt-6 border-t border-brand-gold/20 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2.5 rounded-xl border border-white/15 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark font-serif font-bold text-sm shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>{loading ? 'Saving...' : product ? 'Save Masterpiece Changes' : 'Publish Masterpiece'}</span>
-              </button>
+            <div className="pt-6 border-t border-brand-gold/20 flex items-center justify-between gap-4">
+              <div className="text-xs font-mono text-brand-ivory/50 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-brand-gold" />
+                <span>Changes will be instantly reflected in the storefront catalog & 3D canvases.</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-6 py-2.5 rounded-xl border border-white/15 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  Discard Draft
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark font-serif font-bold text-sm shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>{loading ? 'Saving...' : product ? 'Save Masterpiece Changes' : 'Publish Masterpiece'}</span>
+                </button>
+              </div>
             </div>
           </form>
         </div>
