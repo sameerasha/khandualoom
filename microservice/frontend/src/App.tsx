@@ -20,6 +20,7 @@ import { SocialMediaModal } from '@/components/common/SocialMediaModal';
 import { OAuth2RedirectHandler } from '@/components/auth/OAuth2RedirectHandler';
 import { SmoothScrollProvider } from '@/components/common/SmoothScrollProvider';
 import { CinematicLoomCanvas } from '@/components/3d/CinematicLoomCanvas';
+import { ScrollChapterIndicator } from '@/components/common/ScrollChapterIndicator';
 import { Product } from '@/types';
 import { useAppDispatch } from '@/app/hooks';
 import { setSelectedCategory } from '@/features/products/productsSlice';
@@ -104,6 +105,11 @@ export const App: React.FC = () => {
             onOpenSocial={() => setSocialModalOpen(true)}
             onNavigateHeritage={handleNavigateHeritage}
           />
+        )}
+
+        {/* Floating Luxury Chapter Indicator on Desktop */}
+        {currentView === 'store' && (
+          <ScrollChapterIndicator scrollProgress={globalScrollProgress} />
         )}
 
         {/* Main Content Area */}

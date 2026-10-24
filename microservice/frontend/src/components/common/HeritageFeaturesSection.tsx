@@ -39,7 +39,7 @@ export const HeritageFeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-transparent via-[#150A21]/50 to-transparent text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
+    <section id="trust-section" className="py-20 bg-gradient-to-b from-transparent via-[#150A21]/50 to-transparent text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
       {/* Subtle radial ambient lights framing the 3D celestial rings */}
       <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />

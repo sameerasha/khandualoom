@@ -21,7 +21,7 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick, onExploreClick, scrol
   };
 
   return (
-    <section className="relative min-h-[92vh] flex flex-col justify-center overflow-hidden text-brand-ivory border-b border-brand-gold/15">
+    <section id="hero-top" className="relative min-h-[92vh] flex flex-col justify-center overflow-hidden text-brand-ivory border-b border-brand-gold/15">
       {/* Contrast Gradients for WCAG AA readability over the 3D canvas */}
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/95 via-[#0F0617]/70 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />

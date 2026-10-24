@@ -50,7 +50,7 @@ export const CraftShowcaseSection: React.FC<CraftShowcaseSectionProps> = ({ onEx
   const currentTab = tabContent[activeTab];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-transparent via-[#160B24]/40 to-transparent text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
+    <section id="craft-section" className="py-24 bg-gradient-to-b from-transparent via-[#160B24]/40 to-transparent text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
       {/* Background ambient aura */}
       <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-[450px] h-[450px] bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
