@@ -80,7 +80,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
         !matchesFabric.some((m) => String(m.id) === String(p.id))
     );
 
-    return [...matchesCategory, ...matchesFabric, ...remaining].slice(0, 4);
+    return [...matchesCategory, ...matchesFabric, ...remaining].slice(0, 10);
   }, [catalogPool, product]);
 
   // Auto-record in recent views & reset active image on product change
@@ -255,41 +255,6 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                   <span className="bg-brand-gold text-brand-purple-dark text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow w-fit">
                     {discountPercent}% OFF
                   </span>
-                )}
-              </div>
-
-              {/* Top Right Green Indicator if In Cart */}
-              {isInCart && (
-                <div
-                  onClick={() => dispatch(setCartOpen(true))}
-                  className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-mono uppercase tracking-wider font-bold shadow-lg border border-emerald-400/50 cursor-pointer"
-                  title="Item in Cart • Click to View Bag"
-                >
-                  <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>In Cart • Go to Cart</span>
-                </div>
-              )}
-
-              {/* Middle Action Overlay on Product Image */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-3 z-20 transition-all duration-300 bg-black/40 sm:bg-black/45 sm:opacity-0 sm:group-hover:opacity-100 backdrop-blur-[1px]">
-                {added || isInCart ? (
-                  <button
-                    onClick={() => dispatch(setCartOpen(true))}
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(16,185,129,0.5)] border border-emerald-400/50 transform active:scale-95 transition-all cursor-pointer pointer-events-auto"
-                    title="Click to Open Cart"
-                  >
-                    <Check className="w-4 h-4 stroke-[3]" />
-                    <span>Go to Cart</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleAdd}
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-gold via-amber-400 to-brand-gold text-brand-purple-dark text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_15px_rgba(223,191,122,0.4)] hover:brightness-110 active:scale-95 transition-all cursor-pointer pointer-events-auto"
-                    title="Add to Cart"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Add to Bag</span>
-                  </button>
                 )}
               </div>
             </div>
@@ -649,7 +614,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
               {relatedProducts.map((rel: Product) => {
                 const relInCart = items.some((item) => item.product.id === rel.id);
                 return (
@@ -675,7 +640,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                         </div>
                       )}
                     </div>
-                  <div className="p-3.5 flex-1 flex flex-col justify-between">
+                  <div className="p-2.5 sm:p-3.5 flex-1 flex flex-col justify-between">
                     <div>
                       <span className="text-[10px] text-brand-gold uppercase tracking-wider block font-mono">
                         {rel.category}

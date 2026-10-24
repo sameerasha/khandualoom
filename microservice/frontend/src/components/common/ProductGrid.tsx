@@ -178,13 +178,13 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
           )}
         </div>
 
-        {/* Loading Skeleton - 5 Columns */}
+        {/* Loading Skeleton - 5 Columns Desktop / 2 Columns Mobile */}
         {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5 md:gap-6 lg:gap-7">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
               <div
                 key={n}
-                className="aspect-[3/4] bg-brand-purple-dark/40 animate-pulse rounded-2xl border border-brand-gold/15"
+                className="aspect-[3/3.8] bg-brand-purple-dark/40 animate-pulse rounded-2xl border border-brand-gold/15"
               />
             ))}
           </div>
@@ -210,7 +210,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
         {/* 5-Column Product Cards Grid with Staggered Entrance */}
         {!isLoading && filteredProducts.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-7">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5 md:gap-6 lg:gap-7">
               {displayedProducts.map((product, idx) => (
                 <motion.div
                   key={product.id}
