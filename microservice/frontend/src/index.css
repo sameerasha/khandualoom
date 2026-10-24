@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom gold gradient borders and shimmer effects */
+.gold-gradient {
+  background: linear-gradient(135deg, #C5A059 0%, #DFBF7A 50%, #9E7D3B 100%);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #C5A059 0%, #DFBF7A 50%, #9E7D3B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

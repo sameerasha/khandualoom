@@ -1,2 +1,17 @@
+# Compiled Java
 *.class
-backend/.maven/
+**/target/
+**/.maven/
+
+# Node / Frontend
+**/node_modules/
+**/dist/
+*.tsbuildinfo
+**/coverage/
+
+# Environment and IDE
+.env.local
+.DS_Store
+.idea/
+.vscode/
+*.log
