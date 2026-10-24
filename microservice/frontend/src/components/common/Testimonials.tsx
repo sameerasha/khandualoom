@@ -72,11 +72,9 @@ export const Testimonials: React.FC = () => {
   const active = testimonials[currentIndex];
 
   return (
-    <section className="py-24 relative overflow-hidden text-brand-ivory border-b border-brand-gold/15">
+    <section className="py-14 sm:py-16 relative overflow-hidden text-brand-ivory">
       {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/95 pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
 
       {/* Background Watermark Quote */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] text-brand-gold">

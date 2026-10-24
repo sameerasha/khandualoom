@@ -3,7 +3,7 @@ import { ShoppingBag, User as UserIcon, Search, Menu, X, Shield, Sparkles, LogOu
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { toggleCart } from '@/features/cart/cartSlice';
 import { logout } from '@/features/auth/authSlice';
-import { setSearchQuery, setSelectedCategory } from '@/features/products/productsSlice';
+import { setSearchQuery } from '@/features/products/productsSlice';
 
 interface NavbarProps {
   onOpenAuth: () => void;
@@ -36,12 +36,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     dispatch(setSearchQuery(searchInput.trim()));
   };
 
-  const handleCategorySelect = (category: string) => {
-    dispatch(setSelectedCategory(category));
-    setMobileMenuOpen(false);
-    window.scrollTo({ top: 750, behavior: 'smooth' });
-  };
-
   return (
     <header className="sticky top-0 z-40 bg-brand-purple-dark/95 backdrop-blur-md border-b border-brand-gold/20 text-brand-ivory transition-all shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,9 +43,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           
           {/* Brand Logo & Name */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="w-10 h-10 rounded-full border border-brand-gold/40 flex items-center justify-center bg-gradient-to-tr from-brand-purple to-brand-gold/30 shadow-inner">
-              <Sparkles className="w-5 h-5 text-brand-gold-light animate-pulse" />
-            </div>
+            <img
+              src="/logo.svg"
+              alt="Vastraloom Imperial Logo"
+              className="w-11 h-11 object-contain drop-shadow-[0_2px_10px_rgba(197,160,89,0.4)]"
+            />
             <div>
               <span className="font-serif text-2xl tracking-wider text-brand-gold font-bold">
                 VASTRALOOM
@@ -83,31 +79,31 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </form>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-sm font-medium">
+          {/* Desktop Navigation Links (Section-Driven Navigation, No Specific Category Values) */}
+          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
             <button
-              onClick={() => handleCategorySelect('All')}
+              onClick={() => {
+                document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="hover:text-brand-gold transition-colors"
             >
-              All Sarees
+              Collection
             </button>
             <button
-              onClick={() => handleCategorySelect('Banarasi')}
+              onClick={() => {
+                document.getElementById('craft-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="hover:text-brand-gold transition-colors"
             >
-              Banarasi
+              Craftsmanship
             </button>
             <button
-              onClick={() => handleCategorySelect('Kanjivaram')}
+              onClick={() => {
+                document.getElementById('trust-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="hover:text-brand-gold transition-colors"
             >
-              Kanjivaram
-            </button>
-            <button
-              onClick={() => handleCategorySelect('Chanderi')}
-              className="hover:text-brand-gold transition-colors"
-            >
-              Chanderi
+              Imperial Trust
             </button>
             <button
               onClick={() => {
@@ -123,7 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={onOpenContact}
-              className="hover:text-brand-gold transition-colors flex items-center gap-1"
+              className="hover:text-brand-gold transition-colors flex items-center gap-1.5"
             >
               <MessageSquare className="w-3.5 h-3.5 text-brand-gold" />
               <span>Contact</span>
@@ -251,15 +247,33 @@ export const Navbar: React.FC<NavbarProps> = ({
           </form>
 
           <div className="flex flex-col gap-2 pt-2 border-t border-brand-gold/10">
-            {['All', 'Banarasi', 'Kanjivaram', 'Chanderi', 'Tussar'].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleCategorySelect(cat)}
-                className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm"
-              >
-                {cat} Sarees
-              </button>
-            ))}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm"
+            >
+              Masterpiece Collection
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                document.getElementById('craft-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm"
+            >
+              Ancestral Craftsmanship
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                document.getElementById('trust-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm"
+            >
+              Imperial Trust Pillars
+            </button>
 
             <button
               onClick={() => {

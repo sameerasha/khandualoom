@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Heart, Mail, Phone, MapPin, Instagram, Facebook, Youtube, Share2 } from 'lucide-react';
+import { Heart, Mail, Phone, MapPin, Instagram, Facebook, Youtube, Share2 } from 'lucide-react';
 import { LegalDocType } from './LegalModal';
 
 interface FooterProps {
@@ -18,21 +18,25 @@ export const Footer: React.FC<FooterProps> = ({
   onSelectCategory,
 }) => {
   return (
-    <footer className="bg-brand-purple-dark text-brand-ivory border-t border-brand-gold/20 pt-16 pb-12">
+    <footer className="bg-[#090210] relative z-20 text-brand-ivory border-t-2 border-brand-gold/40 shadow-[0_-20px_50px_rgba(0,0,0,0.95)] pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-brand-gold/15">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-brand-gold/20">
           {/* Brand Info */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-brand-gold" />
+            <div className="flex items-center gap-3">
+              <img
+                src="/logo.svg"
+                alt="Vastraloom Imperial Logo"
+                className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(197,160,89,0.35)]"
+              />
               <span className="font-serif text-xl tracking-wider text-brand-gold font-bold">
                 VASTRALOOM
               </span>
             </div>
-            <p className="text-xs text-brand-ivory/70 leading-relaxed">
+            <p className="text-xs text-brand-ivory/80 leading-relaxed font-light">
               Preserving Indian loom heritage with authentic, direct-from-weaver handloom Banarasi, Kanjivaram, and Chanderi sarees. Every drape carries centuries of artistic legacy.
             </p>
-            <div className="pt-2 flex items-center gap-2 text-xs text-brand-gold-light">
+            <div className="pt-2 flex items-center gap-2 text-xs text-brand-gold-light font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping" />
               <span>Silk Mark India Certified Authenticity</span>
             </div>
@@ -75,7 +79,7 @@ export const Footer: React.FC<FooterProps> = ({
             <h4 className="font-serif font-bold text-sm text-brand-gold mb-4 uppercase tracking-wider">
               Handcrafted Sarees
             </h4>
-            <ul className="space-y-2 text-xs text-brand-ivory/70">
+            <ul className="space-y-2 text-xs text-brand-ivory/85">
               <li>
                 <button
                   onClick={() => onSelectCategory?.('Banarasi')}
@@ -124,7 +128,7 @@ export const Footer: React.FC<FooterProps> = ({
             <h4 className="font-serif font-bold text-sm text-brand-gold mb-4 uppercase tracking-wider">
               Customer Sanctuary
             </h4>
-            <ul className="space-y-2 text-xs text-brand-ivory/70">
+            <ul className="space-y-2 text-xs text-brand-ivory/85">
               <li>
                 <button
                   onClick={onNavigateHeritage}
@@ -181,7 +185,7 @@ export const Footer: React.FC<FooterProps> = ({
             <h4 className="font-serif font-bold text-sm text-brand-gold mb-4 uppercase tracking-wider">
               Heritage Atelier
             </h4>
-            <ul className="space-y-3 text-xs text-brand-ivory/70">
+            <ul className="space-y-3 text-xs text-brand-ivory/85">
               <li
                 onClick={onOpenContact}
                 className="flex items-start gap-2.5 cursor-pointer hover:text-brand-gold transition-colors"

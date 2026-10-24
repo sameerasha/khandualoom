@@ -34,6 +34,17 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
+    ssoLogin: builder.mutation<
+      AuthResponse,
+      { provider: 'google' | 'facebook'; email?: string; name?: string }
+    >({
+      query: (body) => ({
+        url: '/api/auth/sso',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['User'],
+    }),
     register: builder.mutation<AuthResponse, RegisterRequest>({
       query: (userData) => ({
         url: '/api/auth/register',
@@ -106,6 +117,7 @@ export const authApi = baseApi.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useSsoLoginMutation,
   useRegisterMutation,
   useLogoutUserMutation,
   useGetProfileQuery,

@@ -21,13 +21,13 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick, onExploreClick, scrol
   };
 
   return (
-    <section id="hero-top" className="relative min-h-[92vh] flex flex-col justify-center overflow-hidden text-brand-ivory border-b border-brand-gold/15">
+    <section id="hero-top" className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden text-brand-ivory">
       {/* Contrast Gradients for WCAG AA readability over the 3D canvas */}
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/95 via-[#0F0617]/70 to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0F0617]/80 to-transparent pointer-events-none" />
 
       {/* Spatial Content Overlay */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 lg:py-24 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 lg:py-20 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Editorial Headline & Actions */}

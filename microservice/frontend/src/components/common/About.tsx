@@ -29,11 +29,9 @@ export const About: React.FC = () => {
   ];
 
   return (
-    <section id="heritage" className="py-24 relative overflow-hidden text-brand-ivory border-b border-brand-gold/15">
+    <section id="heritage" className="py-14 sm:py-16 relative overflow-hidden text-brand-ivory">
       {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/70 pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
 
       {/* Background radial glow */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />

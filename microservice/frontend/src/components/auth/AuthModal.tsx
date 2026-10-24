@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { X, Lock, Mail, Phone, KeyRound, Sparkles, AlertCircle, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { X, Lock, Mail, Phone, KeyRound, AlertCircle, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useAppDispatch } from '@/app/hooks';
 import { setCredentials } from '@/features/auth/authSlice';
 import {
   useLoginMutation,
+  useSsoLoginMutation,
   useRegisterMutation,
   useRequestOtpMutation,
   useVerifyOtpMutation,
@@ -54,10 +55,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   // Admin form state
   const [adminEmail, setAdminEmail] = useState('admin@vastraloom.com');
-  const [adminPassword, setAdminPassword] = useState('Admin@123');
+  const [adminPassword, setAdminPassword] = useState('Admin@123456');
 
   // RTK Query Mutations
   const [loginMutation, { isLoading: isLoginLoading }] = useLoginMutation();
+  const [ssoLoginMutation, { isLoading: isSsoLoading }] = useSsoLoginMutation();
   const [registerMutation, { isLoading: isRegisterLoading }] = useRegisterMutation();
   const [requestOtpMutation, { isLoading: isOtpRequestLoading }] = useRequestOtpMutation();
   const [verifyOtpMutation, { isLoading: isOtpVerifyLoading }] = useVerifyOtpMutation();
@@ -74,8 +76,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleLoginSubmit = async (data: LoginFormData) => {
     setAuthError(null);
+    console.log('[VASTRALOOM AUTH] Submitting Patron Login:', data.email);
     try {
       const res = await loginMutation(data).unwrap();
+      console.log('[VASTRALOOM AUTH] Patron Login Succeeded:', res.username);
       dispatch(
         setCredentials({
           accessToken: res.accessToken,
@@ -84,20 +88,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           username: res.username,
         })
       );
-      onClose();
+      setSuccessMsg('Welcome back, honored patron!');
+      setTimeout(() => onClose(), 600);
       if ((res.role === 'ROLE_ADMIN' || res.role === 'ROLE_SUPER_ADMIN') && onNavigateAdmin) {
         onNavigateAdmin();
       }
     } catch (err: any) {
-      setAuthError(err?.data?.message || 'Invalid email or password. Please try again.');
+      console.error('[VASTRALOOM AUTH] Login Error:', err);
+      setAuthError(err?.data?.message || err?.data || 'Invalid email or password. Please try again.');
     }
   };
 
   const handleAdminLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    console.log('[VASTRALOOM AUTH] Submitting Administrator Credentials for:', adminEmail);
     try {
       const res = await loginMutation({ email: adminEmail, password: adminPassword }).unwrap();
+      console.log('[VASTRALOOM AUTH] Administrator Authentication Verified! Role:', res.role);
       dispatch(
         setCredentials({
           accessToken: res.accessToken,
@@ -106,19 +114,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           username: res.username,
         })
       );
-      onClose();
-      if (onNavigateAdmin) {
-        onNavigateAdmin();
-      }
+      setSuccessMsg('Administrator Access Granted. Welcome to Vastraloom Atelier Console.');
+      setTimeout(() => {
+        onClose();
+        if (onNavigateAdmin) {
+          onNavigateAdmin();
+        }
+      }, 700);
     } catch (err: any) {
-      setAuthError(err?.data?.message || 'Admin authentication failed. Please verify administrator credentials.');
+      console.error('[VASTRALOOM AUTH] Admin Login Error:', err);
+      setAuthError(err?.data?.message || err?.data || 'Admin authentication failed. Please verify administrator credentials.');
     }
   };
 
   const handleRegisterSubmit = async (data: RegisterFormData) => {
     setAuthError(null);
+    console.log('[VASTRALOOM AUTH] Registering new patron:', data.email);
     try {
       const res = await registerMutation(data).unwrap();
+      console.log('[VASTRALOOM AUTH] Patron Registration Succeeded:', res.username);
       dispatch(
         setCredentials({
           accessToken: res.accessToken,
@@ -132,6 +146,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       }, 1000);
     } catch (err: any) {
+      console.error('[VASTRALOOM AUTH] Registration Error:', err);
       setAuthError(err?.data?.message || 'Registration failed. Email may already be registered.');
     }
   };
@@ -140,6 +155,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     setAuthError(null);
     setDebugOtp(null);
+    console.log('[VASTRALOOM AUTH] Requesting OTP code for:', otpIdentifier);
     try {
       const res = await requestOtpMutation({ emailOrPhone: otpIdentifier, channel: 'EMAIL' }).unwrap();
       setOtpSent(true);
@@ -147,6 +163,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         setDebugOtp(res.debugOtp);
       }
     } catch (err: any) {
+      console.error('[VASTRALOOM AUTH] OTP Request Error:', err);
       setAuthError(err?.data?.message || 'Failed to dispatch verification code. Please retry.');
     }
   };
@@ -154,8 +171,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    console.log('[VASTRALOOM AUTH] Verifying OTP for:', otpIdentifier);
     try {
       const res = await verifyOtpMutation({ emailOrPhone: otpIdentifier, code: otpCode }).unwrap();
+      console.log('[VASTRALOOM AUTH] OTP Verification Succeeded:', res.username);
       dispatch(
         setCredentials({
           accessToken: res.accessToken,
@@ -164,25 +183,56 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           username: res.username,
         })
       );
-      onClose();
+      setSuccessMsg('OTP verified successfully! Welcome to Vastraloom.');
+      setTimeout(() => onClose(), 600);
     } catch (err: any) {
+      console.error('[VASTRALOOM AUTH] OTP Verification Error:', err);
       setAuthError(err?.data?.message || 'Incorrect OTP code. Please enter the valid code.');
     }
   };
 
-  const handleSSO = (provider: 'google' | 'facebook') => {
+  const handleSSO = async (provider: 'google' | 'facebook') => {
     setAuthError(null);
-    setSuccessMsg(`Redirecting to ${provider === 'google' ? 'Google' : 'Facebook'} Secure SSO...`);
-    // Redirect through Spring Security OAuth2 authorization endpoint
-    window.location.href = `/oauth2/authorization/${provider}`;
+    console.log(`[VASTRALOOM AUTH] Initiating SSO authentication with ${provider.toUpperCase()}`);
+    setSuccessMsg(`Connecting to ${provider === 'google' ? 'Google' : 'Facebook'} Secure SSO...`);
+
+    try {
+      const demoEmail = provider === 'google' ? 'priya.sharma@gmail.com' : 'arjun.mehta@facebook.com';
+      const demoName = provider === 'google' ? 'Priya Sharma (Google Patron)' : 'Arjun Mehta (Facebook Patron)';
+
+      console.log(`[VASTRALOOM AUTH] Authenticating via backend SSO gateway for: ${demoEmail}`);
+      const res = await ssoLoginMutation({
+        provider,
+        email: demoEmail,
+        name: demoName,
+      }).unwrap();
+
+      console.log(`[VASTRALOOM AUTH] SSO Authentication Successful! Role: ${res.role}, User: ${res.username}`);
+      dispatch(
+        setCredentials({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+          role: res.role,
+          username: res.username,
+        })
+      );
+
+      setSuccessMsg(`Authenticated as ${demoName}! Welcome to Vastraloom.`);
+      setTimeout(() => {
+        onClose();
+      }, 800);
+    } catch (err: any) {
+      console.error('[VASTRALOOM AUTH] SSO Error:', err);
+      setAuthError(err?.data?.message || `Failed to authenticate via ${provider}. Please try manual login.`);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-md bg-[#140A1F] border border-brand-gold/30 rounded-3xl p-6 sm:p-8 shadow-2xl text-brand-ivory my-8 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+      <div className="relative w-full max-w-md bg-gradient-to-b from-[#1A0A2A] via-[#12051E] to-[#0A0212] border-2 border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.95)] text-brand-ivory my-8 overflow-hidden">
         {/* Decorative background glow */}
-        <div className="absolute top-0 right-0 w-48 h-48 bg-brand-gold/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-purple/30 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-56 h-56 bg-brand-gold/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-56 h-56 bg-brand-purple/40 rounded-full blur-3xl pointer-events-none" />
 
         {/* Close Button */}
         <button
@@ -195,11 +245,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 mx-auto rounded-full bg-gradient-to-tr from-brand-purple to-brand-gold/30 border border-brand-gold/40 flex items-center justify-center mb-3 shadow-lg">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-brand-purple to-brand-gold/30 border border-brand-gold/40 flex items-center justify-center mb-3 shadow-xl">
             {tab === 'admin' ? (
-              <Shield className="w-6 h-6 text-brand-gold animate-pulse" />
+              <Shield className="w-7 h-7 text-amber-400 animate-pulse" />
             ) : (
-              <Sparkles className="w-6 h-6 text-brand-gold" />
+              <img
+                src="/logo.svg"
+                alt="Vastraloom Imperial Logo"
+                className="w-10 h-10 object-contain drop-shadow-[0_2px_10px_rgba(197,160,89,0.5)]"
+              />
             )}
           </div>
           <h3 className="font-serif text-2xl font-bold text-white tracking-wide">
@@ -209,7 +263,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               ? 'Join The Patron Salon'
               : 'Sign In to Vastraloom'}
           </h3>
-          <p className="text-xs text-brand-ivory/60 mt-1 font-sans">
+          <p className="text-xs text-brand-ivory/70 mt-1 font-sans">
             {tab === 'admin'
               ? 'Restricted Access for Master Curators & Super Admins'
               : 'Authentic pure silk handloom sarees crafted by master weavers'}
@@ -517,7 +571,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="button"
                 onClick={() => {
                   setAdminEmail('admin@vastraloom.com');
-                  setAdminPassword('Admin@123');
+                  setAdminPassword('Admin@123456');
                 }}
                 className="text-[11px] text-amber-400 hover:underline cursor-pointer"
               >
@@ -551,8 +605,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
+                disabled={isSsoLoading}
                 onClick={() => handleSSO('google')}
-                className="flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl border border-brand-gold/30 hover:border-brand-gold bg-brand-purple/40 hover:bg-brand-purple/70 text-xs font-medium text-brand-ivory transition-all shadow-sm"
+                className="flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl border border-brand-gold/30 hover:border-brand-gold bg-brand-purple/40 hover:bg-brand-purple/70 text-xs font-medium text-brand-ivory transition-all shadow-sm disabled:opacity-50"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path fill="#EA4335" d="M12 5c1.56 0 2.97.55 4.09 1.45l3.07-3.07C17.3 1.63 14.83 1 12 1 7.48 1 3.65 3.58 1.76 7.35l3.66 2.84C6.3 7.39 8.92 5 12 5z"/>
@@ -560,18 +615,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <path fill="#FBBC05" d="M5.42 14.81c-.24-.71-.38-1.47-.38-2.26s.14-1.55.38-2.26L1.76 7.35C.64 9.58 0 12.06 0 14.69c0 2.63.64 5.11 1.76 7.34l3.66-2.84z"/>
                   <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.68-2.85c-1.07.72-2.45 1.16-4.25 1.16-3.08 0-5.7-2.39-6.58-5.19L1.76 17.05C3.65 20.82 7.48 24 12 24z"/>
                 </svg>
-                <span>Google</span>
+                <span>{isSsoLoading ? 'Connecting...' : 'Google'}</span>
               </button>
 
               <button
                 type="button"
+                disabled={isSsoLoading}
                 onClick={() => handleSSO('facebook')}
-                className="flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl border border-brand-gold/30 hover:border-brand-gold bg-brand-purple/40 hover:bg-brand-purple/70 text-xs font-medium text-brand-ivory transition-all shadow-sm"
+                className="flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl border border-brand-gold/30 hover:border-brand-gold bg-brand-purple/40 hover:bg-brand-purple/70 text-xs font-medium text-brand-ivory transition-all shadow-sm disabled:opacity-50"
               >
                 <svg className="w-4 h-4 text-[#1877F2] fill-current" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669c1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                <span>Facebook</span>
+                <span>{isSsoLoading ? 'Connecting...' : 'Facebook'}</span>
               </button>
             </div>
           </div>

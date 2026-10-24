@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Star,
   ShoppingBag,
@@ -55,9 +55,31 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   const { data: allProducts } = useGetProductsQuery({});
   const catalogPool = allProducts && allProducts.length > 0 ? allProducts : fallbackProducts;
 
-  const relatedProducts = catalogPool
-    .filter((p) => p.id !== product.id && (p.category === product.category || p.fabric === product.fabric))
-    .slice(0, 4);
+  // Curate Related & More Masterpieces:
+  // 1. Same category / fabric first
+  // 2. If fewer than 4, fill from remaining catalog pool so there are always 4 stunning sarees!
+  const relatedProducts = useMemo(() => {
+    const isSameCategory = (p: Product) =>
+      String(p.id) !== String(product.id) &&
+      p.category?.toLowerCase() === product.category?.toLowerCase();
+
+    const isSimilarFabric = (p: Product) =>
+      String(p.id) !== String(product.id) &&
+      p.fabric?.toLowerCase() === product.fabric?.toLowerCase();
+
+    const matchesCategory = catalogPool.filter(isSameCategory);
+    const matchesFabric = catalogPool.filter(
+      (p) => isSimilarFabric(p) && !matchesCategory.some((m) => String(m.id) === String(p.id))
+    );
+    const remaining = catalogPool.filter(
+      (p) =>
+        String(p.id) !== String(product.id) &&
+        !matchesCategory.some((m) => String(m.id) === String(p.id)) &&
+        !matchesFabric.some((m) => String(m.id) === String(p.id))
+    );
+
+    return [...matchesCategory, ...matchesFabric, ...remaining].slice(0, 4);
+  }, [catalogPool, product]);
 
   // Auto-record in recent views & reset active image on product change
   useEffect(() => {
@@ -562,19 +584,25 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
         {/* ==================== RELATED MASTERPIECES GRID ==================== */}
         {relatedProducts.length > 0 && (
           <div className="mt-20 pt-12 border-t border-brand-gold/20">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
               <div>
                 <span className="text-xs uppercase tracking-widest text-brand-gold font-mono">
-                  From The Same Handlooms
+                  From The Imperial Handlooms
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white mt-1">
-                  Related {product.category} Sarees
+                  More Masterpieces You May Adore
                 </h3>
               </div>
+              <button
+                onClick={onClose}
+                className="self-start sm:self-auto px-5 py-2 rounded-full border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 text-xs font-mono uppercase tracking-wider transition-all"
+              >
+                Explore Full Catalog →
+              </button>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-              {relatedProducts.map((rel) => (
+              {relatedProducts.map((rel: Product) => (
                 <div
                   key={rel.id}
                   onClick={() => onSelectProduct?.(rel)}

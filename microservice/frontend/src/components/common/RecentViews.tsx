@@ -53,7 +53,7 @@ export const RecentViews: React.FC<RecentViewsProps> = ({ onSelectProduct }) => 
   }
 
   return (
-    <section className="py-16 bg-[#0E0616] text-brand-ivory border-t border-brand-gold/15">
+    <section className="py-12 sm:py-14 bg-[#0A0210] text-brand-ivory border-t border-brand-gold/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-brand-gold/15">
           <div className="flex items-center gap-3">

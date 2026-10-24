@@ -39,12 +39,10 @@ export const HeritageFeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section id="trust-section" className="py-24 text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
-      {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
+    <section id="trust-section" className="py-14 sm:py-16 text-brand-ivory relative overflow-hidden">
+      {/* Seamless Contrast Gradient matching Hero for WCAG AA readability */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/75 to-[#0F0617]/95 pointer-events-none" />
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/90 via-transparent to-[#0F0617]/90 pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
 
       {/* Subtle radial ambient lights framing the 3D celestial rings */}
       <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
