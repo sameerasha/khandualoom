@@ -17,36 +17,43 @@ const SceneLighting: React.FC<{ scrollProgress: number }> = ({ scrollProgress })
   return (
     <>
       {/* 1. Ambient Warm Champagne Light */}
-      <ambientLight color="#FFF8E7" intensity={0.85 + (p > 0.7 ? 0.3 : 0)} />
+      <ambientLight color="#FFF8E7" intensity={0.9 + (p > 0.7 ? 0.35 : 0)} />
 
-      {/* 2. Key Gold Studio Directional Light */}
+      {/* 2. Key Gold Studio Directional Light with Specular Glaze */}
       <directionalLight
-        position={[6, 7, 5]}
-        intensity={2.8}
+        position={[6, 8, 5]}
+        intensity={3.2}
         color="#FDE68A"
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
 
-      {/* 3. Fill Light: Royal Amethyst Glow */}
+      {/* 3. Fill Light: Royal Magenta & Wine Glow softening shadow folds */}
       <pointLight
         position={[-6, -4, -2]}
-        intensity={3.2}
-        color={p > 0.6 ? '#7C3AED' : '#A855F7'}
+        intensity={3.4}
+        color={p > 0.6 ? '#9333EA' : '#C026D3'}
       />
 
-      {/* 4. High-Contrast Zari Rim Light defining the Silk Silhouette */}
+      {/* 4. High-Contrast 24K Zari Rim Light defining the Silk Silhouette */}
       <pointLight
         position={[2, -3, 3]}
-        intensity={2.4 + p * 1.6}
+        intensity={2.6 + p * 1.8}
         color="#F59E0B"
       />
 
-      {/* 5. Overhead Soft Light */}
+      {/* 5. Overhead Soft Luminescence */}
       <pointLight
-        position={[0, 5, 2]}
-        intensity={1.2}
+        position={[0, 6, 2.5]}
+        intensity={1.4}
         color="#DFBF7A"
+      />
+
+      {/* 6. Subtle Lower Caustic Rim Light */}
+      <pointLight
+        position={[1, -5, 1]}
+        intensity={1.2}
+        color="#EAB308"
       />
     </>
   );
@@ -79,12 +86,12 @@ export const CinematicLoomCanvas: React.FC<CinematicLoomCanvasProps> = ({
     <div className={`relative w-full h-full ${className}`}>
       <Suspense fallback={<WebGLFallback />}>
         <Canvas
-          dpr={[1, 1.75]} // Strictly clamped to prevent GPU degradation on high-density screens
+          dpr={[1, 1.75]} // Strictly clamped to prevent GPU degradation on high-density displays
           gl={{
             powerPreference: 'high-performance',
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: 1.15,
+            toneMappingExposure: 1.25,
             outputColorSpace: THREE.SRGBColorSpace,
             alpha: true,
           }}
@@ -96,7 +103,7 @@ export const CinematicLoomCanvas: React.FC<CinematicLoomCanvasProps> = ({
           }}
           onCreated={({ scene }) => {
             // Atmospheric fog dissolves 3D boundaries into the dark luxury backdrop
-            scene.fog = new THREE.FogExp2('#0F0617', 0.038);
+            scene.fog = new THREE.FogExp2('#0C0414', 0.032);
           }}
         >
           {/* Dynamic 3D Camera Rig responsive to window scroll across all sections */}
@@ -114,7 +121,7 @@ export const CinematicLoomCanvas: React.FC<CinematicLoomCanvasProps> = ({
             reducedMotion={reducedMotion}
           />
 
-          {/* Drifting Golden Zari Stardust */}
+          {/* Dual-Layer Drifting Golden Zari Stardust & Bokeh Embers */}
           {!reducedMotion && (
             <CinematicGoldDust
               count={180}
