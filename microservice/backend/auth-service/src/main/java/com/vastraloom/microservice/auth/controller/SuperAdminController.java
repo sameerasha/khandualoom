@@ -24,7 +24,7 @@ public class SuperAdminController {
     @GetMapping
     public ResponseEntity<?> getAllAdmins() {
         List<User> admins = userRepository.findAll().stream()
-                .filter(u -> "ROLE_ADMIN".equals(u.getRole()))
+                .filter(u -> "ROLE_ADMIN".equals(u.getRole()) || "ROLE_SUPER_ADMIN".equals(u.getRole()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(admins);
     }
@@ -36,6 +36,10 @@ public class SuperAdminController {
         String lastName = payload.get("lastName");
         String email = payload.get("email");
         String password = payload.get("password");
+        String role = payload.getOrDefault("role", "ROLE_ADMIN");
+        if (!"ROLE_SUPER_ADMIN".equals(role)) {
+            role = "ROLE_ADMIN";
+        }
 
         if (email == null || password == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "Email and Password are required"));
@@ -50,7 +54,7 @@ public class SuperAdminController {
                 .lastName(lastName)
                 .email(email)
                 .password(passwordEncoder.encode(password))
-                .role("ROLE_ADMIN")
+                .role(role)
                 .provider(AuthProvider.local)
                 .emailVerified(true)
                 .phoneVerified(true)

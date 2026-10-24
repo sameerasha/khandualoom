@@ -175,11 +175,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
   const handleAddNewProduct = () => {
     setSelectedProductToEdit(null);
     setIsEditorOpen(true);
+    setActiveTab('products');
   };
 
   const handleEditProduct = (product: Product) => {
     setSelectedProductToEdit(product);
     setIsEditorOpen(true);
+    setActiveTab('products');
   };
 
   const handleDeleteProductPrompt = (product: Product) => {
@@ -254,7 +256,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     setSocialsList((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const handleCreateAdmin = async (data: { email: string; password?: string; firstName?: string; lastName?: string }) => {
+  const handleCreateAdmin = async (data: { email: string; password?: string; firstName?: string; lastName?: string; role?: string }) => {
     try {
       await axios.post('/api/super-admin/admins', data);
       const res = await axios.get('/api/super-admin/admins');
@@ -267,7 +269,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
           firstName: data.firstName || 'Atelier',
           lastName: data.lastName || 'Admin',
           email: data.email,
-          role: 'ROLE_ADMIN',
+          role: data.role || 'ROLE_ADMIN',
           createdDate: new Date().toISOString(),
         },
       ]);
@@ -444,12 +446,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       )}
 
       {activeTab === 'products' && (
-        <ProductManagerView
-          products={products}
-          onAddNewProduct={handleAddNewProduct}
-          onEditProduct={handleEditProduct}
-          onDeleteProduct={handleDeleteProductPrompt}
-        />
+        isEditorOpen ? (
+          <ProductEditorModal
+            isOpen={true}
+            inline={true}
+            product={selectedProductToEdit}
+            onSave={handleSaveProduct}
+            onClose={() => {
+              setIsEditorOpen(false);
+              setSelectedProductToEdit(null);
+            }}
+          />
+        ) : (
+          <ProductManagerView
+            products={products}
+            onAddNewProduct={handleAddNewProduct}
+            onEditProduct={handleEditProduct}
+            onDeleteProduct={handleDeleteProductPrompt}
+          />
+        )
       )}
 
       {activeTab === 'orders' && (
@@ -471,17 +486,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       {activeTab === 'admins' && (
         <AdminManagerView admins={adminsList} onCreateAdmin={handleCreateAdmin} />
       )}
-
-      {/* Product Editor Modal */}
-      <ProductEditorModal
-        isOpen={isEditorOpen}
-        product={selectedProductToEdit}
-        onSave={handleSaveProduct}
-        onClose={() => {
-          setIsEditorOpen(false);
-          setSelectedProductToEdit(null);
-        }}
-      />
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
