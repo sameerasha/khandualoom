@@ -27,8 +27,10 @@ public class WebSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private org.springframework.security.oauth2.client.registration.ClientRegistrationRepository clientRegistrationRepository;
 
-    @Value("${vastraloom.cors.allowed-origins}")
+    @Value("${vastraloom.cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:5174}")
     private String corsAllowedOrigins;
 
     public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
@@ -47,6 +49,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Auth APIs
                         .requestMatchers("/api/health").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/signup").permitAll()
@@ -76,10 +79,14 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
 
                         // Any other requests require authentication
-                        .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2AuthenticationSuccessHandler)
-                );
+                        .anyRequest().authenticated());
+
+        if (clientRegistrationRepository != null) {
+            http.oauth2Login(oauth2 -> oauth2
+                    .clientRegistrationRepository(clientRegistrationRepository)
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
+            );
+        }
 
         // Add our custom JWT security filter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

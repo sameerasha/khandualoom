@@ -9,9 +9,8 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins:
-              - "http://localhost:5173"
-              - "http://127.0.0.1:5173"
+            allowedOriginPatterns:
+              - "*"
             allowedMethods:
               - GET
               - POST
@@ -28,19 +27,19 @@ spring:
         - id: auth-service
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/v1/auth/**, /api/v1/users/**, /api/auth/**
+            - Path=/api/v1/auth/**, /api/v1/users/**, /api/auth/**, /api/users/**
 
         # Products & AI RAG Route
         - id: product-service
           uri: ${PRODUCT_SERVICE_URL:http://localhost:8082}
           predicates:
-            - Path=/api/v1/products/**, /api/v1/ai/**, /api/products/**, /images/**
+            - Path=/api/v1/products/**, /api/v1/ai/**, /api/products/**, /api/admin/products/**, /api/v1/admin/products/**, /images/**
 
         # Orders & Payments Route
         - id: order-service
           uri: ${ORDER_SERVICE_URL:http://localhost:8083}
           predicates:
-            - Path=/api/v1/orders/**, /api/v1/checkout/**, /api/v1/payments/**, /api/orders/**
+            - Path=/api/v1/orders/**, /api/v1/checkout/**, /api/v1/payments/**, /api/orders/**, /api/payment/**
 
         # Notifications & Contacts Route
         - id: notification-service

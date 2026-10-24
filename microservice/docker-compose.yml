@@ -1,34 +1,37 @@
 version: '3.8'
 
+name: vastraloom-micro
+
 services:
   # ==========================================
-  # PostgreSQL 16 with pgvector extension
+  # 1. PostgreSQL 16 with pgvector Extension
   # ==========================================
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: vastraloom-postgres
+    container_name: vastraloom-micro-postgres
     ports:
+      - "5419:5432"
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: vastraloom_products
+      POSTGRES_DB: vastraloom_db
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vastraloom_db"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - vastraloom-net
+      - vastraloom-micro-net
 
   # ==========================================
-  # Redis 7 Cache & Session Store
+  # 2. Redis 7 Cache & Session Store
   # ==========================================
   redis:
     image: redis:7-alpine
-    container_name: vastraloom-redis
+    container_name: vastraloom-micro-redis
     ports:
       - "6379:6379"
     volumes:
@@ -39,14 +42,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - vastraloom-net
+      - vastraloom-micro-net
 
   # ==========================================
-  # Apache Kafka (KRaft Mode - No Zookeeper)
+  # 3. Apache Kafka (KRaft Mode - No Zookeeper)
   # ==========================================
   kafka:
     image: confluentinc/cp-kafka:7.6.0
-    container_name: vastraloom-kafka
+    container_name: vastraloom-micro-kafka
     ports:
       - "9092:9092"
     environment:
@@ -66,24 +69,159 @@ services:
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
     volumes:
       - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
     networks:
-      - vastraloom-net
+      - vastraloom-micro-net
 
   # ==========================================
-  # Kafka UI for Real-Time Event Stream Inspection
+  # 4. Kafka UI Web Console
   # ==========================================
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: vastraloom-kafka-ui
+    container_name: vastraloom-micro-kafka-ui
     ports:
       - "8085:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: local-vastraloom-cluster
+      KAFKA_CLUSTERS_0_NAME: vastraloom-kafka
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     depends_on:
       - kafka
     networks:
-      - vastraloom-net
+      - vastraloom-micro-net
+
+  # ==========================================
+  # 5. Auth Microservice (:8081)
+  # ==========================================
+  auth-service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
+    container_name: vastraloom-micro-auth
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/vastraloom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vastraloom-micro-net
+
+  # ==========================================
+  # 6. Product Microservice (:8082)
+  # ==========================================
+  product-service:
+    build:
+      context: ./backend/product-service
+      dockerfile: Dockerfile
+    container_name: vastraloom-micro-product
+    ports:
+      - "8082:8082"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/vastraloom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vastraloom-micro-net
+
+  # ==========================================
+  # 7. Order Microservice (:8083)
+  # ==========================================
+  order-service:
+    build:
+      context: ./backend/order-service
+      dockerfile: Dockerfile
+    container_name: vastraloom-micro-order
+    ports:
+      - "8083:8083"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/vastraloom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - vastraloom-micro-net
+
+  # ==========================================
+  # 8. Notification Microservice (:8084)
+  # ==========================================
+  notification-service:
+    build:
+      context: ./backend/notification-service
+      dockerfile: Dockerfile
+    container_name: vastraloom-micro-notification
+    ports:
+      - "8084:8084"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/vastraloom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - vastraloom-micro-net
+
+  # ==========================================
+  # 9. Spring Cloud API Gateway (:8080)
+  # ==========================================
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: vastraloom-micro-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8081
+      - PRODUCT_SERVICE_URL=http://product-service:8082
+      - ORDER_SERVICE_URL=http://order-service:8083
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8084
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - notification-service
+    networks:
+      - vastraloom-micro-net
+
+  # ==========================================
+  # 10. React TypeScript Luxury Storefront (:3000 / :5174)
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vastraloom-micro-frontend
+    ports:
+      - "3000:80"
+      - "5174:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - vastraloom-micro-net
 
 volumes:
   postgres-data:
@@ -91,5 +229,6 @@ volumes:
   kafka-data:
 
 networks:
-  vastraloom-net:
+  vastraloom-micro-net:
+    name: vastraloom-micro-net
     driver: bridge

@@ -29,7 +29,7 @@ public class Product {
     @Column(name = "original_price")
     private double originalPrice;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String image; // Stores Base64 string or public URL path
 
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -50,7 +50,7 @@ public class Product {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "image_url", columnDefinition = "LONGTEXT")
+    @Column(name = "image_url", columnDefinition = "TEXT")
     @Builder.Default
     private java.util.List<String> images = new java.util.ArrayList<>();
 

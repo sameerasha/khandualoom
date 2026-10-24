@@ -19,10 +19,10 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${vastraloom.superadmin.email}")
+    @Value("${vastraloom.superadmin.email:admin@vastraloom.com}")
     private String superAdminEmail;
 
-    @Value("${vastraloom.superadmin.password}")
+    @Value("${vastraloom.superadmin.password:Admin@123456}")
     private String superAdminPassword;
 
     @Override

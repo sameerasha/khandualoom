@@ -2,30 +2,32 @@ package com.vastraloom.microservice.auth.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
 @Slf4j
 @SuppressWarnings("null")
-@RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Autowired(required = false)
+    private JavaMailSender mailSender;
 
     @Value("${vastraloom.mail.from:vastraloom@example.com}")
     private String fromEmail;
 
-
     public void sendOtpEmail(String toEmail, String otp, int ttlMinutes) {
         CompletableFuture.runAsync(() -> {
+            if (mailSender == null) {
+                log.info("[DEV MOCK] Verification OTP for {}: {} (valid for {} mins)", toEmail, otp, ttlMinutes);
+                return;
+            }
             try {
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -58,9 +60,7 @@ public class EmailService {
             } catch (MessagingException e) {
                 log.error("Failed to send email to {}: {}", toEmail, e.getMessage());
             } catch (Exception e) {
-                // If mail is not configured in properties, it throws an exception on boot or
-                // send. We catch it to prevent crashing.
-                log.error("Mail server configuration error (Check application.properties): {}", e.getMessage());
+                log.error("Mail server error: {}", e.getMessage());
             }
         });
     }

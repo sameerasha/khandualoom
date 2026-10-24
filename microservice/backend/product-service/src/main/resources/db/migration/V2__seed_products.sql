@@ -1,8 +1,5 @@
-INSERT INTO app_config (config_key, config_value) VALUES ('OTP_VALIDITY_MINUTES', '2');
-INSERT INTO app_config (config_key, config_value) VALUES ('OTP_MAX_ATTEMPTS', '5');
-
-INSERT INTO users (first_name, last_name, email, password, phone, role, email_verified, phone_verified, provider, created_date, modified_date) 
-VALUES ('Super', 'Admin', 'admin@vastraloom.com', '$2a$10$w0X3nFjSgYtJ8L/jE.rMDeu5G0zK1CqBkVrR0Z5hV6LgGvJ/mD8kS', '9999999999', 'ROLE_ADMIN', true, true, 'local', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+TRUNCATE TABLE product_images, recent_views CASCADE;
+TRUNCATE TABLE products RESTART IDENTITY CASCADE;
 
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
 VALUES (1, 'Royal Banarasi Silk', 'Banarasi', 24999, 32999, '/images/saree_purple_gold.png', 'Handwoven in Varanasi with pure gold zari work, this regal Banarasi silk saree features intricate mughal-inspired motifs.', 'Pure Silk', 'Handloom', 'Purple & Gold', 4.9, 128, 'Bestseller', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
