@@ -15,12 +15,12 @@
   --color-text-gold: #e8a87c;
   --color-accent: #e8a87c;
   --color-accent-hover: #f0c49f;
-  --color-gold-100: #fae8ff;
-  --color-gold-200: #f5d0fe;
-  --color-gold-300: #f0abfc;
+  --color-gold-100: #fbf5e8;
+  --color-gold-200: #f4e4bf;
+  --color-gold-300: #dfbf7a;
   --color-gold-400: #e8a87c;
   --color-gold-500: #c5a059;
-  --color-gold-600: #a855f7;
+  --color-gold-600: #9e7d3b;
   --color-burgundy-500: #c45b8a;
   --color-success: #34d399;
   --color-error: #f87171;
@@ -228,6 +228,22 @@
   overflow-y: auto;
   min-width: 0;
   background: var(--color-bg-primary);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(223, 191, 122, 0.25) rgba(11, 13, 23, 0.9);
+}
+
+.admin-main::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-main::-webkit-scrollbar-track {
+  background: rgba(11, 13, 23, 0.9);
+}
+.admin-main::-webkit-scrollbar-thumb {
+  background: rgba(223, 191, 122, 0.25);
+  border-radius: 3px;
+}
+.admin-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(223, 191, 122, 0.5);
 }
 
 .admin-main__content {

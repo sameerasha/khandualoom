@@ -22,6 +22,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [latencyMs, setLatencyMs] = useState<number | null>(24);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Click outside to close mobile dropdown
@@ -38,11 +39,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   // Server Heartbeat Check
   useEffect(() => {
     const checkHealth = async () => {
+      const t0 = performance.now();
       try {
         const response = await fetch('/actuator/health', {
           method: 'GET',
           headers: { 'Cache-Control': 'no-cache' },
         });
+        const elapsed = Math.round(performance.now() - t0);
+        setLatencyMs(elapsed);
         if (response.ok) {
           setServerStatus('online');
         } else {
@@ -295,7 +299,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               {serverStatus === 'checking'
                 ? 'Checking...'
                 : serverStatus === 'online'
-                ? 'Online'
+                ? `Online (${latencyMs ?? 24}ms)`
                 : 'Offline'}
             </span>
           </div>
