@@ -19,8 +19,8 @@ import {
   Shield,
 } from 'lucide-react';
 import { Product } from '@/types';
-import { useAppDispatch } from '@/app/hooks';
-import { addToCart } from '@/features/cart/cartSlice';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { addToCart, setCartOpen } from '@/features/cart/cartSlice';
 import { useGetProductsQuery } from '@/features/products/productsApi';
 import { fallbackProducts } from '@/data/fallbackProducts';
 
@@ -38,6 +38,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   onSelectProduct,
 }) => {
   const dispatch = useAppDispatch();
+  const { items } = useAppSelector((state) => state.cart);
+  const cartItem = items.find((item) => item.product.id === product.id);
+  const isInCart = Boolean(cartItem);
+
   const [selectedQty, setSelectedQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState(product.image || '/images/saree_crimson_red.png');
@@ -253,6 +257,41 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                   </span>
                 )}
               </div>
+
+              {/* Top Right Green Indicator if In Cart */}
+              {isInCart && (
+                <div
+                  onClick={() => dispatch(setCartOpen(true))}
+                  className="absolute top-3 right-3 z-30 flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-mono uppercase tracking-wider font-bold shadow-lg border border-emerald-400/50 cursor-pointer"
+                  title="Item in Cart • Click to View Bag"
+                >
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  <span>In Cart • Go to Cart</span>
+                </div>
+              )}
+
+              {/* Middle Action Overlay on Product Image */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-3 z-20 transition-all duration-300 bg-black/40 sm:bg-black/45 sm:opacity-0 sm:group-hover:opacity-100 backdrop-blur-[1px]">
+                {added || isInCart ? (
+                  <button
+                    onClick={() => dispatch(setCartOpen(true))}
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(16,185,129,0.5)] border border-emerald-400/50 transform active:scale-95 transition-all cursor-pointer pointer-events-auto"
+                    title="Click to Open Cart"
+                  >
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>Go to Cart</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleAdd}
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-gold via-amber-400 to-brand-gold text-brand-purple-dark text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_15px_rgba(223,191,122,0.4)] hover:brightness-110 active:scale-95 transition-all cursor-pointer pointer-events-auto"
+                    title="Add to Cart"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>Add to Bag</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Gallery Angle Thumbnails */}
@@ -431,18 +470,25 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                   </button>
                 </div>
 
-                {/* Add to Bag Button with Vibrant Green State */}
-                <button
-                  onClick={handleAdd}
-                  className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border transition-all shadow-md cursor-pointer ${
-                    added
-                      ? 'bg-emerald-600 border-emerald-400 text-white shadow-emerald-500/25'
-                      : 'bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-transparent border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-purple-dark'
-                  }`}
-                >
-                  {added ? <Check className="w-4 h-4 stroke-[3]" /> : <ShoppingBag className="w-4 h-4" />}
-                  <span>{added ? 'Added to Bag' : 'Add to Bag'}</span>
-                </button>
+                {/* Add to Bag / Go to Cart Button */}
+                {added || isInCart ? (
+                  <button
+                    onClick={() => dispatch(setCartOpen(true))}
+                    className="flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border bg-emerald-600 hover:bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-600/30 active:scale-95 transition-all cursor-pointer"
+                    title="Item in Cart • Click to View Bag"
+                  >
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>Go to Cart</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleAdd}
+                    className="flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-transparent border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-purple-dark active:scale-95 transition-all shadow-md cursor-pointer"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>Add to Bag</span>
+                  </button>
+                )}
               </div>
 
               {/* Instant Checkout Button */}
@@ -604,24 +650,31 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {relatedProducts.map((rel: Product) => (
-                <div
-                  key={rel.id}
-                  onClick={() => onSelectProduct?.(rel)}
-                  className="group rounded-2xl border border-brand-gold/20 overflow-hidden bg-brand-purple-dark/60 hover:border-brand-gold/60 cursor-pointer transition-all hover:shadow-xl hover:shadow-brand-gold/15 flex flex-col"
-                >
-                  <div className="aspect-[3/3.8] w-full overflow-hidden bg-black relative">
-                    <img
-                      src={rel.image || '/images/saree_crimson_red.png'}
-                      alt={rel.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    {rel.badge && (
-                      <span className="absolute top-2.5 left-2.5 bg-brand-crimson text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase shadow">
-                        {rel.badge}
-                      </span>
-                    )}
-                  </div>
+              {relatedProducts.map((rel: Product) => {
+                const relInCart = items.some((item) => item.product.id === rel.id);
+                return (
+                  <div
+                    key={rel.id}
+                    onClick={() => onSelectProduct?.(rel)}
+                    className="group rounded-2xl border border-brand-gold/20 overflow-hidden bg-brand-purple-dark/60 hover:border-brand-gold/60 cursor-pointer transition-all hover:shadow-xl hover:shadow-brand-gold/15 flex flex-col"
+                  >
+                    <div className="aspect-[3/3.8] w-full overflow-hidden bg-black relative">
+                      <img
+                        src={rel.image || '/images/saree_crimson_red.png'}
+                        alt={rel.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      {rel.badge && (
+                        <span className="absolute top-2.5 left-2.5 bg-brand-crimson text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase shadow">
+                          {rel.badge}
+                        </span>
+                      )}
+                      {relInCart && (
+                        <div className="absolute top-2.5 right-2.5 bg-emerald-600 text-white rounded-full p-1 shadow-md border border-emerald-400/40 flex items-center justify-center">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </div>
+                      )}
+                    </div>
                   <div className="p-3.5 flex-1 flex flex-col justify-between">
                     <div>
                       <span className="text-[10px] text-brand-gold uppercase tracking-wider block font-mono">
@@ -639,7 +692,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           </div>
         )}
