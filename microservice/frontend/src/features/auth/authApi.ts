@@ -24,6 +24,15 @@ export interface RegisterRequest {
   phone?: string;
 }
 
+export interface ProfileUpdateRequest {
+  firstName?: string;
+  lastName?: string;
+  previousPassword?: string;
+  newPassword?: string;
+  phone?: string;
+  addresses?: Address[];
+}
+
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<AuthResponse, LoginRequest>({
@@ -64,7 +73,7 @@ export const authApi = baseApi.injectEndpoints({
       query: () => '/api/users/profile',
       providesTags: ['User'],
     }),
-    updateProfile: builder.mutation<User, Partial<User>>({
+    updateProfile: builder.mutation<User, ProfileUpdateRequest | Partial<User>>({
       query: (data) => ({
         url: '/api/users/profile',
         method: 'PUT',

@@ -34,11 +34,12 @@ export interface User {
   emailVerified: boolean;
   phoneVerified: boolean;
   avatarUrl?: string;
+  addresses?: Address[];
 }
 
 export interface Address {
   id?: number;
-  addressType: 'HOME' | 'WORK' | 'OTHER';
+  addressType: 'HOME' | 'OFFICE' | 'OTHER' | string;
   fullName: string;
   streetAddress: string;
   landmark?: string;

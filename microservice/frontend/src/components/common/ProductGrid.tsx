@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { SlidersHorizontal, Search, RefreshCw, Sparkles } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { SlidersHorizontal, Search, RefreshCw, Sparkles, ChevronDown } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Product } from '@/types';
 import { ProductCard } from './ProductCard';
@@ -13,6 +13,8 @@ import { useGetProductsQuery } from '@/features/products/productsApi';
 import { fallbackProducts } from '@/data/fallbackProducts';
 
 const CATEGORIES = ['All', 'Banarasi', 'Kanjivaram', 'Chanderi', 'Tussar'];
+const INITIAL_LIMIT = 15;
+const PAGE_SIZE = 15;
 
 interface ProductGridProps {
   onSelectProduct: (product: Product) => void;
@@ -23,6 +25,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
   const { selectedCategory, searchQuery, sortBy } = useAppSelector(
     (state) => state.products
   );
+
+  const [visibleCount, setVisibleCount] = useState(INITIAL_LIMIT);
 
   const {
     data: fetchedProducts,
@@ -75,10 +79,20 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
     return result;
   }, [productsToFilter, selectedCategory, searchQuery, sortBy]);
 
+  // Reset visible count back to 15 whenever filters change
+  useEffect(() => {
+    setVisibleCount(INITIAL_LIMIT);
+  }, [selectedCategory, searchQuery, sortBy]);
+
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, visibleCount);
+  }, [filteredProducts, visibleCount]);
+
   const handleResetFilters = () => {
     dispatch(setSelectedCategory('All'));
     dispatch(setSearchQuery(''));
     dispatch(setSortBy('featured'));
+    setVisibleCount(INITIAL_LIMIT);
   };
 
   return (
@@ -90,13 +104,15 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
       <div className="absolute top-1/4 right-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 relative z-10">
         {/* Title & Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
             <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold mb-2">
               <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-              <span>Masterpieces of the Loom • {filteredProducts.length} Heirloom Sarees</span>
+              <span>
+                Masterpieces of the Loom • Showing {displayedProducts.length} of {filteredProducts.length} Heirloom Sarees
+              </span>
             </div>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-ivory leading-tight">
               Handcrafted Saree Collection
@@ -120,96 +136,127 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
           </div>
         </div>
 
-      {/* Category Pills & Active Search Tag */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-10 pb-4 border-b border-brand-gold/15">
-        <div className="flex flex-wrap gap-2.5">
-          {CATEGORIES.map((cat) => {
-            const count =
-              cat === 'All'
-                ? productsToFilter.length
-                : productsToFilter.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
-            const isSelected = selectedCategory === cat;
-            return (
+        {/* Category Pills & Active Search Tag */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-10 pb-4 border-b border-brand-gold/15">
+          <div className="flex flex-wrap gap-2.5">
+            {CATEGORIES.map((cat) => {
+              const count =
+                cat === 'All'
+                  ? productsToFilter.length
+                  : productsToFilter.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
+              const isSelected = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => dispatch(setSelectedCategory(cat))}
+                  className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark shadow-lg shadow-brand-gold/20 scale-105 font-bold'
+                      : 'bg-brand-purple-dark/60 text-brand-ivory/80 hover:bg-brand-purple-dark hover:text-brand-gold border border-brand-gold/25 backdrop-blur-sm'
+                  }`}
+                >
+                  <span>{cat}</span>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-brand-purple-dark/20 text-brand-purple-dark' : 'bg-white/10 text-brand-ivory/60'}`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {searchQuery && (
+            <div className="flex items-center gap-2 bg-brand-purple-dark/90 px-3.5 py-1.5 rounded-full border border-brand-gold/40 text-xs shadow-md">
+              <Search className="w-3.5 h-3.5 text-brand-gold" />
+              <span className="text-brand-ivory/80">Query: "{searchQuery}"</span>
               <button
-                key={cat}
-                onClick={() => dispatch(setSelectedCategory(cat))}
-                className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
-                  isSelected
-                    ? 'bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark shadow-lg shadow-brand-gold/20 scale-105 font-bold'
-                    : 'bg-brand-purple-dark/60 text-brand-ivory/80 hover:bg-brand-purple-dark hover:text-brand-gold border border-brand-gold/25 backdrop-blur-sm'
-                }`}
+                onClick={() => dispatch(setSearchQuery(''))}
+                className="text-brand-gold hover:text-white font-bold ml-1"
               >
-                <span>{cat}</span>
-                <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-brand-purple-dark/20 text-brand-purple-dark' : 'bg-white/10 text-brand-ivory/60'}`}>
-                  {count}
-                </span>
+                ×
               </button>
-            );
-          })}
+            </div>
+          )}
         </div>
 
-        {searchQuery && (
-          <div className="flex items-center gap-2 bg-brand-purple-dark/90 px-3.5 py-1.5 rounded-full border border-brand-gold/40 text-xs shadow-md">
-            <Search className="w-3.5 h-3.5 text-brand-gold" />
-            <span className="text-brand-ivory/80">Query: "{searchQuery}"</span>
+        {/* Loading Skeleton - 5 Columns */}
+        {isLoading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <div
+                key={n}
+                className="aspect-[3/4] bg-brand-purple-dark/40 animate-pulse rounded-2xl border border-brand-gold/15"
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && filteredProducts.length === 0 && (
+          <div className="text-center py-20 bg-brand-purple-dark/40 backdrop-blur-md rounded-3xl border border-brand-gold/20">
+            <p className="font-serif text-2xl text-brand-gold mb-2">No Sarees Found</p>
+            <p className="text-sm text-brand-ivory/60 mb-6 font-light">
+              We couldn't find matches for your active filters or search terms.
+            </p>
             <button
-              onClick={() => dispatch(setSearchQuery(''))}
-              className="text-brand-gold hover:text-white font-bold ml-1"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-gold text-brand-purple-dark font-semibold text-xs shadow-xl hover:brightness-110"
             >
-              ×
+              <RefreshCw className="w-3.5 h-3.5" />
+              Reset All Filters
             </button>
           </div>
         )}
-      </div>
 
-      {/* Loading Skeleton */}
-      {isLoading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div
-              key={n}
-              className="aspect-[3/4] bg-brand-purple-dark/40 animate-pulse rounded-3xl border border-brand-gold/15"
-            />
-          ))}
-        </div>
-      )}
+        {/* 5-Column Product Cards Grid with Staggered Entrance */}
+        {!isLoading && filteredProducts.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-7">
+              {displayedProducts.map((product, idx) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-30px' }}
+                  transition={{ duration: 0.5, delay: (idx % 5) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <ProductCard
+                    product={product}
+                    onSelect={onSelectProduct}
+                  />
+                </motion.div>
+              ))}
+            </div>
 
-      {/* Empty State */}
-      {!isLoading && filteredProducts.length === 0 && (
-        <div className="text-center py-20 bg-brand-purple-dark/40 backdrop-blur-md rounded-3xl border border-brand-gold/20">
-          <p className="font-serif text-2xl text-brand-gold mb-2">No Sarees Found</p>
-          <p className="text-sm text-brand-ivory/60 mb-6 font-light">
-            We couldn't find matches for your active filters or search terms.
-          </p>
-          <button
-            onClick={handleResetFilters}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-gold text-brand-purple-dark font-semibold text-xs shadow-xl hover:brightness-110"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Reset All Filters
-          </button>
-        </div>
-      )}
-
-      {/* Product Cards Grid with Staggered Entrance */}
-      {!isLoading && filteredProducts.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product, idx) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.6, delay: (idx % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <ProductCard
-                product={product}
-                onSelect={onSelectProduct}
-              />
-            </motion.div>
-          ))}
-        </div>
-      )}
+            {/* Load More Button for Next 15 Products */}
+            {visibleCount < filteredProducts.length ? (
+              <div className="mt-14 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-full max-w-sm bg-white/5 border border-brand-gold/20 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-brand-gold to-brand-gold-light h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(100, (displayedProducts.length / filteredProducts.length) * 100)}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs font-mono text-brand-ivory/60">
+                  Revealed <span className="text-brand-gold font-bold">{displayedProducts.length}</span> of{' '}
+                  <span className="text-brand-gold font-bold">{filteredProducts.length}</span> Certified Masterpieces
+                </p>
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                  className="group px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold text-brand-purple-dark font-serif font-bold text-sm tracking-wide shadow-xl shadow-brand-gold/25 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Load Next 15 Masterpieces</span>
+                  <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
+                </button>
+              </div>
+            ) : filteredProducts.length > INITIAL_LIMIT ? (
+              <div className="mt-14 text-center text-xs font-mono text-brand-gold/75 py-4 border-t border-brand-gold/15 tracking-widest uppercase">
+                ✦ All {filteredProducts.length} Certified Masterpieces Unveiled ✦
+              </div>
+            ) : null}
+          </>
+        )}
       </div>
     </section>
   );
