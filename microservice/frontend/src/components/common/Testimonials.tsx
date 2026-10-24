@@ -72,7 +72,12 @@ export const Testimonials: React.FC = () => {
   const active = testimonials[currentIndex];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-transparent via-[#140A1F]/50 to-transparent text-brand-ivory relative overflow-hidden border-b border-brand-gold/15">
+    <section className="py-24 relative overflow-hidden text-brand-ivory border-b border-brand-gold/15">
+      {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/95 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+
       {/* Background Watermark Quote */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] text-brand-gold">
         <Quote className="w-[450px] h-[450px]" />
@@ -94,7 +99,7 @@ export const Testimonials: React.FC = () => {
         </div>
 
         {/* Testimonial Card Stage */}
-        <div className="relative bg-brand-purple-dark/50 border border-brand-gold/25 rounded-3xl p-8 sm:p-12 lg:p-16 backdrop-blur-xl shadow-2xl">
+        <div className="relative bg-brand-purple-dark/85 border border-brand-gold/30 rounded-3xl p-8 sm:p-12 lg:p-16 backdrop-blur-xl shadow-2xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={active.id}

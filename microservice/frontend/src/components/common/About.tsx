@@ -29,7 +29,12 @@ export const About: React.FC = () => {
   ];
 
   return (
-    <section id="heritage" className="py-24 bg-gradient-to-b from-transparent via-[#14081F]/40 to-transparent text-brand-ivory relative overflow-hidden border-b border-brand-gold/15">
+    <section id="heritage" className="py-24 relative overflow-hidden text-brand-ivory border-b border-brand-gold/15">
+      {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/70 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+
       {/* Background radial glow */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-0 w-96 h-96 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
@@ -97,7 +102,7 @@ export const About: React.FC = () => {
             </p>
 
             {/* Interactive Timeline Tabs */}
-            <div className="mt-8 p-4 rounded-2xl bg-brand-purple-dark/50 border border-brand-gold/25 backdrop-blur-md">
+            <div className="mt-8 p-4 rounded-2xl bg-brand-purple-dark/85 border border-brand-gold/30 backdrop-blur-xl shadow-xl">
               <div className="flex items-center gap-2 border-b border-brand-gold/15 pb-3 overflow-x-auto">
                 {milestones.map((m, idx) => (
                   <button

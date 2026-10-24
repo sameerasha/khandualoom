@@ -82,35 +82,45 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
   };
 
   return (
-    <section id="catalog-section" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      {/* Title & Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-            <span>Masterpieces of the Loom • {filteredProducts.length} Heirloom Sarees</span>
-          </div>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-ivory leading-tight">
-            Handcrafted Saree Collection
-          </h2>
-        </div>
+    <section id="catalog-section" className="relative py-24 text-brand-ivory border-b border-brand-gold/15 overflow-hidden">
+      {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/95 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
 
-        {/* Sort Select */}
-        <div className="flex items-center gap-2 self-start md:self-end bg-brand-purple-dark/80 p-1.5 px-3 rounded-xl border border-brand-gold/30 backdrop-blur-md">
-          <SlidersHorizontal className="w-4 h-4 text-brand-gold" />
-          <span className="text-xs text-brand-ivory/70 font-sans">Sort By:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => dispatch(setSortBy(e.target.value as any))}
-            className="bg-transparent border-none text-xs text-brand-gold font-medium py-1 px-2 focus:outline-none cursor-pointer"
-          >
-            <option value="featured" className="bg-[#13091B] text-brand-ivory">Featured Collection</option>
-            <option value="price-low" className="bg-[#13091B] text-brand-ivory">Price: Low to High</option>
-            <option value="price-high" className="bg-[#13091B] text-brand-ivory">Price: High to Low</option>
-            <option value="rating" className="bg-[#13091B] text-brand-ivory">Highest Rated</option>
-          </select>
+      {/* Subtle ambient lighting */}
+      <div className="absolute top-1/4 right-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Title & Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+              <span>Masterpieces of the Loom • {filteredProducts.length} Heirloom Sarees</span>
+            </div>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-ivory leading-tight">
+              Handcrafted Saree Collection
+            </h2>
+          </div>
+
+          {/* Sort Select */}
+          <div className="flex items-center gap-2 self-start md:self-end bg-brand-purple-dark/85 p-1.5 px-3 rounded-xl border border-brand-gold/30 backdrop-blur-xl shadow-md">
+            <SlidersHorizontal className="w-4 h-4 text-brand-gold" />
+            <span className="text-xs text-brand-ivory/80 font-sans">Sort By:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => dispatch(setSortBy(e.target.value as any))}
+              className="bg-transparent border-none text-xs text-brand-gold font-medium py-1 px-2 focus:outline-none cursor-pointer"
+            >
+              <option value="featured" className="bg-[#13091B] text-brand-ivory">Featured Collection</option>
+              <option value="price-low" className="bg-[#13091B] text-brand-ivory">Price: Low to High</option>
+              <option value="price-high" className="bg-[#13091B] text-brand-ivory">Price: High to Low</option>
+              <option value="rating" className="bg-[#13091B] text-brand-ivory">Highest Rated</option>
+            </select>
+          </div>
         </div>
-      </div>
 
       {/* Category Pills & Active Search Tag */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-10 pb-4 border-b border-brand-gold/15">
@@ -202,6 +212,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
           ))}
         </div>
       )}
+      </div>
     </section>
   );
 };

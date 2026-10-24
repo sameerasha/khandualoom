@@ -50,7 +50,12 @@ export const CraftShowcaseSection: React.FC<CraftShowcaseSectionProps> = ({ onEx
   const currentTab = tabContent[activeTab];
 
   return (
-    <section id="craft-section" className="py-24 bg-gradient-to-b from-transparent via-[#160B24]/40 to-transparent text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
+    <section id="craft-section" className="py-24 text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
+      {/* Contrast Gradients matching Hero for WCAG AA readability */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/65 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+
       {/* Background ambient aura */}
       <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-[450px] h-[450px] bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
@@ -136,17 +141,17 @@ export const CraftShowcaseSection: React.FC<CraftShowcaseSectionProps> = ({ onEx
 
             {/* Craft Credentials Grid */}
             <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-2xl bg-brand-purple-dark/60 border border-brand-gold/20 backdrop-blur-md">
+              <div className="p-4 rounded-2xl bg-brand-purple-dark/85 border border-brand-gold/30 backdrop-blur-xl shadow-lg">
                 <span className="font-serif text-2xl sm:text-3xl font-bold text-brand-gold block">6,000+</span>
-                <span className="text-xs text-brand-ivory/70 mt-1 block">Warp Silk Filaments</span>
+                <span className="text-xs text-brand-ivory/80 mt-1 block">Warp Silk Filaments</span>
               </div>
-              <div className="p-4 rounded-2xl bg-brand-purple-dark/60 border border-brand-gold/20 backdrop-blur-md">
+              <div className="p-4 rounded-2xl bg-brand-purple-dark/85 border border-brand-gold/30 backdrop-blur-xl shadow-lg">
                 <span className="font-serif text-2xl sm:text-3xl font-bold text-brand-gold block">90 Days</span>
-                <span className="text-xs text-brand-ivory/70 mt-1 block">Per Bridal Masterpiece</span>
+                <span className="text-xs text-brand-ivory/80 mt-1 block">Per Bridal Masterpiece</span>
               </div>
-              <div className="p-4 rounded-2xl bg-brand-purple-dark/60 border border-brand-gold/20 backdrop-blur-md col-span-2 sm:col-span-1">
+              <div className="p-4 rounded-2xl bg-brand-purple-dark/85 border border-brand-gold/30 backdrop-blur-xl shadow-lg col-span-2 sm:col-span-1">
                 <span className="font-serif text-2xl sm:text-3xl font-bold text-brand-gold block">24K Zari</span>
-                <span className="text-xs text-brand-ivory/70 mt-1 block">Electroplated Silver Core</span>
+                <span className="text-xs text-brand-ivory/80 mt-1 block">Electroplated Silver Core</span>
               </div>
             </div>
 

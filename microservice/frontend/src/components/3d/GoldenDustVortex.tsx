@@ -44,6 +44,9 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
   const scrollVelocity = useRef(0);
   const smoothedProgress = useRef(scrollProgress);
 
+  // Continuous fluid stream phase accumulator (advances steadily; never jumps with mouse speed!)
+  const streamPhaseRef = useRef(0);
+
   // Reusable radial glow texture for soft circular particles
   const glowTexture = useMemo(() => createGlowTexture(), []);
 
@@ -201,17 +204,13 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
-    // 1. Smooth buttery mouse tracking with spring momentum
-    const target3DX = targetMouse.current.x * 5.5; // Scale to 3D world space
-    const target3DY = targetMouse.current.y * 3.8;
+    // 1. Ultra-smooth velvety mouse tracking (luxurious dampening, no sharp acceleration)
+    const target3DX = targetMouse.current.x * 4.8; // Scale to 3D world space
+    const target3DY = targetMouse.current.y * 3.2;
 
     const mx = smoothedMouse.current;
-    mx.vx = (target3DX - mx.x) * 0.12;
-    mx.vy = (target3DY - mx.y) * 0.12;
-    mx.x = THREE.MathUtils.lerp(mx.x, target3DX, 0.1);
-    mx.y = THREE.MathUtils.lerp(mx.y, target3DY, 0.1);
-
-    const mouseVelocityMag = Math.sqrt(mx.vx * mx.vx + mx.vy * mx.vy);
+    mx.x = THREE.MathUtils.lerp(mx.x, target3DX, 0.04);
+    mx.y = THREE.MathUtils.lerp(mx.y, target3DY, 0.04);
 
     // 2. Scroll progression and velocity
     const scrollDelta = scrollProgress - prevScrollRef.current;
@@ -228,21 +227,22 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
     );
 
     const p = smoothedProgress.current;
-    const v = scrollVelocity.current * 0.05;
+
+    // Advance stream phase continuously and steadily without speed jumps
+    const dt = Math.min(delta, 0.05);
+    streamPhaseRef.current += dt * (reducedMotion ? 0.025 : 0.045);
+    const streamPhase = streamPhaseRef.current;
 
     // -----------------------------------------------------------------------
-    // A. Animate Tier 1: Buttery Golden Zari Silk Stream with Mouse Swirl
+    // A. Animate Tier 1: Buttery Golden Zari Silk Stream with Gentle Swirl
     // -----------------------------------------------------------------------
     if (streamPointsRef.current) {
       const geo = streamPointsRef.current.geometry;
       const posAttr = geo.attributes.position as THREE.BufferAttribute;
       const positions = posAttr.array as Float32Array;
 
-      // Base stream flow rate + scroll burst + mouse movement boost
-      const flowRate = (reducedMotion ? 0.03 : 0.09) + Math.abs(v) * 0.45 + mouseVelocityMag * 0.15;
-
       for (let i = 0; i < streamCount; i++) {
-        let t = (streamTValues[i] + time * flowRate + p * 0.65) % 1.0;
+        let t = (streamTValues[i] + streamPhase + p * 0.45) % 1.0;
         if (t < 0) t += 1.0;
 
         const offX = streamOffsets[i * 3 + 0];
@@ -311,21 +311,23 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
         }
 
         // ===================================================================
-        // BUTTERY MOUSE INTERACTION (DYNAMIC DEFLECTION & VORTEX SWIRL)
+        // BUTTERY MOUSE INTERACTION (GENTLE DEFLECTION & SILK SWIRL)
         // ===================================================================
         const dx = cx - mx.x;
         const dy = cy - mx.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // Responsive radius around cursor
-        const interactionRadius = 3.2;
+        // Gentle interactive radius around cursor
+        const interactionRadius = 2.4;
         let pushX = 0;
         let pushY = 0;
         let pushZ = 0;
 
         if (dist < interactionRadius && dist > 0.001) {
-          // Smooth cubic falloff curve
-          const strength = Math.pow(1 - dist / interactionRadius, 2) * 1.6;
+          // Soft cubic falloff
+          const normDist = dist / interactionRadius;
+          const strength = (1 - normDist) * (1 - normDist) * 0.42;
+
           // Outward radial push
           const nx = dx / dist;
           const ny = dy / dist;
@@ -333,9 +335,9 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
           const swirlX = -ny;
           const swirlY = nx;
 
-          pushX = (nx * 0.65 + swirlX * 0.75) * strength + mx.vx * strength * 2.2;
-          pushY = (ny * 0.65 + swirlY * 0.75) * strength + mx.vy * strength * 2.2;
-          pushZ = Math.sin(dist * 2) * strength * 0.8;
+          pushX = (nx * 0.7 + swirlX * 0.3) * strength;
+          pushY = (ny * 0.7 + swirlY * 0.3) * strength;
+          pushZ = Math.sin(dist * 2) * strength * 0.4;
         }
 
         positions[i * 3 + 0] = cx + offX + pushX;
@@ -359,7 +361,7 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
       ambientPointsRef.current.rotation.x = Math.sin(time * 0.02) * 0.06;
       ambientPointsRef.current.position.y = -p * 1.5;
 
-      // Mouse displacement wave on ambient dust
+      // Gentle mouse displacement wave on ambient dust
       for (let i = 0; i < 400; i++) {
         const ox = ambientOriginalPositions[i * 3 + 0];
         const oy = ambientOriginalPositions[i * 3 + 1];
@@ -368,13 +370,13 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
         const dy = oy - mx.y;
         const d = Math.sqrt(dx * dx + dy * dy);
 
-        if (d < 2.5 && d > 0.01) {
-          const push = Math.pow(1 - d / 2.5, 2) * 0.8;
-          posArray[i * 3 + 0] = THREE.MathUtils.lerp(posArray[i * 3 + 0], ox + (dx / d) * push, 0.1);
-          posArray[i * 3 + 1] = THREE.MathUtils.lerp(posArray[i * 3 + 1], oy + (dy / d) * push, 0.1);
+        if (d < 2.2 && d > 0.01) {
+          const push = Math.pow(1 - d / 2.2, 2) * 0.3;
+          posArray[i * 3 + 0] = THREE.MathUtils.lerp(posArray[i * 3 + 0], ox + (dx / d) * push, 0.04);
+          posArray[i * 3 + 1] = THREE.MathUtils.lerp(posArray[i * 3 + 1], oy + (dy / d) * push, 0.04);
         } else {
-          posArray[i * 3 + 0] = THREE.MathUtils.lerp(posArray[i * 3 + 0], ox, 0.05);
-          posArray[i * 3 + 1] = THREE.MathUtils.lerp(posArray[i * 3 + 1], oy, 0.05);
+          posArray[i * 3 + 0] = THREE.MathUtils.lerp(posArray[i * 3 + 0], ox, 0.02);
+          posArray[i * 3 + 1] = THREE.MathUtils.lerp(posArray[i * 3 + 1], oy, 0.02);
         }
       }
       posAttr.needsUpdate = true;
@@ -407,12 +409,12 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
         let py = Math.sin(currentTheta) * (r * 0.65);
         let pz = Math.sin(currentTheta * 2) * 0.35;
 
-        // Buttery mouse reaction on nebula particles
+        // Buttery gentle mouse reaction on nebula particles
         const dx = px - mx.x;
         const dy = py - mx.y;
         const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 2.6 && d > 0.01) {
-          const force = Math.pow(1 - d / 2.6, 2) * 1.2;
+        if (d < 2.2 && d > 0.01) {
+          const force = Math.pow(1 - d / 2.2, 2) * 0.32;
           px += (dx / d) * force;
           py += (dy / d) * force;
         }
@@ -423,11 +425,11 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
       }
       posAttr.needsUpdate = true;
 
-      // Subtle tilt
+      // Subtle tilt & buttery soft parallax
       celestialHaloRef.current.rotation.x = Math.PI / 5 + Math.sin(time * 0.2) * 0.12;
       celestialHaloRef.current.rotation.z = Math.sin(time * 0.25) * 0.1;
-      celestialHaloRef.current.position.x = mx.x * 0.15;
-      celestialHaloRef.current.position.y = mx.y * 0.15;
+      celestialHaloRef.current.position.x = THREE.MathUtils.lerp(celestialHaloRef.current.position.x, mx.x * 0.04, 0.03);
+      celestialHaloRef.current.position.y = THREE.MathUtils.lerp(celestialHaloRef.current.position.y, mx.y * 0.04, 0.03);
     }
   });
 

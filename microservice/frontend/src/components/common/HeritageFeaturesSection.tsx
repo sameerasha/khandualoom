@@ -39,7 +39,13 @@ export const HeritageFeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section id="trust-section" className="py-20 bg-gradient-to-b from-transparent via-[#150A21]/50 to-transparent text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
+    <section id="trust-section" className="py-24 text-brand-ivory border-b border-brand-gold/15 relative overflow-hidden">
+      {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/75 to-[#0F0617]/95 pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/90 via-transparent to-[#0F0617]/90 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0F0617] via-[#0F0617]/60 to-transparent pointer-events-none" />
+
       {/* Subtle radial ambient lights framing the 3D celestial rings */}
       <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
@@ -89,7 +95,7 @@ export const HeritageFeaturesSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-              className="relative p-6 rounded-3xl bg-brand-purple-dark/50 border border-brand-gold/25 hover:border-brand-gold/80 backdrop-blur-xl shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-brand-gold/20 hover:-translate-y-2 group flex flex-col justify-between"
+              className="relative p-6 rounded-3xl bg-brand-purple-dark/85 border border-brand-gold/30 hover:border-brand-gold/80 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-brand-gold/25 hover:-translate-y-2 group flex flex-col justify-between"
             >
               {/* Top Accent Pill */}
               <div className="flex items-center justify-between mb-4">

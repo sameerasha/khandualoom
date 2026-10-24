@@ -82,17 +82,17 @@ export const CinematicCameraRig: React.FC<CinematicCameraRigProps> = ({
       targetLookY = -0.8 + t * 0.3;
     }
 
-    // Add interactive cursor parallax
-    targetX -= state.pointer.x * 0.35;
-    targetY += state.pointer.y * 0.25;
+    // Add velvety interactive cursor parallax
+    targetX -= state.pointer.x * 0.15;
+    targetY += state.pointer.y * 0.10;
 
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, 0.08);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.08);
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.08);
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, 0.05);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.05);
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.05);
 
-    lookTarget.current.x = THREE.MathUtils.lerp(lookTarget.current.x, targetLookX, 0.08);
-    lookTarget.current.y = THREE.MathUtils.lerp(lookTarget.current.y, targetLookY, 0.08);
-    lookTarget.current.z = THREE.MathUtils.lerp(lookTarget.current.z, targetLookZ, 0.08);
+    lookTarget.current.x = THREE.MathUtils.lerp(lookTarget.current.x, targetLookX, 0.05);
+    lookTarget.current.y = THREE.MathUtils.lerp(lookTarget.current.y, targetLookY, 0.05);
+    lookTarget.current.z = THREE.MathUtils.lerp(lookTarget.current.z, targetLookZ, 0.05);
 
     camera.lookAt(lookTarget.current);
   });
