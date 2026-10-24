@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, User as UserIcon, Search, Menu, X, Shield, LogOut, MessageSquare, Share2 } from 'lucide-react';
+import { ShoppingBag, User as UserIcon, Search, Menu, X, Shield, LogOut } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { toggleCart } from '@/features/cart/cartSlice';
 import { logout } from '@/features/auth/authSlice';
@@ -9,16 +9,12 @@ interface NavbarProps {
   onOpenAuth: () => void;
   onNavigateAdmin?: () => void;
   onOpenProfile?: () => void;
-  onOpenContact?: () => void;
-  onOpenSocial?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
   onNavigateAdmin,
   onOpenProfile,
-  onOpenContact,
-  onOpenSocial,
 }) => {
   const dispatch = useAppDispatch();
   const { items } = useAppSelector((state) => state.cart);
@@ -131,24 +127,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
           </div>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
-            <button
-              onClick={onOpenContact}
-              className="hover:text-brand-gold transition-colors flex items-center gap-1.5"
-            >
-              <MessageSquare className="w-3.5 h-3.5 text-brand-gold" />
-              <span>Contact</span>
-            </button>
-            <button
-              onClick={onOpenSocial}
-              className="hover:text-brand-gold transition-colors text-brand-gold/90 hover:text-brand-gold p-1.5 rounded-full hover:bg-white/5 flex items-center gap-1.5"
-              title="Social Salon & Stories"
-            >
-              <Share2 className="w-4 h-4" />
-            </button>
-          </nav>
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-4">
@@ -264,27 +242,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </form>
 
           <div className="flex flex-col gap-2 pt-2 border-t border-brand-gold/10">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenContact?.();
-              }}
-              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm flex items-center justify-between"
-            >
-              <span>Concierge Contact</span>
-              <MessageSquare className="w-4 h-4 text-brand-gold" />
-            </button>
-
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenSocial?.();
-              }}
-              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm flex items-center justify-between"
-            >
-              <span>Community & Socials</span>
-              <Share2 className="w-4 h-4 text-brand-gold" />
-            </button>
             {!isAuthenticated && (
               <button
                 onClick={() => {

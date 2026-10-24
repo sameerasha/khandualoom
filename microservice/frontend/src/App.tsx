@@ -101,8 +101,6 @@ export const App: React.FC = () => {
             onOpenAuth={() => setAuthModalOpen(true)}
             onNavigateAdmin={() => setCurrentView('admin')}
             onOpenProfile={() => setCurrentView('profile')}
-            onOpenContact={() => setCurrentView('contact')}
-            onOpenSocial={() => setSocialModalOpen(true)}
           />
         )}
 
