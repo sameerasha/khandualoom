@@ -1,9 +1,8 @@
 import React, { Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
-import { SareeHandloomMesh } from './SareeHandloomMesh';
+import { GoldenDustVortex } from './GoldenDustVortex';
 import { CinematicCameraRig } from './CinematicCameraRig';
-import { CinematicGoldDust } from './CinematicGoldDust';
 import { WebGLFallback } from './WebGLFallback';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
@@ -17,43 +16,34 @@ const SceneLighting: React.FC<{ scrollProgress: number }> = ({ scrollProgress })
   return (
     <>
       {/* 1. Ambient Warm Champagne Light */}
-      <ambientLight color="#FFF8E7" intensity={0.9 + (p > 0.7 ? 0.35 : 0)} />
+      <ambientLight color="#FFF8E7" intensity={0.95 + (p > 0.7 ? 0.35 : 0)} />
 
-      {/* 2. Key Gold Studio Directional Light with Specular Glaze */}
+      {/* 2. Key Gold Studio Directional Light */}
       <directionalLight
         position={[6, 8, 5]}
         intensity={3.2}
         color="#FDE68A"
-        castShadow
-        shadow-mapSize={[1024, 1024]}
       />
 
-      {/* 3. Fill Light: Royal Magenta & Wine Glow softening shadow folds */}
+      {/* 3. Fill Light: Royal Violet & Wine Accent */}
       <pointLight
         position={[-6, -4, -2]}
-        intensity={3.4}
-        color={p > 0.6 ? '#9333EA' : '#C026D3'}
+        intensity={3.0}
+        color={p > 0.6 ? '#7C3AED' : '#A855F7'}
       />
 
-      {/* 4. High-Contrast 24K Zari Rim Light defining the Silk Silhouette */}
+      {/* 4. High-Intensity 24K Zari Rim Glow */}
       <pointLight
-        position={[2, -3, 3]}
-        intensity={2.6 + p * 1.8}
+        position={[2, -2, 3]}
+        intensity={2.8 + p * 1.5}
         color="#F59E0B"
       />
 
-      {/* 5. Overhead Soft Luminescence */}
+      {/* 5. Overhead Soft Glow */}
       <pointLight
         position={[0, 6, 2.5]}
         intensity={1.4}
         color="#DFBF7A"
-      />
-
-      {/* 6. Subtle Lower Caustic Rim Light */}
-      <pointLight
-        position={[1, -5, 1]}
-        intensity={1.2}
-        color="#EAB308"
       />
     </>
   );
@@ -86,48 +76,40 @@ export const CinematicLoomCanvas: React.FC<CinematicLoomCanvasProps> = ({
     <div className={`relative w-full h-full ${className}`}>
       <Suspense fallback={<WebGLFallback />}>
         <Canvas
-          dpr={[1, 1.75]} // Strictly clamped to prevent GPU degradation on high-density displays
+          dpr={[1, 1.75]} // Strictly clamped to guarantee 60 FPS on all screens
           gl={{
             powerPreference: 'high-performance',
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: 1.25,
+            toneMappingExposure: 1.3,
             outputColorSpace: THREE.SRGBColorSpace,
             alpha: true,
           }}
           camera={{
-            position: [0.8, 0.1, 5.4],
+            position: [0.8, 0.1, 5.5],
             fov: 42,
             near: 0.1,
             far: 100,
           }}
           onCreated={({ scene }) => {
-            // Atmospheric fog dissolves 3D boundaries into the dark luxury backdrop
-            scene.fog = new THREE.FogExp2('#0C0414', 0.032);
+            // Atmospheric fog seamlessly dissolves 3D boundaries into the dark luxury backdrop
+            scene.fog = new THREE.FogExp2('#08020E', 0.026);
           }}
         >
-          {/* Dynamic 3D Camera Rig responsive to window scroll across all sections */}
+          {/* Dynamic 3D Camera Rig responsive to scroll progression across all sections */}
           <CinematicCameraRig
             scrollProgress={scrollProgress}
             reducedMotion={reducedMotion}
           />
 
-          {/* Multi-Point Art-Directed Studio Lighting */}
+          {/* Art-Directed Studio Illumination */}
           <SceneLighting scrollProgress={scrollProgress} />
 
-          {/* Master 3D Saree, Flying Handloom Shuttle & Multi-Stage Geometry */}
-          <SareeHandloomMesh
+          {/* Pure 3D Golden Dust Matrix with Multi-Tier Scroll Choreography */}
+          <GoldenDustVortex
             scrollProgress={scrollProgress}
             reducedMotion={reducedMotion}
           />
-
-          {/* Dual-Layer Drifting Golden Zari Stardust & Bokeh Embers */}
-          {!reducedMotion && (
-            <CinematicGoldDust
-              count={180}
-              scrollProgress={scrollProgress}
-            />
-          )}
         </Canvas>
       </Suspense>
     </div>

@@ -134,10 +134,10 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick, onExploreClick, scrol
             >
               <div className="flex items-center justify-center gap-2 text-[10px] tracking-widest uppercase text-brand-gold-light font-mono">
                 <MousePointerClick className="w-3.5 h-3.5 text-brand-gold animate-bounce" />
-                <span>Real-Time 3D Handloom Stage</span>
+                <span>24K Golden Dust Matrix</span>
               </div>
               <p className="text-xs text-brand-ivory/80 mt-2 font-serif italic">
-                Scroll to navigate through the silk drape, flying shuttle, warp shed, and sacred loom
+                Scroll or move cursor to orchestrate the fluid golden zari streams, celestial vortexes, and floating embers
               </p>
               {scrollProgress > 0 && (
                 <div className="mt-3 w-full bg-white/10 rounded-full h-1 overflow-hidden">
