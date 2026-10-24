@@ -70,11 +70,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
           )}
         </div>
 
-        {/* Top Right Green Indicator if In Cart */}
+        {/* Top Right Add to Cart Icon Button on Mobile / In-Cart Badge on Desktop */}
+        <button
+          onClick={isInCart ? handleGoToCart : handleAddToCart}
+          className={`sm:hidden absolute top-2 right-2 z-30 w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-md border ${
+            isInCart
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400/50'
+              : 'bg-black/60 backdrop-blur-md text-brand-gold hover:text-white border-brand-gold/40'
+          }`}
+          aria-label={isInCart ? 'Go to Cart' : 'Add to Cart'}
+          title={isInCart ? 'In Cart • Go to Cart' : 'Add to Cart'}
+        >
+          {isInCart ? (
+            <Check className="w-3.5 h-3.5 stroke-[3] text-white" />
+          ) : (
+            <ShoppingBag className="w-3.5 h-3.5" />
+          )}
+        </button>
+
         {isInCart && (
           <div
             onClick={handleGoToCart}
-            className="absolute top-2.5 right-2.5 z-10 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full p-1 shadow-md border border-emerald-400/40 flex items-center justify-center transition-transform hover:scale-110"
+            className="hidden sm:flex absolute top-2.5 right-2.5 z-10 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full p-1 shadow-md border border-emerald-400/40 items-center justify-center transition-transform hover:scale-110 cursor-pointer"
             title="Item in Cart • Click to View Bag"
           >
             <Check className="w-3 h-3 stroke-[3]" />
@@ -82,36 +99,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
         )}
 
         {/* ======================================================== */}
-        {/* MIDDLE OF THE PRODUCT: ADD TO CART / GO TO CART ACTION   */}
+        {/* MIDDLE OF PRODUCT (DESKTOP ONLY HOVER OVERLAY)           */}
+        {/* Completely hidden on mobile to keep saree image unblocked*/}
         {/* ======================================================== */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-2 sm:p-3 z-20 transition-all duration-300 bg-black/40 sm:bg-black/45 sm:opacity-0 sm:group-hover:opacity-100 backdrop-blur-[1px]">
+        <div className="hidden sm:flex absolute inset-0 flex-col items-center justify-center p-3 z-20 transition-all duration-300 bg-black/45 opacity-0 group-hover:opacity-100 backdrop-blur-[1px]">
           {added || isInCart ? (
             <button
               onClick={handleGoToCart}
-              className="inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(16,185,129,0.5)] border border-emerald-400/50 transform active:scale-95 transition-all duration-200 cursor-pointer pointer-events-auto"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(16,185,129,0.5)] border border-emerald-400/50 transform active:scale-95 transition-all duration-200 cursor-pointer pointer-events-auto"
               title="Click to Open Cart"
             >
-              <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3] text-white" />
+              <Check className="w-4 h-4 stroke-[3] text-white" />
               <span>Go to Cart</span>
             </button>
           ) : (
             <button
               onClick={handleAddToCart}
-              className="inline-flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r from-brand-gold via-amber-400 to-brand-gold text-brand-purple-dark text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_15px_rgba(223,191,122,0.4)] hover:brightness-110 active:scale-95 transition-all duration-200 cursor-pointer pointer-events-auto"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-brand-gold via-amber-400 to-brand-gold text-brand-purple-dark text-xs font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_15px_rgba(223,191,122,0.4)] hover:brightness-110 active:scale-95 transition-all duration-200 cursor-pointer pointer-events-auto"
               title="Add to Cart"
             >
-              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <ShoppingBag className="w-4 h-4" />
               <span>Add to Cart</span>
             </button>
           )}
 
-          {/* Quick View Link (hidden on mobile, visible on desktop hover) */}
+          {/* Quick View Link (Desktop hover only) */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onSelect(product);
             }}
-            className="hidden sm:flex mt-2 text-[10px] font-mono text-brand-gold-light/90 hover:text-white items-center gap-1 transition-colors underline decoration-brand-gold/40 pointer-events-auto"
+            className="mt-2 text-[10px] font-mono text-brand-gold-light/90 hover:text-white flex items-center gap-1 transition-colors underline decoration-brand-gold/40 pointer-events-auto"
           >
             <Eye className="w-3 h-3" />
             <span>Quick View Details</span>
@@ -160,21 +178,46 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
             )}
           </div>
 
-          {/* Subtle Right Indicator */}
-          {isInCart ? (
-            <span
-              onClick={handleGoToCart}
-              className="inline-flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-mono text-emerald-400 hover:text-emerald-300 font-bold transition-colors cursor-pointer"
-              title="Click to Open Cart"
-            >
-              <Check className="w-3 h-3 stroke-[2.8]" />
-              <span>In Cart</span>
-            </span>
-          ) : (
-            <span className="text-[9px] sm:text-[10px] font-mono text-brand-gold-light/60 uppercase tracking-wider">
-              {product.fabric || 'Pure Silk'}
-            </span>
-          )}
+          {/* Mobile Bottom Action: Compact Cart Button */}
+          <div className="sm:hidden flex items-center">
+            {isInCart ? (
+              <button
+                onClick={handleGoToCart}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider border border-emerald-400/50 shadow-sm active:scale-95 cursor-pointer"
+                title="Go to Cart"
+              >
+                <Check className="w-3 h-3 stroke-[3]" />
+                <span>Cart</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-brand-gold/20 hover:bg-brand-gold text-brand-gold hover:text-brand-purple-dark text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-gold/40 shadow-sm active:scale-95 cursor-pointer"
+                title="Add to Cart"
+              >
+                <ShoppingBag className="w-3 h-3" />
+                <span>+Add</span>
+              </button>
+            )}
+          </div>
+
+          {/* Desktop Right Indicator */}
+          <div className="hidden sm:flex items-center">
+            {isInCart ? (
+              <span
+                onClick={handleGoToCart}
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 hover:text-emerald-300 font-bold transition-colors cursor-pointer"
+                title="Click to Open Cart"
+              >
+                <Check className="w-3 h-3 stroke-[2.8]" />
+                <span>In Cart</span>
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono text-brand-gold-light/60 uppercase tracking-wider">
+                {product.fabric || 'Pure Silk'}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
