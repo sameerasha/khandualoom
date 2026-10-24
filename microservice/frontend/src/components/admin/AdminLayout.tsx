@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout } from '@/features/auth/authSlice';
+import { AdminBackground3D } from './AdminBackground3D';
 import './adminStyles.css';
 
 interface AdminLayoutProps {
@@ -147,7 +148,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   }
 
   return (
-    <div className="admin-layout">
+    <div className="admin-layout relative">
+      <AdminBackground3D />
+
       {/* Sidebar */}
       <aside className="admin-sidebar">
         <div className="admin-sidebar__header">
@@ -307,7 +310,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       </aside>
 
       {/* Main Content Area */}
-      <main className="admin-main">
+      <main className="admin-main relative z-10">
         <div className="admin-main__content">{children}</div>
       </main>
     </div>

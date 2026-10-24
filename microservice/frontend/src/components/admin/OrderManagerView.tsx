@@ -268,23 +268,31 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
       {/* Order Dossier & Tracking Modal */}
       {selectedOrder && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
           onClick={() => setSelectedOrder(null)}
         >
           <div
-            className="relative w-full max-w-2xl bg-[#140a20] border border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 text-brand-ivory max-h-[90vh] overflow-y-auto"
+            className="relative w-full max-w-2xl bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] z-10 text-brand-ivory max-h-[92vh] overflow-y-auto my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-4 border-b border-brand-gold/20">
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold">
-                  Imperial Dispatch Dossier
-                </span>
-                <h3 className="font-serif text-2xl font-bold text-white">Order #VL-{selectedOrder.id}</h3>
+            <div className="flex items-center justify-between pb-5 border-b border-brand-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold font-bold">
+                  VL
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold">
+                    IMPERIAL DISPATCH DOSSIER
+                  </span>
+                  <h3 className="font-serif text-2xl font-bold text-white tracking-tight">
+                    Order #VL-{selectedOrder.id}
+                  </h3>
+                </div>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="p-1.5 rounded-full text-brand-ivory/60 hover:text-white bg-white/5 hover:bg-white/10"
+                className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-ivory/60 hover:text-white flex items-center justify-center transition-all"
+                title="Close"
               >
                 ✕
               </button>

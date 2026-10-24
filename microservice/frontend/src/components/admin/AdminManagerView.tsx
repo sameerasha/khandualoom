@@ -111,80 +111,108 @@ export const AdminManagerView: React.FC<AdminManagerViewProps> = ({ admins, onCr
       {/* Add Admin Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
           onClick={() => setShowModal(false)}
         >
           <div
-            className="relative w-full max-w-md bg-[#140a20] border border-brand-gold/30 rounded-2xl p-6 sm:p-8 shadow-2xl z-10 text-brand-ivory"
+            className="relative w-full max-w-md bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] z-10 text-brand-ivory my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-4 border-b border-brand-gold/20">
-              <h3 className="font-serif text-xl font-bold text-white">Add Administrator</h3>
+            <div className="flex items-center justify-between pb-5 border-b border-brand-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold font-bold">
+                  🛡
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold">
+                    SUPER ADMIN PROTOCOL
+                  </span>
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    Add Administrator
+                  </h3>
+                </div>
+              </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-1 rounded-full text-brand-ivory/60 hover:text-white"
+                className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-ivory/60 hover:text-white flex items-center justify-center transition-all"
+                title="Close"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 py-4">
-              {error && <div className="p-3 bg-red-500/20 border border-red-500/40 text-red-300 text-xs rounded-lg">{error}</div>}
+            <form onSubmit={handleSubmit} className="space-y-4 py-5">
+              {error && (
+                <div className="p-3.5 bg-red-500/15 border border-red-500/30 text-red-300 text-xs rounded-xl">
+                  {error}
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-brand-ivory/60 mb-1">First Name</label>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+                    First Name
+                  </label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full bg-[#131628] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-brand-gold"
+                    placeholder="e.g. Yash"
+                    className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono text-brand-ivory/60 mb-1">Last Name</label>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+                    Last Name
+                  </label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full bg-[#131628] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-brand-gold"
+                    placeholder="e.g. Verma"
+                    className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-brand-ivory/60 mb-1">Email Address</label>
+                <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+                  Administrator Email *
+                </label>
                 <input
                   type="email"
                   required
                   placeholder="admin@vastraloom.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#131628] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-brand-gold"
+                  className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-brand-ivory/60 mb-1">Initial Password</label>
+                <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
+                  Temporary Access Key *
+                </label>
                 <input
                   type="text"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#131628] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-brand-gold"
+                  className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors font-mono"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-brand-gold/20">
+              <div className="flex items-center justify-end gap-3 pt-5 border-t border-brand-gold/15">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-white/5 text-xs text-brand-ivory rounded-lg hover:bg-white/10"
+                  className="px-5 py-2.5 rounded-xl border border-white/15 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-brand-gold text-brand-purple-dark font-bold text-xs rounded-lg hover:bg-brand-gold-light"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold text-brand-purple-dark font-serif font-bold text-sm shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
                   Create Admin
                 </button>

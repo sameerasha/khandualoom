@@ -98,17 +98,22 @@ export const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({
       </div>
 
       {/* Channel Editor Form */}
-      <form onSubmit={handleSubmit} className="mb-8 p-6 bg-white/5 border border-brand-gold/20 rounded-2xl">
-        <h3 className="text-sm font-serif font-bold text-white mb-4">
-          {editingId ? 'Edit Social Channel' : 'Add New Social Channel'}
-        </h3>
+      <form onSubmit={handleSubmit} className="mb-8 p-6 sm:p-7 bg-gradient-to-b from-[#1A0B2C] to-[#0A0314] border border-brand-gold/30 rounded-3xl shadow-xl">
+        <div className="flex items-center gap-2 mb-4 border-b border-white/5 pb-3">
+          <span className="w-2 h-2 rounded-full bg-brand-gold" />
+          <h3 className="text-sm font-serif font-bold text-white uppercase tracking-wider">
+            {editingId ? 'Edit Social Channel Reference' : 'Configure New Brand Channel'}
+          </h3>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-mono text-brand-ivory/60 mb-1">Platform</label>
+            <label className="block text-xs font-mono uppercase tracking-wider text-brand-gold/80 mb-2">
+              Platform *
+            </label>
             <select
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
-              className="w-full bg-[#131628] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-brand-gold"
+              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl p-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
             >
               {PLATFORMS.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -118,7 +123,9 @@ export const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({
             </select>
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-xs font-mono text-brand-ivory/60 mb-1">Profile / Channel URL</label>
+            <label className="block text-xs font-mono uppercase tracking-wider text-brand-gold/80 mb-2">
+              Profile / Channel URL *
+            </label>
             <div className="flex gap-2">
               <input
                 type="url"
@@ -126,11 +133,11 @@ export const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({
                 placeholder="https://..."
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="flex-1 bg-[#131628] border border-white/10 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-brand-gold"
+                className="flex-1 bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl p-2.5 text-sm text-white focus:outline-none transition-colors placeholder-white/30"
               />
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-brand-gold text-brand-purple-dark font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-brand-gold-light transition-colors"
+                className="px-6 py-2.5 bg-gradient-to-r from-brand-gold to-brand-gold-light text-brand-purple-dark font-serif font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 {editingId ? 'Update' : 'Save'}
               </button>
@@ -141,7 +148,7 @@ export const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({
                     setEditingId(null);
                     setUrl('');
                   }}
-                  className="px-4 py-2.5 bg-white/5 text-brand-ivory text-xs rounded-lg hover:bg-white/10 transition-colors"
+                  className="px-4 py-2.5 bg-white/5 text-brand-ivory text-xs rounded-xl hover:bg-white/10 transition-colors"
                 >
                   Cancel
                 </button>

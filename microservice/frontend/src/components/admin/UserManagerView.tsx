@@ -178,59 +178,81 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
       {/* Patron Details Modal */}
       {selectedUser && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
           onClick={() => setSelectedUser(null)}
         >
           <div
-            className="relative w-full max-w-lg bg-[#140a20] border border-brand-gold/30 rounded-2xl p-6 sm:p-8 shadow-2xl z-10 text-brand-ivory"
+            className="relative w-full max-w-lg bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] z-10 text-brand-ivory my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-4 border-b border-brand-gold/20">
-              <h3 className="font-serif text-xl font-bold text-white">Patron Dossier</h3>
+            <div className="flex items-center justify-between pb-5 border-b border-brand-gold/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold font-bold">
+                  {((selectedUser.firstName?.[0] || '') + (selectedUser.lastName?.[0] || 'P')).toUpperCase()}
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold">
+                    PATRON DOSSIER & CREDENTIALS
+                  </span>
+                  <h3 className="font-serif text-2xl font-bold text-white tracking-tight">
+                    {selectedUser.firstName} {selectedUser.lastName}
+                  </h3>
+                </div>
+              </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="p-1 rounded-full text-brand-ivory/60 hover:text-white"
+                className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-ivory/60 hover:text-white flex items-center justify-center transition-all"
+                title="Close"
               >
                 ✕
               </button>
             </div>
 
-            <div className="space-y-4 py-4 text-sm">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-brand-gold/20 border border-brand-gold/40 flex items-center justify-center font-bold text-lg text-brand-gold">
-                  {((selectedUser.firstName?.[0] || '') + (selectedUser.lastName?.[0] || 'P')).toUpperCase()}
+            <div className="space-y-4 py-5 text-sm">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-brand-gold/20">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-brand-gold/30 via-brand-purple to-brand-gold/10 border border-brand-gold/50 flex items-center justify-center font-bold text-base text-brand-gold shadow-md">
+                    {((selectedUser.firstName?.[0] || '') + (selectedUser.lastName?.[0] || 'P')).toUpperCase()}
+                  </div>
+                  <div>
+                    <h4 className="font-serif text-lg font-bold text-white">
+                      {selectedUser.firstName} {selectedUser.lastName}
+                    </h4>
+                    <span className="text-xs font-mono text-brand-gold uppercase tracking-wider">
+                      {selectedUser.role.replace('ROLE_', '')} PATRON
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-serif text-lg font-bold text-white">
-                    {selectedUser.firstName} {selectedUser.lastName}
-                  </h4>
-                  <span className="text-xs font-mono text-brand-gold uppercase">{selectedUser.role}</span>
+
+                <div className="text-right font-mono text-xs text-brand-ivory/60">
+                  <div>Patron ID: #{selectedUser.id}</div>
+                  <div className="text-emerald-400 font-semibold">Active Member</div>
                 </div>
               </div>
 
-              <div className="space-y-3 bg-white/5 p-4 rounded-xl border border-white/5">
-                <div className="flex items-center justify-between">
+              <div className="space-y-3 bg-white/[0.02] p-5 rounded-2xl border border-white/5">
+                <div className="flex items-center justify-between pb-3 border-b border-white/5">
                   <div>
-                    <div className="text-xs text-brand-ivory/50 uppercase font-mono">Email Address</div>
-                    <div className="font-semibold text-white">{selectedUser.email}</div>
+                    <div className="text-xs text-brand-ivory/50 uppercase font-mono">Verified Email Address</div>
+                    <div className="font-semibold text-white mt-0.5">{selectedUser.email}</div>
                   </div>
                   <button
                     onClick={() => handleCopy(selectedUser.email, 'email')}
-                    className="text-xs text-brand-gold hover:underline font-mono"
+                    className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-brand-gold font-mono transition-colors"
                   >
                     {copiedField === 'email' ? '✓ Copied' : 'Copy'}
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pb-3 border-b border-white/5">
                   <div>
-                    <div className="text-xs text-brand-ivory/50 uppercase font-mono">Telephone</div>
-                    <div className="text-brand-ivory/90">{selectedUser.phone || 'Unlisted'}</div>
+                    <div className="text-xs text-brand-ivory/50 uppercase font-mono">Contact Telephone</div>
+                    <div className="text-brand-ivory/90 font-mono mt-0.5">{selectedUser.phone || 'Unlisted'}</div>
                   </div>
                   {selectedUser.phone && (
                     <button
                       onClick={() => handleCopy(selectedUser.phone!, 'phone')}
-                      className="text-xs text-brand-gold hover:underline font-mono"
+                      className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-brand-gold font-mono transition-colors"
                     >
                       {copiedField === 'phone' ? '✓ Copied' : 'Copy'}
                     </button>
@@ -238,12 +260,21 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
                 </div>
 
                 <div>
-                  <div className="text-xs text-brand-ivory/50 uppercase font-mono">Atelier Shipping Vault</div>
+                  <div className="text-xs text-brand-ivory/50 uppercase font-mono">Vault Shipping Residence</div>
                   <div className="text-brand-ivory/80 text-xs mt-1 leading-relaxed">
-                    {selectedUser.address || 'Imperial Vault Residence, India'}
+                    {selectedUser.address || 'Imperial Vault Residence, New Delhi - 110001, India'}
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-brand-gold/15">
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="px-6 py-2.5 rounded-xl bg-brand-gold text-brand-purple-dark font-bold text-xs uppercase tracking-wider hover:bg-brand-gold-light transition-colors"
+              >
+                Close Dossier
+              </button>
             </div>
           </div>
         </div>
