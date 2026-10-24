@@ -153,31 +153,50 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
   }, []);
 
   // =========================================================================
-  // 3. TIER 3: BUTTERY CELESTIAL HALO PARTICLES (600 PARTICLES)
-  // Replaces harsh geometric lines with soft, organic swirling gold mist
+  // 3. TIER 3: BUTTERY LIQUID GOLD SPIRAL NEBULA (750 PARTICLES)
+  // Replaces the 3 rigid concentric rings with a continuous, buttery fluid vortex
   // =========================================================================
-  const haloCount = 600;
-  const { haloPositions, haloColors } = useMemo(() => {
-    const pos = new Float32Array(haloCount * 3);
-    const cols = new Float32Array(haloCount * 3);
+  const nebulaCount = 750;
+  const { nebulaPositions, nebulaRadii, nebulaBaseAngles, nebulaSpeeds, nebulaColors } = useMemo(() => {
+    const pos = new Float32Array(nebulaCount * 3);
+    const radii = new Float32Array(nebulaCount);
+    const baseAngles = new Float32Array(nebulaCount);
+    const speeds = new Float32Array(nebulaCount);
+    const cols = new Float32Array(nebulaCount * 3);
 
-    for (let i = 0; i < haloCount; i++) {
-      const ringIdx = i % 3;
-      const radius = 2.2 + ringIdx * 0.9 + (Math.random() - 0.5) * 0.4;
-      const angle = (i / haloCount) * Math.PI * 6 + Math.random() * 0.2;
-      pos[i * 3 + 0] = Math.cos(angle) * radius;
-      pos[i * 3 + 1] = Math.sin(angle) * radius * 0.65;
-      pos[i * 3 + 2] = Math.sin(angle * 2) * 0.5 + (Math.random() - 0.5) * 0.3;
+    for (let i = 0; i < nebulaCount; i++) {
+      // Continuous smooth spiral distribution (no discrete concentric tracks!)
+      const progress = i / nebulaCount;
+      const r = 0.8 + Math.sqrt(progress) * 3.4 + (Math.random() - 0.5) * 0.45;
+      const theta = progress * Math.PI * 10 + (Math.random() - 0.5) * 0.35;
+      const z = Math.sin(theta * 2) * 0.35 + (Math.random() - 0.5) * 0.4;
 
+      radii[i] = r;
+      baseAngles[i] = theta;
+      // Differential fluid velocity: inner particles orbit faster than outer particles
+      speeds[i] = 0.55 / Math.sqrt(Math.max(r, 0.8)) + 0.08;
+
+      pos[i * 3 + 0] = Math.cos(theta) * r;
+      pos[i * 3 + 1] = Math.sin(theta) * r * 0.65;
+      pos[i * 3 + 2] = z;
+
+      // Color gradient from bright molten champagne core to warm 24K zari rim
+      const heat = Math.max(0, 1.0 - r / 4.2);
       cols[i * 3 + 0] = 1.0;
-      cols[i * 3 + 1] = 0.88;
-      cols[i * 3 + 2] = 0.45;
+      cols[i * 3 + 1] = 0.75 + heat * 0.22;
+      cols[i * 3 + 2] = 0.25 + heat * 0.55;
     }
-    return { haloPositions: pos, haloColors: cols };
+    return {
+      nebulaPositions: pos,
+      nebulaRadii: radii,
+      nebulaBaseAngles: baseAngles,
+      nebulaSpeeds: speeds,
+      nebulaColors: cols,
+    };
   }, []);
 
   // =========================================================================
-  // FRAME LOOP: BUTTERY MOUSE INTERACTION & SCROLL CHOREOGRAPHY
+  // FRAME LOOP: BUTTERY MOUSE INTERACTION & CONTINUOUS SPIRAL CHOREOGRAPHY
   // =========================================================================
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
@@ -241,7 +260,7 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
           cy = (0.5 - t) * 6.8 + Math.sin(angle + time * 0.8) * 0.42;
           cz = Math.cos(angle) * 1.55 + Math.sin(angle * 3) * 0.32;
         } else if (p <= 0.5) {
-          // Heritage: Unfurling into a wide golden halo
+          // Heritage: Unfurling wide golden spiral stream
           const factor = (p - 0.25) / 0.25;
           const heroAngle = t * Math.PI * 2.2;
           const haloAngle = t * Math.PI * 2;
@@ -342,7 +361,6 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
 
       // Mouse displacement wave on ambient dust
       for (let i = 0; i < 400; i++) {
-        // Displace the first 400 closest ambient particles near cursor
         const ox = ambientOriginalPositions[i * 3 + 0];
         const oy = ambientOriginalPositions[i * 3 + 1];
 
@@ -363,19 +381,51 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
     }
 
     // -----------------------------------------------------------------------
-    // C. Animate Tier 3: Soft Buttery Celestial Halo (Pure Particles, No Lines!)
+    // C. Animate Tier 3: Buttery Liquid Gold Spiral Nebula (Differential Fluid Motion)
     // -----------------------------------------------------------------------
     if (celestialHaloRef.current) {
-      const haloVis =
-        p >= 0.15 && p <= 0.52
-          ? Math.sin(((p - 0.15) / (0.52 - 0.15)) * Math.PI)
+      const geo = celestialHaloRef.current.geometry;
+      const posAttr = geo.attributes.position as THREE.BufferAttribute;
+      const posArray = posAttr.array as Float32Array;
+
+      // Smooth visibility envelope on scroll: prominent during Heritage Features (p = 0.15 to 0.55)
+      const nebulaVis =
+        p >= 0.15 && p <= 0.55
+          ? Math.sin(((p - 0.15) / (0.55 - 0.15)) * Math.PI)
           : 0.18;
 
       celestialHaloRef.current.scale.setScalar(
-        THREE.MathUtils.lerp(celestialHaloRef.current.scale.x, haloVis * 1.25, 0.08)
+        THREE.MathUtils.lerp(celestialHaloRef.current.scale.x, nebulaVis * 1.25, 0.08)
       );
-      celestialHaloRef.current.rotation.z = time * 0.28 + p * 2.0;
-      celestialHaloRef.current.rotation.x = Math.PI / 4 + Math.sin(time * 0.22) * 0.14;
+
+      // Differential fluid rotation: each particle rotates at its own fluid speed
+      for (let i = 0; i < nebulaCount; i++) {
+        const r = nebulaRadii[i];
+        const currentTheta = nebulaBaseAngles[i] + time * nebulaSpeeds[i] + p * 2.2;
+
+        let px = Math.cos(currentTheta) * r;
+        let py = Math.sin(currentTheta) * (r * 0.65);
+        let pz = Math.sin(currentTheta * 2) * 0.35;
+
+        // Buttery mouse reaction on nebula particles
+        const dx = px - mx.x;
+        const dy = py - mx.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 2.6 && d > 0.01) {
+          const force = Math.pow(1 - d / 2.6, 2) * 1.2;
+          px += (dx / d) * force;
+          py += (dy / d) * force;
+        }
+
+        posArray[i * 3 + 0] = px;
+        posArray[i * 3 + 1] = py;
+        posArray[i * 3 + 2] = pz;
+      }
+      posAttr.needsUpdate = true;
+
+      // Subtle tilt
+      celestialHaloRef.current.rotation.x = Math.PI / 5 + Math.sin(time * 0.2) * 0.12;
+      celestialHaloRef.current.rotation.z = Math.sin(time * 0.25) * 0.1;
       celestialHaloRef.current.position.x = mx.x * 0.15;
       celestialHaloRef.current.position.y = mx.y * 0.15;
     }
@@ -424,19 +474,20 @@ export const GoldenDustVortex: React.FC<GoldenDustVortexProps> = ({
       </points>
 
       {/* ================================================================= */}
-      {/* 3. TIER 3: BUTTERY CELESTIAL HALO MIST (600 PARTICLES, NO LINES!) */}
+      {/* 3. TIER 3: BUTTERY LIQUID GOLD SPIRAL NEBULA (750 PARTICLES)      */}
+      {/* Continuous fluid spiral vortex with differential fluid rotation    */}
       {/* ================================================================= */}
       <points ref={celestialHaloRef} scale={[0.1, 0.1, 0.1]}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[haloPositions, 3]} />
-          <bufferAttribute attach="attributes-color" args={[haloColors, 3]} />
+          <bufferAttribute attach="attributes-position" args={[nebulaPositions, 3]} />
+          <bufferAttribute attach="attributes-color" args={[nebulaColors, 3]} />
         </bufferGeometry>
         <pointsMaterial
-          size={0.12}
+          size={0.13}
           map={glowTexture}
           vertexColors
           transparent
-          opacity={0.85}
+          opacity={0.88}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           sizeAttenuation
