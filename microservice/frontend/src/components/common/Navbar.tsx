@@ -25,13 +25,23 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { user, isAuthenticated, isAdmin } = useAppSelector((state) => state.auth);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     dispatch(setSearchQuery(searchInput.trim()));
+    setSearchFocused(false);
+    document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSelectQuickTag = (tag: string) => {
+    setSearchInput(tag);
+    dispatch(setSearchQuery(tag));
+    setSearchFocused(false);
+    document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -56,26 +66,71 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Search Bar - Desktop */}
-          <form
-            onSubmit={handleSearchSubmit}
-            className="hidden md:flex items-center relative w-72 lg:w-96"
-          >
-            <input
-              type="text"
-              placeholder="Search Banarasi, Kanjivaram, Silk..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full bg-brand-purple/60 border border-brand-gold/30 rounded-full py-2 pl-4 pr-10 text-sm text-brand-ivory placeholder-brand-ivory/50 focus:outline-none focus:border-brand-gold transition-colors"
-            />
-            <button
-              type="submit"
-              aria-label="Search"
-              className="absolute right-3 text-brand-gold hover:text-brand-gold-light"
-            >
-              <Search className="w-4 h-4" />
-            </button>
-          </form>
+          {/* Search Bar & Suggestion Dialog - Desktop */}
+          <div className="hidden md:block relative w-72 lg:w-96">
+            <form onSubmit={handleSearchSubmit} className="flex items-center relative">
+              <input
+                type="text"
+                placeholder="Search Banarasi, Kanjivaram, Silk..."
+                value={searchInput}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full bg-[#160726]/80 border border-brand-gold/30 hover:border-brand-gold/60 focus:border-brand-gold rounded-full py-2 pl-4 pr-16 text-sm text-brand-ivory placeholder-brand-ivory/50 focus:outline-none focus:ring-1 focus:ring-brand-gold/40 transition-all shadow-inner"
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchInput('');
+                    dispatch(setSearchQuery(''));
+                  }}
+                  className="absolute right-9 text-brand-ivory/50 hover:text-white transition-colors p-1"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <button
+                type="submit"
+                aria-label="Search"
+                className="absolute right-3 text-brand-gold hover:text-brand-gold-light transition-colors"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* Enriched Search Suggestion Dialog */}
+            {searchFocused && (
+              <div
+                className="absolute top-full left-0 right-0 mt-2 p-3.5 bg-gradient-to-b from-[#180B28] via-[#12051E] to-[#0A0212] border border-brand-gold/35 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-50 animate-in fade-in slide-in-from-top-2"
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-brand-gold/90 mb-2 px-1">
+                  <span>Popular Weave Traditions</span>
+                  <button
+                    onClick={() => setSearchFocused(false)}
+                    className="text-brand-ivory/40 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {['Banarasi Kadwa', 'Kanjeevaram Silk', 'Chanderi Tissue', 'Royal Shikargah', 'Paithani Gold', 'Pure Zari'].map(
+                    (tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => handleSelectQuickTag(tag)}
+                        className="text-xs px-2.5 py-1 rounded-lg bg-white/5 hover:bg-brand-gold/20 border border-brand-gold/20 hover:border-brand-gold/60 text-brand-ivory/80 hover:text-brand-gold transition-all"
+                      >
+                        {tag}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">

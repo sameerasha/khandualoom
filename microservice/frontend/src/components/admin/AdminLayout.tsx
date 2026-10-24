@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout } from '@/features/auth/authSlice';
 import { AdminBackground3D } from './AdminBackground3D';
@@ -21,10 +22,40 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   const { role, user } = useAppSelector((state) => state.auth);
   const isSuperAdmin = role === 'ROLE_SUPER_ADMIN' || user?.email === 'superadmin@vastraloom.com';
 
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('vastraloom_admin_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [latencyMs, setLatencyMs] = useState<number | null>(24);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const toggleSidebar = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('vastraloom_admin_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  // Keyboard shortcut Ctrl+B or Cmd+B to toggle sidebar
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleSidebar();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Click outside to close mobile dropdown
   useEffect(() => {
@@ -148,18 +179,26 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   }
 
   return (
-    <div className="admin-layout relative">
+    <div className="admin-layout relative" data-lenis-prevent="true">
       <AdminBackground3D />
 
       {/* Sidebar */}
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${isCollapsed ? 'admin-sidebar--collapsed' : ''}`} data-lenis-prevent="true">
         <div className="admin-sidebar__header">
-          <button className="admin-sidebar__logo" onClick={() => onNavigate('dashboard')}>
+          <button className="admin-sidebar__logo" onClick={() => onNavigate('dashboard')} title="Vastra Loom Atelier">
             <img src="/logo.svg" alt="Vastra Loom Logo" className="admin-sidebar__logo-icon" />
             <div className="admin-sidebar__logo-text">
               <span className="admin-sidebar__logo-main">Vastra Loom</span>
               <span className="admin-sidebar__logo-sub">Admin Panel</span>
             </div>
+          </button>
+          <button
+            className="admin-sidebar-toggle-btn"
+            onClick={toggleSidebar}
+            title={isCollapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'}
+            aria-label="Toggle navigation width"
+          >
+            {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
           </button>
         </div>
 
@@ -171,6 +210,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 currentRoute === item.id ? 'admin-sidebar__link--active' : ''
               } ${item.hideOnMobile ? 'admin-sidebar__link--desktop-only' : ''}`}
               onClick={() => onNavigate(item.id)}
+              title={isCollapsed ? item.label : undefined}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -282,20 +322,20 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         </nav>
 
         <div className="admin-sidebar__footer">
-          <button className="admin-sidebar__link" onClick={onBackToStore}>
+          <button className="admin-sidebar__link" onClick={onBackToStore} title={isCollapsed ? 'View Store' : undefined}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" />
             </svg>
             <span>View Store</span>
           </button>
-          <button className="admin-sidebar__link admin-sidebar__link--danger" onClick={handleLogout}>
+          <button className="admin-sidebar__link admin-sidebar__link--danger" onClick={handleLogout} title={isCollapsed ? 'Logout' : undefined}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
             </svg>
             <span>Logout</span>
           </button>
 
-          <div className="admin-server-health">
+          <div className="admin-server-health" title={`Server Latency: ${latencyMs ?? 24}ms`}>
             <div className={`health-pulse-dot ${serverStatus}`}></div>
             <span>
               Server{' '}
@@ -310,7 +350,56 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       </aside>
 
       {/* Main Content Area */}
-      <main className="admin-main relative z-10">
+      <main
+        className={`admin-main ${isCollapsed ? 'admin-main--collapsed' : ''} relative z-10`}
+        data-lenis-prevent="true"
+      >
+        {/* Sticky Topbar above Content */}
+        <div className="admin-topbar">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleSidebar}
+              className="admin-topbar-toggle-btn"
+              title={isCollapsed ? 'Expand navigation sidebar (Ctrl+B)' : 'Collapse navigation sidebar (Ctrl+B)'}
+            >
+              {isCollapsed ? (
+                <>
+                  <PanelLeftOpen className="w-4 h-4 text-brand-gold" />
+                  <span className="hidden sm:inline">Expand Menu</span>
+                </>
+              ) : (
+                <>
+                  <PanelLeftClose className="w-4 h-4 text-brand-gold" />
+                  <span className="hidden sm:inline">Collapse Menu</span>
+                </>
+              )}
+            </button>
+            <div className="hidden sm:flex items-center gap-2 text-xs text-brand-ivory/60 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-gold/60" />
+              <span>Atelier Command</span>
+              <span>/</span>
+              <span className="capitalize text-brand-gold font-semibold">{currentRoute}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onBackToStore}
+              className="text-xs text-brand-gold hover:text-white transition-colors flex items-center gap-1.5 font-medium px-2.5 py-1 rounded-lg bg-brand-gold/10 border border-brand-gold/20"
+              title="View Customer Storefront"
+            >
+              <span>Storefront</span>
+              <span className="text-[10px]">↗</span>
+            </button>
+            <div className="admin-server-health !mt-0 !pt-0">
+              <div className={`health-pulse-dot ${serverStatus}`}></div>
+              <span className="text-xs font-mono">
+                {serverStatus === 'online' ? `${latencyMs ?? 24}ms` : 'Offline'}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div className="admin-main__content">{children}</div>
       </main>
     </div>

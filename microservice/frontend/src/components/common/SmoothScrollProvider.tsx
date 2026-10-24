@@ -5,13 +5,17 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface SmoothScrollProviderProps {
   children: ReactNode;
+  enabled?: boolean;
 }
 
-export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ children }) => {
+export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
+  children,
+  enabled = true,
+}) => {
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !enabled) return;
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -33,7 +37,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
       cancelAnimationFrame(animationFrameId);
       lenis.destroy();
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, enabled]);
 
   return <>{children}</>;
 };

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { ChevronDown } from 'lucide-react';
 import { Order } from '@/types';
 
 interface OrderManagerViewProps {
@@ -226,18 +228,24 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
                       </span>
                     </td>
                     <td>
-                      <select
-                        value={order.status || 'PENDING'}
-                        onChange={(e) => onStatusChange(order.id, e.target.value)}
-                        className="bg-[#140A22] border border-brand-gold/30 rounded-lg py-1 px-2.5 text-xs font-mono font-bold focus:outline-none focus:border-brand-gold cursor-pointer"
-                        style={{ color: getStatusColor(order.status || 'PENDING') }}
-                      >
-                        <option value="PENDING">PENDING</option>
-                        <option value="PROCESSING">PROCESSING</option>
-                        <option value="SHIPPED">SHIPPED</option>
-                        <option value="DELIVERED">DELIVERED</option>
-                        <option value="CANCELLED">CANCELLED</option>
-                      </select>
+                      <div className="relative inline-block">
+                        <select
+                          value={order.status || 'PENDING'}
+                          onChange={(e) => onStatusChange(order.id, e.target.value)}
+                          className="appearance-none bg-[#140A22] border border-brand-gold/30 hover:border-brand-gold/60 rounded-xl py-1.5 pl-3 pr-8 text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-brand-gold/40 cursor-pointer shadow-inner transition-all"
+                          style={{ color: getStatusColor(order.status || 'PENDING') }}
+                        >
+                          <option value="PENDING" className="bg-[#120822] text-amber-400">PENDING</option>
+                          <option value="PROCESSING" className="bg-[#120822] text-blue-400">PROCESSING</option>
+                          <option value="SHIPPED" className="bg-[#120822] text-purple-400">SHIPPED</option>
+                          <option value="DELIVERED" className="bg-[#120822] text-emerald-400">DELIVERED</option>
+                          <option value="CANCELLED" className="bg-[#120822] text-rose-400">CANCELLED</option>
+                        </select>
+                        <ChevronDown
+                          className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-70"
+                          style={{ color: getStatusColor(order.status || 'PENDING') }}
+                        />
+                      </div>
                     </td>
                     <td>
                       <button
@@ -266,10 +274,11 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
       </div>
 
       {/* Order Dossier & Tracking Modal */}
-      {selectedOrder && (
+      {selectedOrder && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
           onClick={() => setSelectedOrder(null)}
+          data-lenis-prevent="true"
         >
           <div
             className="relative w-full max-w-2xl bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] z-10 text-brand-ivory max-h-[92vh] overflow-y-auto my-auto"
@@ -403,7 +412,8 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

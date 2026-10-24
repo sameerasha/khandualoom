@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 export interface SocialItem {
   id: number;
@@ -110,17 +111,20 @@ export const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({
             <label className="block text-xs font-mono uppercase tracking-wider text-brand-gold/80 mb-2">
               Platform *
             </label>
-            <select
-              value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl p-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
-            >
-              {PLATFORMS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={platform}
+                onChange={(e) => setPlatform(e.target.value)}
+                className="w-full appearance-none bg-[#0E0518] border border-brand-gold/30 hover:border-brand-gold/60 focus:border-brand-gold rounded-xl py-2.5 pl-3.5 pr-10 text-sm text-white focus:outline-none transition-all cursor-pointer shadow-inner"
+              >
+                {PLATFORMS.map((p) => (
+                  <option key={p.id} value={p.id} className="bg-[#120822] text-white">
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-4 h-4 text-brand-gold absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-80" />
+            </div>
           </div>
           <div className="sm:col-span-2">
             <label className="block text-xs font-mono uppercase tracking-wider text-brand-gold/80 mb-2">

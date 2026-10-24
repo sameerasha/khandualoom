@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ChevronDown, X } from 'lucide-react';
 import { Product } from '@/types';
 
 interface ProductManagerViewProps {
@@ -143,6 +144,15 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-ivory/50 hover:text-white p-1"
+              title="Clear search"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         <div className="product-manager__filter-row">
@@ -151,6 +161,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
               className="product-manager__select"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
+              aria-label="Filter by Weave Category"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
@@ -158,6 +169,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
                 </option>
               ))}
             </select>
+            <ChevronDown className="product-manager__select-arrow w-4 h-4" />
           </div>
 
           <div className="product-manager__select-wrap">
@@ -165,6 +177,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
               className="product-manager__select"
               value={selectedBadge}
               onChange={(e) => setSelectedBadge(e.target.value)}
+              aria-label="Filter by Heirloom Badge"
             >
               {badges.map((b) => (
                 <option key={b} value={b}>
@@ -172,6 +185,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
                 </option>
               ))}
             </select>
+            <ChevronDown className="product-manager__select-arrow w-4 h-4" />
           </div>
 
           <div className="product-manager__select-wrap">
@@ -179,12 +193,14 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
               className="product-manager__select"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
+              aria-label="Sort Catalog Items"
             >
               <option value="newest">Newest Commissioned</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
               <option value="name">Name: A to Z</option>
             </select>
+            <ChevronDown className="product-manager__select-arrow w-4 h-4" />
           </div>
         </div>
       </div>

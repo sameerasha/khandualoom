@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Plus, Trash2, Sparkles } from 'lucide-react';
+import { X, Plus, Trash2, Sparkles, ChevronDown } from 'lucide-react';
 import { Product } from '@/types';
 
 interface ProductEditorModalProps {
@@ -92,9 +93,14 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     await onSave(formData);
   };
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
+        data-lenis-prevent="true"
+      >
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -162,18 +168,21 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                   <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
                     Weave Tradition *
                   </label>
-                  <select
-                    name="category"
-                    value={formData.category || 'Banarasi'}
-                    onChange={handleChange}
-                    className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
-                  >
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c} Weave
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      name="category"
+                      value={formData.category || 'Banarasi'}
+                      onChange={handleChange}
+                      className="w-full appearance-none bg-[#0E0518] border border-brand-gold/30 hover:border-brand-gold/60 focus:border-brand-gold rounded-xl px-4 py-2.5 pr-10 text-sm text-white focus:outline-none transition-all cursor-pointer shadow-inner"
+                    >
+                      {CATEGORIES.map((c) => (
+                        <option key={c} value={c} className="bg-[#120822] text-white py-1">
+                          {c} Weave
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-brand-gold absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-80" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -216,18 +225,21 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                   <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
                     Curatorial Badge
                   </label>
-                  <select
-                    name="badge"
-                    value={formData.badge || 'Bestseller'}
-                    onChange={handleChange}
-                    className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
-                  >
-                    {BADGES.map((b) => (
-                      <option key={b} value={b}>
-                        {b}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      name="badge"
+                      value={formData.badge || 'Bestseller'}
+                      onChange={handleChange}
+                      className="w-full appearance-none bg-[#0E0518] border border-brand-gold/30 hover:border-brand-gold/60 focus:border-brand-gold rounded-xl px-4 py-2.5 pr-10 text-sm text-white focus:outline-none transition-all cursor-pointer shadow-inner"
+                    >
+                      {BADGES.map((b) => (
+                        <option key={b} value={b} className="bg-[#120822] text-white py-1">
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-brand-gold absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-80" />
+                  </div>
                 </div>
               </div>
 
@@ -392,6 +404,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           </form>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

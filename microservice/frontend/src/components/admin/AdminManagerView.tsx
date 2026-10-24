@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface AdminUserItem {
   id: number;
@@ -109,10 +110,11 @@ export const AdminManagerView: React.FC<AdminManagerViewProps> = ({ admins, onCr
       </div>
 
       {/* Add Admin Modal */}
-      {showModal && (
+      {showModal && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
           onClick={() => setShowModal(false)}
+          data-lenis-prevent="true"
         >
           <div
             className="relative w-full max-w-md bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] z-10 text-brand-ivory my-auto"
@@ -219,7 +221,8 @@ export const AdminManagerView: React.FC<AdminManagerViewProps> = ({ admins, onCr
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

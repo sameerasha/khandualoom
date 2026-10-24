@@ -85,7 +85,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <SmoothScrollProvider>
+    <SmoothScrollProvider enabled={currentView !== 'admin'}>
       <div className="min-h-screen bg-[#0F0617] text-brand-ivory flex flex-col selection:bg-brand-gold selection:text-brand-purple-dark relative">
         
         {/* Persistent 3D Master Loom Canvas Across All Storefront Sections */}
