@@ -44,3 +44,5 @@ buildNumber.properties
 # Env secrets
 .env
 .env.*
+
+.maven-repository/
