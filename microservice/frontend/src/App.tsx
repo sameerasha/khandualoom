@@ -103,7 +103,6 @@ export const App: React.FC = () => {
             onOpenProfile={() => setCurrentView('profile')}
             onOpenContact={() => setCurrentView('contact')}
             onOpenSocial={() => setSocialModalOpen(true)}
-            onNavigateHeritage={handleNavigateHeritage}
           />
         )}
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, User as UserIcon, Search, Menu, X, Shield, Sparkles, LogOut, MessageSquare, Share2 } from 'lucide-react';
+import { ShoppingBag, User as UserIcon, Search, Menu, X, Shield, LogOut, MessageSquare, Share2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { toggleCart } from '@/features/cart/cartSlice';
 import { logout } from '@/features/auth/authSlice';
@@ -11,7 +11,6 @@ interface NavbarProps {
   onOpenProfile?: () => void;
   onOpenContact?: () => void;
   onOpenSocial?: () => void;
-  onNavigateHeritage?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -20,7 +19,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenProfile,
   onOpenContact,
   onOpenSocial,
-  onNavigateHeritage,
 }) => {
   const dispatch = useAppDispatch();
   const { items } = useAppSelector((state) => state.cart);
@@ -79,44 +77,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </form>
 
-          {/* Desktop Navigation Links (Section-Driven Navigation, No Specific Category Values) */}
+          {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
-            <button
-              onClick={() => {
-                document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="hover:text-brand-gold transition-colors"
-            >
-              Collection
-            </button>
-            <button
-              onClick={() => {
-                document.getElementById('craft-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="hover:text-brand-gold transition-colors"
-            >
-              Craftsmanship
-            </button>
-            <button
-              onClick={() => {
-                document.getElementById('trust-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="hover:text-brand-gold transition-colors"
-            >
-              Imperial Trust
-            </button>
-            <button
-              onClick={() => {
-                if (onNavigateHeritage) {
-                  onNavigateHeritage();
-                } else {
-                  document.getElementById('heritage')?.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-              className="hover:text-brand-gold transition-colors"
-            >
-              Heritage
-            </button>
             <button
               onClick={onOpenContact}
               className="hover:text-brand-gold transition-colors flex items-center gap-1.5"
@@ -247,49 +209,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </form>
 
           <div className="flex flex-col gap-2 pt-2 border-t border-brand-gold/10">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm"
-            >
-              Masterpiece Collection
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                document.getElementById('craft-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm"
-            >
-              Ancestral Craftsmanship
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                document.getElementById('trust-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm"
-            >
-              Imperial Trust Pillars
-            </button>
-
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                if (onNavigateHeritage) {
-                  onNavigateHeritage();
-                } else {
-                  document.getElementById('heritage')?.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-              className="text-left py-2 px-3 rounded hover:bg-brand-purple text-brand-ivory hover:text-brand-gold text-sm flex items-center justify-between"
-            >
-              <span>Heritage & GI Story</span>
-              <Sparkles className="w-4 h-4 text-brand-gold" />
-            </button>
-
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
