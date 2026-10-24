@@ -27,7 +27,7 @@ spring:
         - id: auth-service
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/v1/auth/**, /api/v1/users/**, /api/auth/**, /api/users/**
+            - Path=/api/v1/auth/**, /api/v1/users/**, /api/auth/**, /api/users/**, /api/admin/users/**, /api/super-admin/**
 
         # Products & AI RAG Route
         - id: product-service
@@ -39,13 +39,13 @@ spring:
         - id: order-service
           uri: ${ORDER_SERVICE_URL:http://localhost:8083}
           predicates:
-            - Path=/api/v1/orders/**, /api/v1/checkout/**, /api/v1/payments/**, /api/orders/**, /api/payment/**
+            - Path=/api/v1/orders/**, /api/v1/checkout/**, /api/v1/payments/**, /api/orders/**, /api/payment/**, /api/admin/orders/**
 
         # Notifications & Contacts Route
         - id: notification-service
           uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
           predicates:
-            - Path=/api/v1/contact/**, /api/v1/social/**, /api/contact/**
+            - Path=/api/v1/contact/**, /api/v1/social/**, /api/contact/**, /api/social-media/**, /api/admin/social-media/**
 
 management:
   endpoints:

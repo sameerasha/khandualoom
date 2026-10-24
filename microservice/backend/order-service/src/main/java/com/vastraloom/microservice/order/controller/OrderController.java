@@ -12,7 +12,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping({"/api/orders", "/api/v1/orders", "/api/admin/orders"})
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -38,12 +38,12 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
     }
 
-    @GetMapping("/admin/all")
+    @GetMapping({"", "/admin/all", "/all"})
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
-    @PutMapping("/admin/{id}/status")
+    @PutMapping({"/{id}/status", "/admin/{id}/status"})
     public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long id,
             @RequestBody OrderStatusUpdateRequest request

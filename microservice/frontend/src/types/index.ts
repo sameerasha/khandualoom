@@ -9,7 +9,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image: string;
-  images?: ProductImage[];
+  images?: Array<string | ProductImage>;
   description: string;
   fabric: string;
   weave: string;
