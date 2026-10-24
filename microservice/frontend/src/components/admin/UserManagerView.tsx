@@ -201,7 +201,7 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
           data-lenis-prevent="true"
         >
           <div
-            className="relative w-full max-w-4xl bg-gradient-to-b from-[#1C0B2E] via-[#120622] to-[#090212] border border-brand-gold/45 rounded-3xl p-6 sm:p-8 shadow-[0_25px_90px_rgba(0,0,0,0.9),0_0_50px_rgba(223,191,122,0.18)] z-10 text-brand-ivory my-auto max-h-[92vh] overflow-y-auto"
+            className="relative w-[96vw] max-w-6xl xl:max-w-7xl bg-gradient-to-b from-[#1C0B2E] via-[#120622] to-[#090212] border border-brand-gold/45 rounded-3xl p-6 sm:p-9 shadow-[0_25px_95px_rgba(0,0,0,0.92),0_0_60px_rgba(223,191,122,0.22)] z-10 text-brand-ivory my-auto max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}

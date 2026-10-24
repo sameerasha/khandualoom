@@ -195,7 +195,7 @@ export const AdminManagerView: React.FC<AdminManagerViewProps> = ({ admins, onCr
           data-lenis-prevent="true"
         >
           <div
-            className="relative w-full max-w-3xl bg-gradient-to-b from-[#1E0D33] via-[#130624] to-[#0A0214] border border-brand-gold/50 rounded-3xl p-6 sm:p-9 shadow-[0_25px_95px_rgba(0,0,0,0.92),0_0_55px_rgba(223,191,122,0.2)] z-10 text-brand-ivory my-auto max-h-[92vh] overflow-y-auto"
+            className="relative w-[95vw] max-w-5xl xl:max-w-6xl bg-gradient-to-b from-[#1E0D33] via-[#130624] to-[#0A0214] border border-brand-gold/50 rounded-3xl p-6 sm:p-9 shadow-[0_25px_95px_rgba(0,0,0,0.92),0_0_55px_rgba(223,191,122,0.2)] z-10 text-brand-ivory my-auto max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}

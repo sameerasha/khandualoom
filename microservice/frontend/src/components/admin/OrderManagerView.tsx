@@ -276,12 +276,12 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
       {/* Order Dossier & Tracking Modal */}
       {selectedOrder && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto"
           onClick={() => setSelectedOrder(null)}
           data-lenis-prevent="true"
         >
           <div
-            className="relative w-full max-w-2xl bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] z-10 text-brand-ivory max-h-[92vh] overflow-y-auto my-auto"
+            className="relative w-[94vw] max-w-4xl xl:max-w-5xl bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/45 rounded-3xl p-6 sm:p-8 shadow-[0_25px_90px_rgba(0,0,0,0.9),0_0_50px_rgba(223,191,122,0.18)] z-10 text-brand-ivory max-h-[92vh] overflow-y-auto my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-5 border-b border-brand-gold/20">

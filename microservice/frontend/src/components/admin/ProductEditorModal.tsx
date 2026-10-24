@@ -71,6 +71,8 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
   });
 
   const [angleSlots, setAngleSlots] = useState<string[]>(['', '', '', '', '']);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isMasterDragOver, setIsMasterDragOver] = useState<boolean>(false);
 
   useEffect(() => {
     const slots = ['', '', '', '', ''];
@@ -171,6 +173,59 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
 
   const handleClearAngle = (index: number) => {
     handleAngleUrlChange(index, '');
+  };
+
+  const handleAngleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleAngleDragLeave = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragOverIndex === index) {
+      setDragOverIndex(null);
+    }
+  };
+
+  const handleAngleDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverIndex(null);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        handleAngleFileUpload(index, file);
+      }
+    }
+  };
+
+  const handleMasterDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMasterDragOver(true);
+  };
+
+  const handleMasterDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMasterDragOver(false);
+  };
+
+  const handleMasterDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMasterDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
+      files.slice(0, 5).forEach((file, idx) => {
+        handleAngleFileUpload(idx, file);
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -458,7 +513,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
         </div>
       </div>
 
-      {/* Section 4: Imagery Showcase (5 Curated Angles with Direct Upload & URL) */}
+      {/* Section 4: Imagery Showcase (5 Curated Angles with Drag & Drop, Direct File Upload & URL) */}
       <div className="p-6 rounded-3xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-brand-gold/30 shadow-lg space-y-5">
         <div className="border-b border-white/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -487,21 +542,71 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           </div>
         </div>
 
+        {/* Multi-Perspective Master Drag & Drop Zone */}
+        <div
+          onDragOver={handleMasterDragOver}
+          onDragEnter={handleMasterDragOver}
+          onDragLeave={handleMasterDragLeave}
+          onDrop={handleMasterDrop}
+          className={`p-5 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center relative overflow-hidden ${
+            isMasterDragOver
+              ? 'border-brand-gold bg-brand-gold/25 shadow-[0_0_35px_rgba(223,191,122,0.35)] scale-[1.01]'
+              : 'border-brand-gold/30 bg-black/30 hover:border-brand-gold/60 hover:bg-black/40'
+          }`}
+        >
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="w-11 h-11 rounded-2xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
+              <Upload className={`w-5 h-5 transition-transform ${isMasterDragOver ? '-translate-y-1 scale-110 text-amber-300' : ''}`} />
+            </div>
+            <div>
+              <div className="font-serif font-bold text-sm sm:text-base text-white">
+                {isMasterDragOver ? 'Drop Photos Now to Populate Angles' : 'Drag & Drop Saree Perspectives Here'}
+              </div>
+              <p className="text-xs text-brand-ivory/60 mt-0.5 font-sans max-w-lg mx-auto">
+                Drop multiple image files at once to automatically populate Angle 1 to 5 in sequence, or drag photos directly into individual perspective cards below.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-brand-ivory/60">
+                PNG, JPG, WebP supported
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-gold/10 border border-brand-gold/20 text-brand-gold font-bold">
+                Drag & Drop Ready
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* 5 Dedicated Luxury Angle Cards */}
         <div className="space-y-4">
           {ANGLE_METADATA.map((angle, idx) => {
             const currentUrl = angleSlots[idx] || '';
             const hasImage = currentUrl.trim().length > 0;
+            const isDraggingOverThis = dragOverIndex === idx;
 
             return (
               <div
                 key={angle.id}
-                className={`p-4 rounded-2xl border transition-all ${
-                  hasImage
+                onDragOver={(e) => handleAngleDragOver(e, idx)}
+                onDragEnter={(e) => handleAngleDragOver(e, idx)}
+                onDragLeave={(e) => handleAngleDragLeave(e, idx)}
+                onDrop={(e) => handleAngleDrop(e, idx)}
+                className={`p-4 rounded-2xl border transition-all relative overflow-hidden ${
+                  isDraggingOverThis
+                    ? 'border-brand-gold bg-brand-gold/20 shadow-[0_0_30px_rgba(223,191,122,0.4)] ring-2 ring-brand-gold/60 scale-[1.01]'
+                    : hasImage
                     ? 'bg-[#10051C]/90 border-brand-gold/40 shadow-[0_4px_20px_rgba(0,0,0,0.3)]'
                     : 'bg-black/25 border-white/10 hover:border-brand-gold/30'
                 }`}
               >
+                {/* Drag over banner indicator */}
+                {isDraggingOverThis && (
+                  <div className="absolute top-2 right-4 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-gold text-brand-purple-dark text-[11px] font-mono font-bold animate-pulse shadow-md">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Drop image to upload {angle.name}</span>
+                  </div>
+                )}
+
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2.5">
                     <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-brand-gold/20 text-brand-gold border border-brand-gold/30">
@@ -524,7 +629,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                       </span>
                     ) : (
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-brand-ivory/40">
-                        Awaiting Image
+                        Drag or Upload Image
                       </span>
                     )}
                     {hasImage && (
@@ -542,8 +647,10 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  {/* Live Thumbnail Preview */}
-                  <div className="w-24 h-28 sm:w-28 sm:h-32 rounded-xl border border-brand-gold/35 bg-[#0A0214] overflow-hidden shrink-0 flex items-center justify-center relative group shadow-md">
+                  {/* Live Thumbnail Preview & Drop Target */}
+                  <div className={`w-24 h-28 sm:w-28 sm:h-32 rounded-xl border bg-[#0A0214] overflow-hidden shrink-0 flex items-center justify-center relative group shadow-md transition-all ${
+                    isDraggingOverThis ? 'border-brand-gold ring-2 ring-brand-gold' : 'border-brand-gold/35'
+                  }`}>
                     {hasImage ? (
                       <img
                         src={currentUrl}
@@ -553,7 +660,13 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                     ) : (
                       <div className="flex flex-col items-center justify-center p-2 text-center text-brand-ivory/30">
                         <Upload className="w-6 h-6 mb-1 text-brand-gold/40" />
-                        <span className="text-[9px] font-mono uppercase tracking-wider">No Angle</span>
+                        <span className="text-[9px] font-mono uppercase tracking-wider">Drag & Drop</span>
+                      </div>
+                    )}
+                    {isDraggingOverThis && (
+                      <div className="absolute inset-0 bg-brand-purple-dark/85 backdrop-blur-xs flex flex-col items-center justify-center text-brand-gold text-center p-1 z-10">
+                        <Upload className="w-5 h-5 mb-1 animate-bounce" />
+                        <span className="text-[9px] font-mono font-bold uppercase">Drop Image</span>
                       </div>
                     )}
                   </div>
@@ -563,7 +676,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                     <div className="flex flex-wrap items-center gap-2.5">
                       <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-transparent hover:from-brand-gold/30 hover:to-brand-gold/20 border border-brand-gold/45 text-brand-gold text-xs font-mono uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm">
                         <Upload className="w-3.5 h-3.5" />
-                        <span>{hasImage ? 'Replace Image File' : 'Upload Angle File'}</span>
+                        <span>{hasImage ? 'Replace Image File' : 'Upload or Drag File'}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -575,7 +688,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                         />
                       </label>
                       <span className="text-[11px] text-brand-ivory/50 font-mono">
-                        Supports high-res PNG, JPG, WebP
+                        Drag & drop photo directly onto this card
                       </span>
                     </div>
 
@@ -732,7 +845,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-4xl max-h-[92vh] bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] overflow-hidden flex flex-col z-10 text-brand-ivory my-auto"
+          className="relative w-[96vw] max-w-6xl xl:max-w-7xl max-h-[92vh] bg-gradient-to-b from-[#1A0B2C] via-[#120622] to-[#0A0314] border border-brand-gold/40 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_40px_rgba(223,191,122,0.12)] overflow-hidden flex flex-col z-10 text-brand-ivory my-auto"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-brand-gold/20 bg-[#160826]/90">
