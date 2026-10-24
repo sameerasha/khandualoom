@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/common/Navbar';
 import { Hero } from '@/components/common/Hero';
-import { HeritageFeaturesSection } from '@/components/common/HeritageFeaturesSection';
-import { CraftShowcaseSection } from '@/components/common/CraftShowcaseSection';
+import { ShopByCollection } from '@/components/common/ShopByCollection';
+import { NewArrivalsSection } from '@/components/common/NewArrivalsSection';
 import { ProductGrid } from '@/components/common/ProductGrid';
+import { HeritageFeaturesSection } from '@/components/common/HeritageFeaturesSection';
 import { About } from '@/components/common/About';
+import { CraftShowcaseSection } from '@/components/common/CraftShowcaseSection';
 import { Testimonials } from '@/components/common/Testimonials';
+import { NewsletterSection } from '@/components/common/NewsletterSection';
 import { RecentViews } from '@/components/common/RecentViews';
 import { CartSidebar } from '@/components/common/CartSidebar';
 import { Footer } from '@/components/common/Footer';
@@ -23,6 +26,8 @@ import { CinematicLoomCanvas } from '@/components/3d/CinematicLoomCanvas';
 import { Product } from '@/types';
 import { useAppDispatch } from '@/app/hooks';
 import { setSelectedCategory } from '@/features/products/productsSlice';
+import { useGetProductsQuery } from '@/features/products/productsApi';
+import { fallbackProducts } from '@/data/fallbackProducts';
 
 export type AppView = 'store' | 'checkout' | 'admin' | 'profile' | 'contact' | 'product';
 
@@ -35,6 +40,10 @@ export const App: React.FC = () => {
   const [legalInitialTab, setLegalInitialTab] = useState<LegalDocType>('privacy');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [globalScrollProgress, setGlobalScrollProgress] = useState(0);
+
+  // Fetch product catalog for New Arrivals and overall views
+  const { data: fetchedProducts } = useGetProductsQuery({});
+  const allProducts = fetchedProducts && fetchedProducts.length > 0 ? fetchedProducts : fallbackProducts;
 
   // Track global scroll progression across all sections (0.0 to 1.0)
   useEffect(() => {
@@ -63,17 +72,20 @@ export const App: React.FC = () => {
   const handleSelectCategoryFromFooter = (category: string) => {
     dispatch(setSelectedCategory(category));
     setCurrentView('store');
-    window.scrollTo({ top: 750, behavior: 'smooth' });
+    const catalogElement = document.getElementById('catalog-section');
+    if (catalogElement) {
+      catalogElement.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleNavigateHeritage = () => {
     if (currentView !== 'store') {
       setCurrentView('store');
       setTimeout(() => {
-        document.getElementById('heritage')?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('heritage-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 150);
     } else {
-      document.getElementById('heritage')?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('heritage-section')?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -114,7 +126,7 @@ export const App: React.FC = () => {
         <main className="flex-1 relative z-10">
           {currentView === 'store' && (
             <>
-              {/* Section 1: 3D Saree & Flying Shuttle Hero Section */}
+              {/* Section 1: Hero */}
               <Hero
                 scrollProgress={globalScrollProgress}
                 onExploreClick={() => {
@@ -123,26 +135,38 @@ export const App: React.FC = () => {
                 onSignUpClick={() => setAuthModalOpen(true)}
               />
 
-              {/* Section 2: Royal Atelier Trust Pillars & 3D Celestial Rings */}
+              {/* Section 2: Shop by Collection */}
+              <ShopByCollection />
+
+              {/* Section 3: New Arrivals */}
+              <NewArrivalsSection
+                products={allProducts}
+                onSelectProduct={handleSelectProduct}
+              />
+
+              {/* Section 4: Bestselling Sarees & Filterable Catalog */}
+              <ProductGrid onSelectProduct={handleSelectProduct} />
+
+              {/* Section 5: Why Choose Khadua Looms? */}
               <HeritageFeaturesSection />
 
-              {/* Section 3: Flying Shuttle & Kadwa Weaving Story with Active Trailing Yarn */}
+              {/* Section 6: Our Heritage: A Legacy Woven Through Generations */}
+              <About />
+
+              {/* Section 7: Odisha Weaving Story & Active Trailing Yarn */}
               <CraftShowcaseSection
                 onExploreCatalog={() => {
                   document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               />
 
-              {/* Section 4: Master Saree Catalog Grid framed by 3D Silk Horizon Wave */}
-              <ProductGrid onSelectProduct={handleSelectProduct} />
-
-              {/* Section 5: Atelier History & Sacred Loom Manifesto framed by Pit Loom Architecture */}
-              <About />
-
-              {/* Section 6: Connoisseur Testimonials */}
+              {/* Section 8: Customer Appraisals & Testimonials */}
               <Testimonials />
 
-              {/* Recently Viewed Sarees */}
+              {/* Section 9: Stay Connected with Our Weaves Newsletter */}
+              <NewsletterSection />
+
+              {/* Section 10: Recently Viewed Sarees */}
               <RecentViews onSelectProduct={handleSelectProduct} />
             </>
           )}

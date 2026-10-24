@@ -391,7 +391,7 @@ export const AdminManagerView: React.FC<AdminManagerViewProps> = ({ admins, onCr
                         <input
                           type="email"
                           required
-                          placeholder="governor@vastraloom.com"
+                          placeholder="admin@khadualooms.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none transition-colors"

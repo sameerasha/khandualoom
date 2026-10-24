@@ -153,13 +153,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   // Quick Demo fill buttons for hassle-free evaluation
   const handleQuickFillSuperAdmin = () => {
-    setEmail('superadmin@vastraloom.com');
+    setEmail('superadmin@khadualooms.com');
     setPassword('Admin@123456');
     setFieldErrors({});
   };
 
   const handleQuickFillAdmin = () => {
-    setEmail('admin@vastraloom.com');
+    setEmail('admin@khadualooms.com');
     setPassword('Admin@123456');
     setFieldErrors({});
   };
@@ -478,11 +478,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           >
             <div className="auth-modal-visual__overlay" />
             <div className="auth-modal-visual__content">
-              <img src="/logo.svg" alt="Vastra Loom Emblem" className="visual-logo-badge" />
-              <h2>Vastra Loom</h2>
+              <img src="/logo.svg" alt="Khadua Looms Emblem" className="visual-logo-badge" />
+              <h2>Khadua Looms</h2>
               <p>
-                Wrap yourself in handcrafted heritage. Experience the finest pure silk handloom
-                masterpieces created by generational master weavers.
+                Woven in Tradition. Wrapped in Elegance. Discover exquisite Odisha handloom sarees
+                crafted by generations of master weavers.
               </p>
               <div className="visual-features">
                 <div className="v-feat">✓ Silk Mark Certified Pure Weave</div>
@@ -542,7 +542,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           setEmail(e.target.value);
                           setFieldErrors({ ...fieldErrors, email: null });
                         }}
-                        placeholder="patron@domain.com or admin@vastraloom.com"
+                        placeholder="patron@domain.com or admin@khadualooms.com"
                         autoComplete="email"
                       />
                       {fieldErrors.email && <small className="field-error-msg">{fieldErrors.email}</small>}

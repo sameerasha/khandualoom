@@ -106,13 +106,13 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         <div className="relative z-10 max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-gold/40 bg-brand-gold/10 text-brand-gold text-[11px] font-mono uppercase tracking-widest mb-3">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Imperial Handloom Authority • Active Session
+            Khadua Looms Authority • Active Session
           </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
-            Vastra Loom Atelier Command
+            Khadua Looms Store Command
           </h1>
           <p className="text-sm text-brand-ivory/70 mt-2 font-light leading-relaxed">
-            Imperial administration suite for catalog curation, master weave authentication, patron orders, and royal storytelling.
+            Administration suite for Odisha handloom catalog curation, order fulfillment, patron accounts, and artisan storytelling.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 mt-5">

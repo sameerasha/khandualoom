@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShieldCheck, Heart, Truck, Sparkles, Clock, Calendar } from 'lucide-react';
+import { Sparkles, Calendar, Feather } from 'lucide-react';
 
 export const About: React.FC = () => {
   const [activeEra, setActiveEra] = useState<number>(0);
 
   const milestones = [
     {
-      year: '1984',
-      title: 'The Ancestral Pit Loom Founded',
-      desc: 'Master weaver Pandit Harishankar established the first pit loom in Varanasi Chowk, committed exclusively to hand-spun pure katan silk and real silver zari.',
+      year: 'Ancient Roots',
+      title: 'Nuapatna & Sacred Gitagovinda Verses',
+      desc: 'The historic roots of Khadua Pata in Nuapatna, traditionally woven with sacred calligraphic verses of Jayadeva’s Gita Govinda offered to Lord Jagannath in Puri.',
     },
     {
-      year: '1998',
-      title: 'Royal & Bridal Guild Patronage',
-      desc: 'Vastraloom expanded across Kanchipuram and Patan, becoming the private silk atelier for royal weddings, ceremonial drapes, and high-society patrons.',
+      year: 'Bandha Artistry',
+      title: 'Tie-Dye Mastery of Western Odisha',
+      desc: 'Generations of master weavers across Bargarh and Sambalpur perfected the mathematical tie-dye (Bandha) technique, aligning intricate warp and weft threads before weaving.',
     },
     {
-      year: '2012',
-      title: 'GI Tag & Silk Mark Certification',
-      desc: 'Every masterloom piece was certified under the Silk Mark Organisation of India and Government of India GI Tag Registry with zero synthetic blends allowed.',
+      year: 'Royal Patronage',
+      title: 'Extra-Weft Bomkai & Phoda Kumbha',
+      desc: 'The royal courts of Subarnapur and Ganjam fostered complex extra-weft jaal patterns and needle-interlocked Phoda Kumbha temple spires cherished across generations.',
     },
     {
-      year: '2026',
-      title: 'The Global Digital Atelier',
-      desc: 'Bringing authentic heritage handlooms directly to connoisseurs across 45 countries, ensuring fair trade livelihoods for over 300 weaver families.',
+      year: 'Modern Era',
+      title: 'Khadua Looms Online Heritage Store',
+      desc: 'Connecting saree connoisseurs, brides, and collectors worldwide directly with authentic Odisha handloom craftsmanship, honoring timeless cultural identity.',
     },
   ];
 
   return (
-    <section id="heritage" className="py-14 sm:py-16 relative overflow-hidden text-brand-ivory">
+    <section id="heritage-section" className="py-16 sm:py-20 relative overflow-hidden text-brand-ivory">
       {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/70 pointer-events-none" />
 
@@ -40,11 +40,11 @@ export const About: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          {/* Left Visual Column - Editorial Image Composition */}
+          {/* Left Visual Column - Authentic Odisha Handloom Composition */}
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 relative"
           >
@@ -52,21 +52,26 @@ export const About: React.FC = () => {
               {/* Primary Image */}
               <div className="relative rounded-3xl overflow-hidden border border-brand-gold/30 shadow-2xl group">
                 <img 
-                  src="/images/saree_crimson_red.png" 
-                  alt="Kanjeevaram Temple Border Weave" 
+                  src="/images/products/p3/front.jpg" 
+                  alt="Authentic Odisha Khadua Silk Weave" 
                   className="w-full h-[480px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
-                  <span className="text-[11px] tracking-widest uppercase text-brand-gold font-mono block">Kanchipuram & Varanasi Master Looms</span>
-                  <p className="font-serif text-lg font-bold text-white mt-1">Interlocking Warp & Weft Technique</p>
+                  <span className="text-[11px] tracking-widest uppercase text-brand-gold font-mono block">
+                    Nuapatna & Western Odisha Handlooms
+                  </span>
+                  <p className="font-serif text-lg font-bold text-white mt-1">
+                    Authentic Tie-Dye Bandha & Extra-Weft Artistry
+                  </p>
                 </div>
               </div>
 
               {/* Accent Floating Badge */}
               <div className="absolute -top-6 -left-6 bg-gradient-to-br from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark p-5 rounded-2xl shadow-2xl border border-yellow-200/50 flex flex-col items-center justify-center text-center">
-                <span className="font-serif font-black text-3xl leading-none">40+</span>
-                <span className="text-[10px] uppercase font-bold tracking-wider mt-1">Years of Heritage</span>
+                <Feather className="w-6 h-6 text-brand-purple-dark stroke-[2.2]" />
+                <span className="font-serif font-black text-2xl leading-none mt-1">Odisha</span>
+                <span className="text-[9.5px] uppercase font-bold tracking-wider mt-0.5">Heritage Weaves</span>
               </div>
             </div>
           </motion.div>
@@ -75,41 +80,43 @@ export const About: React.FC = () => {
           <motion.div 
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6"
           >
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-brand-gold font-mono mb-4">
               <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-              <span>Ancestral Craftsmanship & Sacred Loom</span>
+              <span>Our Heritage & Craftsmanship</span>
             </div>
 
             <h2 className="font-serif text-3xl sm:text-5xl font-bold text-brand-ivory leading-tight">
-              Weaving Dreams, <br />
+              A Legacy Woven <br />
               <span className="bg-gradient-to-r from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent italic">
-                Preserving Eternity
+                Through Generations
               </span>
             </h2>
 
             <div className="w-20 h-0.5 bg-gradient-to-r from-brand-gold to-transparent my-6" />
 
-            <p className="text-base sm:text-lg text-brand-ivory/80 font-sans leading-relaxed font-light">
-              Since 1984, Vastraloom has stood at the vanguard of India&apos;s royal handloom renaissance. 
-              We partner directly with over 300 master artisans across Varanasi, Kanchipuram, 
-              Chanderi, and Patan — safeguarding centuries-old weaving guilds while honoring fair livelihoods.
+            <p className="text-base sm:text-lg text-brand-ivory/85 font-sans leading-relaxed font-light">
+              Khadua Looms celebrates the rich textile heritage of Odisha. Our collection brings together traditional weaving styles, intricate patterns, and timeless designs for women who value craftsmanship and cultural identity.
+            </p>
+
+            <p className="mt-4 text-xs sm:text-sm text-brand-ivory/70 font-sans leading-relaxed font-light">
+              From the sacred Nuapatna Gitagovinda calligraphic drapes to Sambalpuri double-ikat bandha and ornate Bomkai borders, each weave represents an unbroken line of artistic devotion, geometric precision, and natural fibers.
             </p>
 
             {/* Interactive Timeline Tabs */}
-            <div className="mt-8 p-4 rounded-2xl bg-brand-purple-dark/85 border border-brand-gold/30 backdrop-blur-xl shadow-xl">
-              <div className="flex items-center gap-2 border-b border-brand-gold/15 pb-3 overflow-x-auto">
+            <div className="mt-8 pt-6 border-t border-brand-gold/20">
+              <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
                 {milestones.map((m, idx) => (
                   <button
-                    key={m.year}
+                    key={idx}
                     onClick={() => setActiveEra(idx)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all shrink-0 flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
                       activeEra === idx
-                        ? 'bg-brand-gold text-brand-purple-dark font-bold'
-                        : 'text-brand-ivory/60 hover:text-brand-gold'
+                        ? 'bg-brand-gold text-brand-purple-dark font-bold shadow-md'
+                        : 'bg-white/5 text-brand-ivory/60 hover:text-brand-gold hover:bg-white/10 border border-brand-gold/15'
                     }`}
                   >
                     <Calendar className="w-3 h-3" />
@@ -118,6 +125,7 @@ export const About: React.FC = () => {
                 ))}
               </div>
 
+              {/* Active Milestone Card */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeEra}
@@ -125,59 +133,16 @@ export const About: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
-                  className="pt-3"
+                  className="bg-brand-purple-dark/60 border border-brand-gold/25 rounded-2xl p-4 backdrop-blur-md"
                 >
-                  <h4 className="font-serif text-sm font-bold text-brand-gold-light">
+                  <h4 className="font-serif font-bold text-base text-brand-gold mb-1">
                     {milestones[activeEra].title}
                   </h4>
-                  <p className="text-xs text-brand-ivory/70 mt-1 leading-relaxed font-light">
+                  <p className="text-xs text-brand-ivory/80 leading-relaxed font-light">
                     {milestones[activeEra].desc}
                   </p>
                 </motion.div>
               </AnimatePresence>
-            </div>
-
-            {/* Feature Badges */}
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 backdrop-blur-sm">
-                <div className="p-2 rounded-xl bg-brand-gold/10 text-brand-gold shrink-0">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-serif font-bold text-sm text-brand-ivory">100% Authentic GI Tagged</h4>
-                  <p className="text-xs text-brand-ivory/60 mt-0.5">Government certified Silk Mark purity</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 backdrop-blur-sm">
-                <div className="p-2 rounded-xl bg-brand-gold/10 text-brand-gold shrink-0">
-                  <Heart className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-serif font-bold text-sm text-brand-ivory">Artisan Direct Guild</h4>
-                  <p className="text-xs text-brand-ivory/60 mt-0.5">Direct revenue to hereditary weavers</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 backdrop-blur-sm">
-                <div className="p-2 rounded-xl bg-brand-gold/10 text-brand-gold shrink-0">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-serif font-bold text-sm text-brand-ivory">Heirloom Longevity</h4>
-                  <p className="text-xs text-brand-ivory/60 mt-0.5">Pure tested metallic silver & gold zari</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 backdrop-blur-sm">
-                <div className="p-2 rounded-xl bg-brand-gold/10 text-brand-gold shrink-0">
-                  <Truck className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-serif font-bold text-sm text-brand-ivory">Global Insured Delivery</h4>
-                  <p className="text-xs text-brand-ivory/60 mt-0.5">Tamper-evident luxury vault packaging</p>
-                </div>
-              </div>
             </div>
           </motion.div>
 

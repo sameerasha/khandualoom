@@ -1,47 +1,45 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Award, HeartHandshake, ShieldCheck, Sparkles, Check, ChevronRight } from 'lucide-react';
+import { Layers, FileText, ShieldCheck, Headphones, Truck, Sparkles } from 'lucide-react';
 
 export const HeritageFeaturesSection: React.FC = () => {
-  const features = [
+  const benefits = [
     {
-      icon: <Award className="w-5 h-5 text-brand-gold" />,
-      title: 'Silk Mark Certified',
-      subtitle: '100% Guaranteed Purity',
-      desc: 'Authenticated by the Silk Mark Organisation of India. Zero synthetic adulteration.',
-      badge: 'GI Tagged',
-      detail: 'Pure natural mulberry filaments',
+      icon: <Layers className="w-5 h-5 text-brand-gold" />,
+      title: 'Thoughtfully Curated Collections',
+      subtitle: 'Authentic Odisha Weaves',
+      desc: 'Each saree is hand-selected across authentic Khadua, Sambalpuri, Bomkai, and regional handloom traditions, reflecting true regional artistry.',
     },
     {
-      icon: <HeartHandshake className="w-5 h-5 text-brand-gold" />,
-      title: 'Direct from Artisans',
-      subtitle: 'Fair Trade Weavers Guild',
-      desc: 'Eliminating intermediaries. 100% fair trade patron value flowing directly to weaver families.',
-      badge: 'Zero Middlemen',
-      detail: '300+ Ancestral Weaver Families',
+      icon: <FileText className="w-5 h-5 text-brand-gold" />,
+      title: 'Detailed Product Information',
+      subtitle: 'Transparent Specifications',
+      desc: 'Comprehensive weave descriptions, fabric breakdowns, dimensions, and multi-angle photography so you make informed, confident choices.',
     },
     {
       icon: <ShieldCheck className="w-5 h-5 text-brand-gold" />,
-      title: 'Master Inspection',
-      subtitle: 'Zero-Defect Standard',
-      desc: 'Every warp and weft is scrutinized by senior master craftsmen before dispatch.',
-      badge: 'Triple Audit',
-      detail: 'Hand-inspected under studio light',
+      title: 'Secure Checkout',
+      subtitle: 'Encrypted Payments',
+      desc: 'Bank-grade encrypted payments supporting UPI, cards, and net banking with protected customer data and order tracking.',
     },
     {
-      icon: <Sparkles className="w-5 h-5 text-brand-gold" />,
-      title: 'Heirloom Packaging',
-      subtitle: 'Velvet Storage Chest',
-      desc: 'Delivered in a handcrafted velvet-lined luxury chest engineered to preserve silk for generations.',
-      badge: 'Museum Grade',
-      detail: 'Lined with pure cotton muslin',
+      icon: <Headphones className="w-5 h-5 text-brand-gold" />,
+      title: 'Reliable Customer Support',
+      subtitle: 'Dedicated Assistance',
+      desc: 'Our customer support team is available via email and phone to answer saree queries, drape styling advice, and order assistance.',
+    },
+    {
+      icon: <Truck className="w-5 h-5 text-brand-gold" />,
+      title: 'Transparent Shipping & Returns',
+      subtitle: 'Pan-India Delivery',
+      desc: 'Complimentary insured shipping across India with prompt dispatch within 24-48 hours and an easy 7-day return and exchange policy.',
     },
   ];
 
   return (
-    <section id="trust-section" className="py-14 sm:py-16 text-brand-ivory relative overflow-hidden">
+    <section id="why-us-section" className="py-16 sm:py-20 text-brand-ivory relative overflow-hidden">
       {/* Seamless Contrast Gradient matching Hero for WCAG AA readability */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/75 to-[#0F0617]/95 pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/95 pointer-events-none" />
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#0F0617]/90 via-transparent to-[#0F0617]/90 pointer-events-none" />
 
       {/* Subtle radial ambient lights framing the 3D celestial rings */}
@@ -60,7 +58,7 @@ export const HeritageFeaturesSection: React.FC = () => {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-gold/30 bg-brand-purple-dark/80 backdrop-blur-md text-brand-gold-light text-xs font-mono uppercase tracking-widest mb-4"
           >
             <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-            <span>The Four Pillars of Imperial Trust</span>
+            <span>The Khadua Looms Promise</span>
           </motion.div>
 
           <motion.h2
@@ -70,7 +68,7 @@ export const HeritageFeaturesSection: React.FC = () => {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight"
           >
-            Uncompromised Handloom Integrity
+            Why Choose Khadua Looms?
           </motion.h2>
 
           <motion.p
@@ -80,56 +78,38 @@ export const HeritageFeaturesSection: React.FC = () => {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="mt-4 text-xs sm:text-sm text-brand-ivory/80 font-sans leading-relaxed font-light"
           >
-            Watch the 3D celestial seals orbit above as you explore the heirloom standards governing every thread woven at our Varanasi and Kanchipuram looms.
+            We combine authentic Odisha textile heritage with a seamless, trustworthy digital shopping experience.
           </motion.p>
         </div>
 
-        {/* 4 Trust Feature Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((item, idx) => (
+        {/* 5 Benefits Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+          {benefits.map((item, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-              className="relative p-6 rounded-3xl bg-brand-purple-dark/85 border border-brand-gold/30 hover:border-brand-gold/80 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-brand-gold/25 hover:-translate-y-2 group flex flex-col justify-between"
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              className="relative p-6 rounded-3xl bg-brand-purple-dark/85 border border-brand-gold/30 hover:border-brand-gold/80 backdrop-blur-xl shadow-xl transition-all duration-300 hover:-translate-y-1 group flex flex-col justify-between"
             >
-              {/* Top Accent Pill */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-gold/20 transition-all">
+              <div>
+                <div className="w-11 h-11 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center mb-4 group-hover:scale-105 group-hover:bg-brand-gold/20 transition-all">
                   {item.icon}
                 </div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-brand-gold-light bg-brand-gold/10 border border-brand-gold/25 px-2.5 py-1 rounded-full">
-                  {item.badge}
-                </span>
-              </div>
-
-              {/* Title & Subtitle */}
-              <div>
-                <h4 className="font-serif font-bold text-lg text-white group-hover:text-brand-gold transition-colors">
-                  {item.title}
-                </h4>
-                <p className="text-xs font-mono uppercase tracking-wider text-brand-gold-light mt-0.5">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-brand-gold/80 block mb-1">
                   {item.subtitle}
-                </p>
-                <p className="text-xs text-brand-ivory/70 mt-3 leading-relaxed font-sans font-light">
+                </span>
+                <h3 className="font-serif font-bold text-base text-white group-hover:text-brand-gold transition-colors leading-snug">
+                  {item.title}
+                </h3>
+                <p className="mt-2.5 text-xs text-brand-ivory/70 font-sans leading-relaxed font-light">
                   {item.desc}
                 </p>
-              </div>
-
-              {/* Card Footer Micro-Stat */}
-              <div className="mt-5 pt-3 border-t border-brand-gold/15 flex items-center justify-between text-[11px] text-brand-ivory/60">
-                <span className="flex items-center gap-1.5 text-brand-gold-light">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  {item.detail}
-                </span>
-                <ChevronRight className="w-3.5 h-3.5 text-brand-gold opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
               </div>
             </motion.div>
           ))}
         </div>
-
       </div>
     </section>
   );

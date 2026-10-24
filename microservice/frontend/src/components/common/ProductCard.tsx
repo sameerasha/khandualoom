@@ -34,7 +34,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
   const imageSrc =
     !imgError && product.image
       ? product.image
-      : '/images/saree_crimson_red.png';
+      : '/images/products/p1/front.jpg';
 
   const discountPercent =
     product.originalPrice && product.originalPrice > product.price

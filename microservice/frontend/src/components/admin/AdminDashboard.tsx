@@ -33,7 +33,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
   const isAdminUser = isAuthenticated && (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN');
 
   const [loginMutation, { isLoading: isLoggingIn }] = useLoginMutation();
-  const [adminEmail, setAdminEmail] = useState('superadmin@vastraloom.com');
+  const [adminEmail, setAdminEmail] = useState('superadmin@khadualooms.com');
   const [adminPassword, setAdminPassword] = useState('Admin@123456');
   const [selectedRoleType, setSelectedRoleType] = useState<'super' | 'admin'>('super');
   const [showPassword, setShowPassword] = useState(false);
@@ -115,7 +115,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       id: 1,
       firstName: 'Imperial',
       lastName: 'Admin',
-      email: 'admin@vastraloom.com',
+      email: 'admin@khadualooms.com',
       role: 'ROLE_ADMIN',
       createdDate: '2026-05-01T00:00:00Z',
     },
@@ -123,17 +123,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       id: 2,
       firstName: 'Supreme',
       lastName: 'Curator',
-      email: 'superadmin@vastraloom.com',
+      email: 'superadmin@khadualooms.com',
       role: 'ROLE_SUPER_ADMIN',
       createdDate: '2026-04-15T00:00:00Z',
     },
   ]);
 
   const [socialsList, setSocialsList] = useState<SocialItem[]>([
-    { id: 1, platform: 'instagram', url: 'https://instagram.com/vastraloom' },
-    { id: 2, platform: 'whatsapp', url: 'https://wa.me/919876543210' },
-    { id: 3, platform: 'facebook', url: 'https://facebook.com/vastraloom' },
-    { id: 4, platform: 'youtube', url: 'https://youtube.com/@vastraloom' },
+    { id: 1, platform: 'instagram', url: 'https://instagram.com/khadualooms' },
+    { id: 2, platform: 'whatsapp', url: 'https://wa.me/916742918844' },
+    { id: 3, platform: 'facebook', url: 'https://facebook.com/khadualooms' },
+    { id: 4, platform: 'youtube', url: 'https://youtube.com/@khadualooms' },
   ]);
 
   // Load backend data if available
@@ -319,10 +319,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               <Shield className="w-7 h-7" />
             </div>
             <h2 className="font-serif text-2xl font-bold tracking-wide text-white">
-              Vastraloom Atelier Vault
+              Khadua Looms Vault
             </h2>
             <p className="text-xs text-brand-ivory/70 font-sans leading-relaxed">
-              Administrative authentication portal for Super Administrators & Atelier Managers.
+              Administrative authentication portal for Super Administrators & Store Managers.
             </p>
           </div>
 
@@ -332,7 +332,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               type="button"
               onClick={() => {
                 setSelectedRoleType('super');
-                setAdminEmail('superadmin@vastraloom.com');
+                setAdminEmail('superadmin@khadualooms.com');
                 setAdminPassword('Admin@123456');
                 setAuthError(null);
               }}
@@ -349,7 +349,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               type="button"
               onClick={() => {
                 setSelectedRoleType('admin');
-                setAdminEmail('admin@vastraloom.com');
+                setAdminEmail('admin@khadualooms.com');
                 setAdminPassword('Admin@123456');
                 setAuthError(null);
               }}
@@ -380,7 +380,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                 required
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
-                placeholder="admin@vastraloom.com"
+                placeholder="admin@khadualooms.com"
                 className="w-full bg-[#07010E] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
               />
             </div>

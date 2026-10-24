@@ -110,7 +110,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               <div className="space-y-4">
                 <h4 className="font-serif text-lg font-bold text-white">Privacy & Confidentiality Standard</h4>
                 <p>
-                  Vastra Loom respects your privacy and is devoted to safeguarding all personal information. When you create an account, purchase heirloom sarees, or consult our bespoke bridal trousseau atelier, your data is processed with enterprise-grade encryption.
+                  Khadua Looms respects your privacy and is devoted to safeguarding all personal information. When you create an account, purchase authentic Odisha handloom sarees, or contact our customer support team, your data is processed with enterprise-grade encryption.
                 </p>
                 <h5 className="font-serif font-bold text-brand-gold pt-2">1. Personal Information Collected</h5>
                 <p>
@@ -127,11 +127,11 @@ export const LegalModal: React.FC<LegalModalProps> = ({
               <div className="space-y-4">
                 <h4 className="font-serif text-lg font-bold text-white">Terms of Curated Service</h4>
                 <p>
-                  By accessing the Vastra Loom digital atelier or completing purchases, you enter an agreement governed by the craft traditions of authentic Indian handlooms.
+                  By accessing the Khadua Looms digital storefront or completing purchases, you enter an agreement governed by the craft traditions of authentic Odisha handlooms.
                 </p>
                 <h5 className="font-serif font-bold text-brand-gold pt-2">1. Handloom Characteristics & Authenticity</h5>
                 <p>
-                  Every saree is handwoven by master artisans across Varanasi, Kanchipuram, Chanderi, or Patan. Slight irregularities in weaving tension, zari slubs, or hand-dyed color saturation are natural hall-marks of artisanal authenticity and are not defects.
+                  Every saree is handwoven by traditional master artisans across Nuapatna, Bargarh, Subarnapur, Koraput, and Berhampur. Slight variations in weaving tension, dye saturation, or handloom texture are natural hallmarks of authentic artisan craft.
                 </p>
                 <h5 className="font-serif font-bold text-brand-gold pt-2">2. Silk Mark Certification</h5>
                 <p>
@@ -164,7 +164,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                   You hold the absolute right to be forgotten. In accordance with Indian digital data protection standards and international privacy norms, you may request permanent deletion of your profile, active sessions, and saved addresses.
                 </p>
                 <p>
-                  To request complete account purge, contact <a href="mailto:privacy@vastraloom.com" className="text-brand-gold underline">privacy@vastraloom.com</a> or use the profile management dashboard.
+                  To request complete account purge, contact <a href="mailto:privacy@khadualooms.com" className="text-brand-gold underline">privacy@khadualooms.com</a> or use the profile management dashboard.
                 </p>
               </div>
             )}

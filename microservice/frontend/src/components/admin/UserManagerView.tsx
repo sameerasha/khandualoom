@@ -749,7 +749,7 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-5 border-t border-brand-gold/20 gap-3">
               <div className="flex items-center gap-2 text-xs font-mono text-brand-ivory/50">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Vastraloom Cryptographic JWKS Directory • Immutable Record</span>
+                <span>Khadua Looms Cryptographic JWKS Directory • Immutable Record</span>
               </div>
               <button
                 type="button"

@@ -85,20 +85,20 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToStore }) => {
             <div className="p-6 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/20 backdrop-blur-md">
               <h3 className="font-serif font-bold text-lg text-brand-gold mb-4 flex items-center gap-2.5">
                 <MapPin className="w-5 h-5 text-brand-gold" />
-                Varanasi Master Atelier
+                Bhubaneswar Retail Pavilion
               </h3>
               <p className="text-sm text-brand-ivory/80 leading-relaxed font-light">
-                Ghat Weaving Quarter, B-12 Heritage Looms, Chowk, Varanasi, Uttar Pradesh 221001, India
+                Odisha Handloom Retail Pavilion, Janpath, Bhubaneswar, Odisha 751001, India
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/20 backdrop-blur-md">
               <h3 className="font-serif font-bold text-lg text-brand-gold mb-4 flex items-center gap-2.5">
                 <MapPin className="w-5 h-5 text-brand-gold" />
-                New Delhi Experience Lounge
+                Nuapatna Weavers Quarter
               </h3>
               <p className="text-sm text-brand-ivory/80 leading-relaxed font-light">
-                24 Mehrauli Heritage Complex, Qutub Road, New Delhi 110030, India
+                Nuapatna Silk Village, Tigiria, Cuttack District, Odisha 754035, India
               </p>
             </div>
 
@@ -106,9 +106,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToStore }) => {
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-brand-gold" />
                 <div>
-                  <span className="text-[11px] text-brand-ivory/60 uppercase font-mono block">Concierge Hotline</span>
-                  <a href="tel:+918005559876" className="text-sm font-medium hover:text-brand-gold transition-colors">
-                    +91 (800) 555-9876 / +91 (11) 4567-8901
+                  <span className="text-[11px] text-brand-ivory/60 uppercase font-mono block">Customer Hotline</span>
+                  <a href="tel:+916742918844" className="text-sm font-medium hover:text-brand-gold transition-colors">
+                    +91 (0) 674 291 8844
                   </a>
                 </div>
               </div>
@@ -116,9 +116,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToStore }) => {
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-brand-gold" />
                 <div>
-                  <span className="text-[11px] text-brand-ivory/60 uppercase font-mono block">Direct Inquiries</span>
-                  <a href="mailto:concierge@vastraloom.com" className="text-sm font-medium hover:text-brand-gold transition-colors">
-                    concierge@vastraloom.com
+                  <span className="text-[11px] text-brand-ivory/60 uppercase font-mono block">Direct Support</span>
+                  <a href="mailto:support@khadualooms.com" className="text-sm font-medium hover:text-brand-gold transition-colors">
+                    support@khadualooms.com
                   </a>
                 </div>
               </div>

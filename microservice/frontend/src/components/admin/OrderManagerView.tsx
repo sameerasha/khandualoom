@@ -198,12 +198,12 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
                 filteredOrders.map((order) => (
                   <tr key={order.id}>
                     <td>
-                      <span className="font-mono text-brand-gold font-bold">#VL-{order.id}</span>
+                      <span className="font-mono text-brand-gold font-bold">#KL-{order.id}</span>
                     </td>
                     <td>
                       <div>
-                        <div className="font-semibold text-white">{order.customerName || 'Imperial Patron'}</div>
-                        <div className="text-xs text-brand-ivory/60">{order.customerEmail || 'patron@vastraloom.com'}</div>
+                        <div className="font-semibold text-white">{order.customerName || 'Handloom Patron'}</div>
+                        <div className="text-xs text-brand-ivory/60">{order.customerEmail || 'patron@khadualooms.com'}</div>
                       </div>
                     </td>
                     <td>

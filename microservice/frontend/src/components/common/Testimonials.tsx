@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Star, ChevronLeft, ChevronRight, Quote, CheckCircle } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Quote, MessageCircle } from 'lucide-react';
 
 interface Testimonial {
   id: number;
@@ -9,45 +9,45 @@ interface Testimonial {
   rating: number;
   text: string;
   product: string;
-  verified: boolean;
+  isDemo: boolean;
 }
 
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: 'Priya Sharma',
-    location: 'Mumbai, Maharashtra',
+    name: 'Sasmita Mohapatra',
+    location: 'Bhubaneswar, Odisha',
     rating: 5,
-    text: 'The Banarasi silk I received for my wedding reception was breathtaking. The pure gold zari work had a soft, luminous gleam under the chandeliers that synthetic copies simply cannot match. It is an heirloom I will pass down to my daughter.',
-    product: 'Royal Banarasi Silk',
-    verified: true,
+    text: 'The Nuapatna Khadua Silk saree has remarkable drape quality. The sacred calligraphic verses and subtle gold zari feel authentic and respectful of our traditional handloom heritage. A treasured addition to my festive wardrobe.',
+    product: 'Traditional Khadua Silk Saree',
+    isDemo: true,
   },
   {
     id: 2,
-    name: 'Anita Krishnamurthy',
-    location: 'Chennai, Tamil Nadu',
+    name: 'Priyanka Sen',
+    location: 'Kolkata, West Bengal',
     rating: 5,
-    text: 'Growing up in South India, Kanjeevarams are woven into our identity. Vastra Loom’s korvai temple border weave is authentic to the highest standard. The weight of the mulberry silk and contrast pallu is pure perfection.',
-    product: 'Kanjeevaram Temple Border',
-    verified: true,
+    text: 'The Sambalpuri Bandha tie-dye alignment is flawless. The conch and chakra motifs are sharp, and the pure mulberry silk has a rich natural luster without being stiff or synthetic.',
+    product: 'Sambalpuri Ikat Handloom Saree',
+    isDemo: true,
   },
   {
     id: 3,
-    name: 'Deepika Patel',
-    location: 'Ahmedabad, Gujarat',
+    name: 'Ananya Rao',
+    location: 'Bengaluru, Karnataka',
     rating: 5,
-    text: 'Acquiring an authentic double-ikat Patola online felt daunting, but Vastra Loom exceeded every expectation. The geometric symmetry and vegetable dye radiance take months to weave, and the velvet presentation box made it unforgettable.',
-    product: 'Patola Heritage Weave',
-    verified: true,
+    text: 'Ordering an authentic Bomkai saree online made me cautious, but the detailed weave photographs and prompt pan-India delivery exceeded all expectations. The jhabba pallu craftsmanship is stunning.',
+    product: 'Traditional Bomkai Silk Saree',
+    isDemo: true,
   },
   {
     id: 4,
-    name: 'Meera Reddy',
-    location: 'Hyderabad, Telangana',
+    name: 'Rupali Patnaik',
+    location: 'New Delhi',
     rating: 5,
-    text: 'Having collected master handlooms for over twenty years, this atelier has become my premier destination. Direct artisan sourcing with verified Silk Mark credentials makes every purchase a meaningful celebration of our culture.',
-    product: 'Chanderi Emerald Dream',
-    verified: true,
+    text: 'The Phoda Kumbha temple borders on this bridal silk saree are extraordinarily detailed. The unstitched blouse piece matched the body tone perfectly, and the presentation box is heirloom grade.',
+    product: 'Wedding Heritage Silk Saree',
+    isDemo: true,
   },
 ];
 
@@ -72,7 +72,7 @@ export const Testimonials: React.FC = () => {
   const active = testimonials[currentIndex];
 
   return (
-    <section className="py-14 sm:py-16 relative overflow-hidden text-brand-ivory">
+    <section className="py-16 sm:py-20 relative overflow-hidden text-brand-ivory">
       {/* Contrast Gradients matching Hero for WCAG AA readability over 3D canvas */}
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0F0617]/95 via-[#0F0617]/80 to-[#0F0617]/95 pointer-events-none" />
 
@@ -81,96 +81,99 @@ export const Testimonials: React.FC = () => {
         <Quote className="w-[450px] h-[450px]" />
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold font-mono block mb-3">
-            Connoisseur Reviews
-          </span>
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-brand-gold/30 bg-brand-gold/10 text-brand-gold text-xs font-mono uppercase tracking-widest mb-3">
+            <MessageCircle className="w-3.5 h-3.5 text-brand-gold" />
+            <span>Demonstration Feedback • Preview</span>
+          </div>
           <h2 className="font-serif text-3xl sm:text-5xl font-bold text-brand-ivory">
-            Cherished by <span className="bg-gradient-to-r from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent italic">Patrons</span>
+            Customer <span className="bg-gradient-to-r from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent italic">Appraisals</span>
           </h2>
-          <div className="w-16 h-0.5 bg-brand-gold mx-auto mt-5 mb-4" />
-          <p className="text-sm sm:text-base text-brand-ivory/70 font-light">
-            Read intimate stories from brides, connoisseurs, and saree collectors across the globe.
+          <div className="w-16 h-0.5 bg-brand-gold mx-auto mt-4 mb-3" />
+          <p className="text-xs sm:text-sm text-brand-ivory/70 font-light">
+            Illustrative customer experiences highlighting the drape, weave details, and artistry of Khadua Looms sarees.
           </p>
         </div>
 
         {/* Testimonial Card Stage */}
-        <div className="relative bg-brand-purple-dark/85 border border-brand-gold/30 rounded-3xl p-8 sm:p-12 lg:p-16 backdrop-blur-xl shadow-2xl">
+        <div className="relative bg-gradient-to-b from-[#180828] to-[#0D0216] border border-brand-gold/30 rounded-3xl p-7 sm:p-10 lg:p-12 backdrop-blur-xl shadow-2xl">
+          <Quote className="w-10 h-10 text-brand-gold/25 mb-4" />
+
           <AnimatePresence mode="wait">
             <motion.div
               key={active.id}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-center text-center"
+              transition={{ duration: 0.4 }}
+              className="space-y-6"
             >
-              {/* Star Rating */}
-              <div className="flex items-center gap-1.5 text-brand-gold mb-6">
+              {/* Rating */}
+              <div className="flex items-center gap-1.5 text-amber-400">
                 {[...Array(active.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-brand-gold" />
+                  <Star key={i} className="w-4 h-4 fill-current" />
                 ))}
+                <span className="ml-2 text-xs font-mono text-brand-gold-light/80">5.0 / 5.0</span>
               </div>
 
-              {/* Quote Text */}
-              <blockquote className="font-serif text-lg sm:text-2xl text-brand-ivory leading-relaxed font-normal max-w-3xl italic">
-                &ldquo;{active.text}&rdquo;
-              </blockquote>
+              {/* Review Text */}
+              <p className="font-serif text-lg sm:text-xl lg:text-2xl text-white font-medium leading-relaxed italic">
+                "{active.text}"
+              </p>
 
-              {/* Author & Product Info */}
-              <div className="mt-8 pt-8 border-t border-brand-gold/15 w-full max-w-md flex flex-col items-center">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-serif font-bold text-lg text-brand-ivory">{active.name}</h4>
-                  {active.verified && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono">
-                      <CheckCircle className="w-3 h-3" /> Verified Buyer
-                    </span>
-                  )}
+              {/* Author & Product */}
+              <div className="pt-4 border-t border-brand-gold/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h4 className="font-serif font-bold text-base text-brand-gold">
+                    {active.name}
+                  </h4>
+                  <p className="text-xs text-brand-ivory/60 font-sans mt-0.5">
+                    {active.location}
+                  </p>
                 </div>
-                <p className="text-xs text-brand-ivory/60 mt-1">{active.location}</p>
-                <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-brand-gold font-mono uppercase tracking-wider">
-                  <span>Purchased:</span>
-                  <span className="font-bold underline decoration-brand-gold/40">{active.product}</span>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-brand-gold-light/90 bg-white/5 border border-brand-gold/25 px-3 py-1 rounded-full">
+                    Saree: {active.product}
+                  </span>
                 </div>
               </div>
             </motion.div>
           </AnimatePresence>
 
-          {/* Carousel Arrows */}
-          <div className="flex justify-between items-center mt-10 pt-6 border-t border-brand-gold/10">
-            <button
-              onClick={handlePrev}
-              className="p-3 rounded-full border border-brand-gold/30 text-brand-gold-light hover:bg-brand-gold/10 hover:border-brand-gold transition-colors"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            {/* Pagination Dots */}
-            <div className="flex items-center gap-2.5">
-              {testimonials.map((t, idx) => (
+          {/* Navigation Controls */}
+          <div className="flex items-center justify-between mt-8 pt-4 border-t border-brand-gold/15">
+            <div className="flex gap-2">
+              {testimonials.map((_, idx) => (
                 <button
-                  key={t.id}
+                  key={idx}
                   onClick={() => setCurrentIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    idx === currentIndex
-                      ? 'w-8 bg-brand-gold'
-                      : 'w-2 bg-brand-gold/30 hover:bg-brand-gold/60'
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${
+                    currentIndex === idx ? 'bg-brand-gold w-6' : 'bg-white/20 hover:bg-white/40'
                   }`}
-                  aria-label={`Go to slide ${idx + 1}`}
+                  aria-label={`Go to review ${idx + 1}`}
                 />
               ))}
             </div>
 
-            <button
-              onClick={handleNext}
-              className="p-3 rounded-full border border-brand-gold/30 text-brand-gold-light hover:bg-brand-gold/10 hover:border-brand-gold transition-colors"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handlePrev}
+                className="w-9 h-9 rounded-full border border-brand-gold/30 hover:border-brand-gold flex items-center justify-center text-brand-gold hover:text-white hover:bg-brand-gold/20 transition-all cursor-pointer"
+                aria-label="Previous testimonial"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleNext}
+                className="w-9 h-9 rounded-full border border-brand-gold/30 hover:border-brand-gold flex items-center justify-center text-brand-gold hover:text-white hover:bg-brand-gold/20 transition-all cursor-pointer"
+                aria-label="Next testimonial"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

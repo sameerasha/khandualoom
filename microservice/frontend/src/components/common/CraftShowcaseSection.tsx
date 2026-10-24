@@ -41,7 +41,7 @@ export const CraftShowcaseSection: React.FC<CraftShowcaseSectionProps> = ({ onEx
       tag: 'Imperial 24K Zari Core',
       title: 'Pure Silver Filaments Electroplated in 24K Yellow Gold',
       description:
-        'Vastraloom refuses synthetic polyester or copper metallic yarns. Our zari begins with a core of 98.5% pure silver drawn into microscopic ribbons thinner than human hair, electroplated in liquid 24K gold to ensure lifelong heirloom luster that never tarnishes.',
+        'Khadua Looms refuses synthetic polyester or copper metallic yarns. Our zari begins with a core of 98.5% pure silver drawn into microscopic ribbons thinner than human hair, electroplated in liquid 24K gold to ensure lifelong heirloom luster that never tarnishes.',
       highlight: 'Certified 98.5% Silver Core • Real 24K Gold Electroplate',
       badge: 'Hallmark Tested',
     },

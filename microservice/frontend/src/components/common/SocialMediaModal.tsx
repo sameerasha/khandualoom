@@ -15,10 +15,10 @@ interface SocialMediaModalProps {
 }
 
 const defaultSocials: SocialMediaItem[] = [
-  { id: 1, platform: 'instagram', url: 'https://instagram.com/vastraloom' },
-  { id: 2, platform: 'whatsapp', url: 'https://wa.me/918005559876' },
-  { id: 3, platform: 'facebook', url: 'https://facebook.com/vastraloom' },
-  { id: 4, platform: 'youtube', url: 'https://youtube.com/@vastraloom' },
+  { id: 1, platform: 'instagram', url: 'https://instagram.com/khadualooms' },
+  { id: 2, platform: 'whatsapp', url: 'https://wa.me/916742918844' },
+  { id: 3, platform: 'facebook', url: 'https://facebook.com/khadualooms' },
+  { id: 4, platform: 'youtube', url: 'https://youtube.com/@khadualooms' },
 ];
 
 export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onClose }) => {
@@ -78,10 +78,10 @@ export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onCl
           <div className="flex items-center justify-between pb-4 border-b border-brand-gold/20">
             <div>
               <h3 className="font-serif text-xl font-bold text-brand-ivory">
-                The Vastra Loom Community
+                The Khadua Looms Community
               </h3>
               <p className="text-xs text-brand-ivory/60 mt-0.5">
-                Immerse in weaver stories, bridal features & lookbooks
+                Immerse in Odisha weaver stories, lookbooks & heritage drapes
               </p>
             </div>
             <button
@@ -111,7 +111,7 @@ export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onCl
                       {item.platform}
                     </h4>
                     <span className="text-[11px] text-brand-ivory/50 font-mono">
-                      @vastraloom official
+                      @khadualooms official
                     </span>
                   </div>
                 </div>
@@ -123,7 +123,7 @@ export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onCl
 
           <div className="mt-6 pt-4 border-t border-brand-gold/15 text-center">
             <p className="text-[11px] text-brand-ivory/60 font-light italic">
-              Tag #VastraLoomRoyalty on Instagram to be featured on our digital salon.
+              Tag #KhaduaLooms on social channels to share your handloom story.
             </p>
           </div>
         </motion.div>

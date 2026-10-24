@@ -5,7 +5,7 @@ interface ProductsState {
   items: Product[];
   selectedCategory: string;
   searchQuery: string;
-  sortBy: 'featured' | 'price-low' | 'price-high' | 'rating';
+  sortBy: 'featured' | 'price-low' | 'price-high' | 'rating' | 'newest';
   selectedProduct: Product | null;
   loading: boolean;
   error: string | null;
@@ -38,7 +38,7 @@ export const productsSlice = createSlice({
     },
     setSortBy: (
       state,
-      action: PayloadAction<'featured' | 'price-low' | 'price-high' | 'rating'>
+      action: PayloadAction<'featured' | 'price-low' | 'price-high' | 'rating' | 'newest'>
     ) => {
       state.sortBy = action.payload;
     },

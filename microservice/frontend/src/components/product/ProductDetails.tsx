@@ -99,10 +99,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   // Auto-record in recent views & reset active image on product change
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('vastraloom_recent_products');
+      const stored = localStorage.getItem('khadualooms_recent_products');
       let list: Product[] = stored ? JSON.parse(stored) : [];
       list = [product, ...list.filter((p) => p.id !== product.id)].slice(0, 8);
-      localStorage.setItem('vastraloom_recent_products', JSON.stringify(list));
+      localStorage.setItem('khadualooms_recent_products', JSON.stringify(list));
     } catch {
       // Ignore storage errors
     }
@@ -165,7 +165,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
     if (navigator.share) {
       navigator.share({
         title: product.name,
-        text: `Behold this masterwork from Vastraloom: ${product.name}`,
+        text: `Behold this authentic Odisha handloom saree from Khadua Looms: ${product.name}`,
         url: window.location.href,
       }).catch(() => {});
     } else {
@@ -460,31 +460,31 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                 </div>
                 <div className="flex justify-between py-1 border-b border-brand-gold/10">
                   <span className="text-brand-ivory/60">Weaving:</span>
-                  <span className="font-semibold text-white">{product.weave || 'Interlocking Kadwa'}</span>
+                  <span className="font-semibold text-white">{product.weave || 'Odisha Handloom Weave'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Zari:</span>
-                  <span className="font-semibold text-brand-gold-light">24K Electroplated Silver Thread</span>
+                  <span className="text-brand-ivory/60">Zari / Border:</span>
+                  <span className="font-semibold text-brand-gold-light">Traditional Kumbha & Zari Accent</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Color:</span>
-                  <span className="font-semibold text-white">{product.color || 'Imperial Heritage Tone'}</span>
+                  <span className="text-brand-ivory/60">Color Tone:</span>
+                  <span className="font-semibold text-white">{product.color || 'Traditional Odisha Palette'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-brand-gold/10">
                   <span className="text-brand-ivory/60">Saree Length:</span>
-                  <span className="font-semibold text-white">5.5 Metres Standard</span>
+                  <span className="font-semibold text-white">6.3 Metres Total</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-brand-gold/10">
                   <span className="text-brand-ivory/60">Blouse Piece:</span>
-                  <span className="font-semibold text-emerald-400">Included (0.8m Silk)</span>
+                  <span className="font-semibold text-emerald-400">Included (0.8m Unstitched Matching)</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Weaving Time:</span>
-                  <span className="font-semibold text-white">18 - 24 Days Pitloom</span>
+                  <span className="text-brand-ivory/60">Origin / Cluster:</span>
+                  <span className="font-semibold text-white">Odisha Handloom Guild</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Care:</span>
-                  <span className="font-semibold text-amber-300">Dry Clean Only</span>
+                  <span className="text-brand-ivory/60">Care Instructions:</span>
+                  <span className="font-semibold text-amber-300">Dry Clean Recommended</span>
                 </div>
               </div>
             </div>
@@ -566,12 +566,12 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                 <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-3">
                   <Feather className="w-4 h-4" />
                 </div>
-                <h3 className="font-serif text-base font-bold text-white">Kadwa Weaving Tradition</h3>
+                <h3 className="font-serif text-base font-bold text-white">Authentic Odisha Bandha</h3>
                 <p className="mt-1.5 text-xs text-brand-ivory/70 leading-relaxed font-light">
-                  Every booti is separately hand-woven with pure zari shuttles, leaving zero raw floating threads on the backside.
+                  Tie-dye and extra-weft patterns woven with sacred motifs inspired by generations of culture and temple architecture.
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Varanasi Chowk Guild</span>
+              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Nuapatna & Western Odisha</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
@@ -579,12 +579,12 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                 <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-3">
                   <Clock className="w-4 h-4" />
                 </div>
-                <h3 className="font-serif text-base font-bold text-white">200+ Man Hours on Pitloom</h3>
+                <h3 className="font-serif text-base font-bold text-white">Traditional Pit Looms</h3>
                 <p className="mt-1.5 text-xs text-brand-ivory/70 leading-relaxed font-light">
-                  Two master craftsmen collaborate synchronously across the warp frame, guiding flying shuttles with millimeter accuracy.
+                  Handcrafted on indigenous wooden pit and frame looms with meticulous warp and weft alignment.
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Zero Powerloom Shortcuts</span>
+              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Pure Handloom Artistry</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
@@ -594,10 +594,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                 </div>
                 <h3 className="font-serif text-base font-bold text-white">Heirloom Preservation</h3>
                 <p className="mt-1.5 text-xs text-brand-ivory/70 leading-relaxed font-light">
-                  Delivered in our bespoke royal velvet chest lined with pure muslin to protect the zari sheen across generations.
+                  Delivered in protective packaging with muslin wrapping guidance to preserve the silk drape for years to come.
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Imperial Atelier Standard</span>
+              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Khadua Looms Standard</span>
             </div>
           </div>
         </div>
