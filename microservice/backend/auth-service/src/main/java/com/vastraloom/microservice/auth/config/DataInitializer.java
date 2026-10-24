@@ -19,11 +19,17 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${vastraloom.superadmin.email:admin@vastraloom.com}")
+    @Value("${vastraloom.superadmin.email:superadmin@vastraloom.com}")
     private String superAdminEmail;
 
     @Value("${vastraloom.superadmin.password:Admin@123456}")
     private String superAdminPassword;
+
+    @Value("${vastraloom.admin.email:admin@vastraloom.com}")
+    private String adminEmail;
+
+    @Value("${vastraloom.admin.password:Admin@123456}")
+    private String adminPassword;
 
     @Override
     @SuppressWarnings("null")
@@ -40,8 +46,8 @@ public class DataInitializer implements CommandLineRunner {
             },
             () -> {
                 User superAdmin = User.builder()
-                        .firstName("Super")
-                        .lastName("Admin")
+                        .firstName("Imperial")
+                        .lastName("SuperAdmin")
                         .email(superAdminEmail)
                         .password(passwordEncoder.encode(superAdminPassword))
                         .phone("0000000000")
@@ -56,21 +62,21 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         // 2. Safely Initialize standard Admin (Only if missing, do NOT reset password)
-        userRepository.findByEmail("admin@vastraloom.com").ifPresentOrElse(
+        userRepository.findByEmail(adminEmail).ifPresentOrElse(
             admin -> {
-                // Ensure role is correct, but do NOT touch the password
+                // Ensure role is correct
                 if (!"ROLE_ADMIN".equals(admin.getRole())) {
                     admin.setRole("ROLE_ADMIN");
                     userRepository.save(admin);
                 }
-                log.info("Standard Admin account already exists. Preserving custom password.");
+                log.info("Standard Admin account already exists: {}", adminEmail);
             },
             () -> {
                 User admin = User.builder()
-                        .firstName("Store")
+                        .firstName("Atelier")
                         .lastName("Admin")
-                        .email("admin@vastraloom.com")
-                        .password(passwordEncoder.encode("admin123"))
+                        .email(adminEmail)
+                        .password(passwordEncoder.encode(adminPassword))
                         .phone("9999999999")
                         .role("ROLE_ADMIN")
                         .emailVerified(true)
@@ -78,7 +84,7 @@ public class DataInitializer implements CommandLineRunner {
                         .provider(AuthProvider.local)
                         .build();
                 userRepository.save(admin);
-                log.info("Default Standard Admin account created: admin@vastraloom.com / admin123");
+                log.info("Default Standard Admin account created: {} / Admin@123456", adminEmail);
             }
         );
     }

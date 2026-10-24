@@ -1222,6 +1222,10 @@
    RESPONSIVE DESIGN (Matching Root Frontend)
    ========================================================= */
 @media (max-width: 900px) {
+  .admin-sidebar-toggle-btn {
+    display: none !important;
+  }
+
   .admin-sidebar {
     width: 72px;
     overflow: hidden;

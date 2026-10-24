@@ -18,7 +18,7 @@ import { ContactPage } from '@/components/common/ContactPage';
 import { LegalModal, LegalDocType } from '@/components/common/LegalModal';
 import { SocialMediaModal } from '@/components/common/SocialMediaModal';
 import { OAuth2RedirectHandler } from '@/components/auth/OAuth2RedirectHandler';
-import { SmoothScrollProvider } from '@/components/common/SmoothScrollProvider';
+import { SmoothScrollProvider, scrollToTopImmediate } from '@/components/common/SmoothScrollProvider';
 import { CinematicLoomCanvas } from '@/components/3d/CinematicLoomCanvas';
 import { Product } from '@/types';
 import { useAppDispatch } from '@/app/hooks';
@@ -80,17 +80,13 @@ export const App: React.FC = () => {
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
     setCurrentView('product');
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    scrollToTopImmediate();
   };
 
   const handleNavigateHome = () => {
     setCurrentView('store');
     setSelectedProduct(null);
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    scrollToTopImmediate();
   };
 
   return (

@@ -24,6 +24,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { addToCart, setCartOpen } from '@/features/cart/cartSlice';
 import { useGetProductsQuery } from '@/features/products/productsApi';
 import { fallbackProducts } from '@/data/fallbackProducts';
+import { scrollToTopImmediate } from '@/components/common/SmoothScrollProvider';
 
 interface ProductDetailsProps {
   product: Product;
@@ -86,9 +87,13 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
   // Guarantee viewport always starts from the absolute top before paint
   useLayoutEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    scrollToTopImmediate();
+    const af = requestAnimationFrame(scrollToTopImmediate);
+    const t = setTimeout(scrollToTopImmediate, 60);
+    return () => {
+      cancelAnimationFrame(af);
+      clearTimeout(t);
+    };
   }, [product.id]);
 
   // Auto-record in recent views & reset active image on product change
@@ -102,18 +107,24 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
       // Ignore storage errors
     }
     setActiveImage(product.image || '/images/saree_crimson_red.png');
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    scrollToTopImmediate();
   }, [product]);
 
-  // Curated gallery angles
-  const galleryImages = [
-    product.image || '/images/saree_crimson_red.png',
-    '/images/saree_master_pallu.png',
-    '/images/saree_master_border.png',
-    '/images/saree_master_back.png',
-  ];
+  // Curated gallery angles (uses product.images up to 5 angles if present, else fallback master angles)
+  const galleryImages = useMemo(() => {
+    if (product.images && product.images.length > 0) {
+      const extracted = product.images
+        .map((img) => (typeof img === 'string' ? img : (img as any).imageUrl || ''))
+        .filter((url) => typeof url === 'string' && url.trim().length > 0);
+      if (extracted.length > 0) return extracted.slice(0, 5);
+    }
+    return [
+      product.image || '/images/saree_crimson_red.png',
+      '/images/saree_master_pallu.png',
+      '/images/saree_master_border.png',
+      '/images/saree_master_back.png',
+    ];
+  }, [product]);
 
   // Mouse move zoom handler (Desktop fine pointer only)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

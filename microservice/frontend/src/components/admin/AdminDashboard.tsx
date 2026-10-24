@@ -9,6 +9,10 @@ import {
 } from '@/features/products/productsApi';
 import { Product } from '@/types';
 import { fallbackProducts } from '@/data/fallbackProducts';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { useLoginMutation } from '@/features/auth/authApi';
+import { setCredentials } from '@/features/auth/authSlice';
+import { Shield, ArrowLeft, Sparkles, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { AdminLayout } from './AdminLayout';
 import { AdminDashboardView } from './AdminDashboardView';
 import { ProductManagerView } from './ProductManagerView';
@@ -24,6 +28,17 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore }) => {
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, role } = useAppSelector((state) => state.auth);
+  const isAdminUser = isAuthenticated && (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN');
+
+  const [loginMutation, { isLoading: isLoggingIn }] = useLoginMutation();
+  const [adminEmail, setAdminEmail] = useState('superadmin@vastraloom.com');
+  const [adminPassword, setAdminPassword] = useState('Admin@123456');
+  const [selectedRoleType, setSelectedRoleType] = useState<'super' | 'admin'>('super');
+  const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   // Orders API
@@ -258,6 +273,158 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       ]);
     }
   };
+
+  const handleAdminLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    try {
+      const res = await loginMutation({ email: adminEmail.trim(), password: adminPassword }).unwrap();
+      if (res.role !== 'ROLE_ADMIN' && res.role !== 'ROLE_SUPER_ADMIN') {
+        setAuthError('Access restricted. This account does not possess administrator credentials.');
+        return;
+      }
+      dispatch(setCredentials(res));
+    } catch (err: any) {
+      setAuthError(err?.data?.message || err?.data || 'Invalid credentials. Please verify administrator email and password.');
+    }
+  };
+
+  if (!isAdminUser) {
+    return (
+      <div className="min-h-screen bg-[#07020C] text-brand-ivory flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+        {/* Background Ambient Glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-gold/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#3B154C]/30 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* Back to Boutique Button */}
+        <div className="w-full max-w-md mb-6 flex justify-between items-center z-10">
+          <button
+            onClick={onBackToStore}
+            className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-brand-gold-light/80 hover:text-brand-gold transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return to Boutique</span>
+          </button>
+          <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold/60">
+            Vault Protocol v2.4
+          </span>
+        </div>
+
+        {/* Main Vault Gate Card */}
+        <div className="w-full max-w-md bg-gradient-to-b from-[#180A26] via-[#10031B] to-[#0D0216] border border-brand-gold/40 rounded-3xl p-7 sm:p-9 shadow-[0_20px_70px_rgba(0,0,0,0.9)] relative z-10">
+          <div className="text-center space-y-2 mb-7">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-gold/15 border border-brand-gold/40 text-brand-gold mb-2 shadow-inner">
+              <Shield className="w-7 h-7" />
+            </div>
+            <h2 className="font-serif text-2xl font-bold tracking-wide text-white">
+              Vastraloom Atelier Vault
+            </h2>
+            <p className="text-xs text-brand-ivory/70 font-sans leading-relaxed">
+              Administrative authentication portal for Super Administrators & Atelier Managers.
+            </p>
+          </div>
+
+          {/* Role Presets Toggle */}
+          <div className="grid grid-cols-2 gap-2 p-1 bg-black/40 rounded-xl border border-brand-gold/20 mb-6">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedRoleType('super');
+                setAdminEmail('superadmin@vastraloom.com');
+                setAdminPassword('Admin@123456');
+                setAuthError(null);
+              }}
+              className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+                selectedRoleType === 'super'
+                  ? 'bg-gradient-to-r from-brand-gold to-brand-gold-dark text-brand-purple-dark font-bold shadow-md'
+                  : 'text-brand-ivory/60 hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Super Admin</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedRoleType('admin');
+                setAdminEmail('admin@vastraloom.com');
+                setAdminPassword('Admin@123456');
+                setAuthError(null);
+              }}
+              className={`py-2 px-3 rounded-lg text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+                selectedRoleType === 'admin'
+                  ? 'bg-gradient-to-r from-brand-gold to-brand-gold-dark text-brand-purple-dark font-bold shadow-md'
+                  : 'text-brand-ivory/60 hover:text-white'
+              }`}
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>Store Admin</span>
+            </button>
+          </div>
+
+          {authError && (
+            <div className="p-3 mb-5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs text-center font-sans">
+              {authError}
+            </div>
+          )}
+
+          <form onSubmit={handleAdminLoginSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-1.5">
+                Admin Email ID
+              </label>
+              <input
+                type="email"
+                required
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                placeholder="admin@vastraloom.com"
+                className="w-full bg-[#07010E] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-1.5">
+                Vault Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full bg-[#07010E] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-brand-ivory/50 hover:text-brand-gold transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="w-full mt-2 py-3.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark font-serif font-bold text-sm tracking-wider uppercase transition-all shadow-lg hover:shadow-brand-gold/20 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+            >
+              {isLoggingIn ? 'Authenticating Credentials...' : 'Unlock Admin Atelier'}
+            </button>
+          </form>
+
+          <div className="mt-6 pt-5 border-t border-brand-gold/15 text-center">
+            <p className="text-[11px] text-brand-ivory/50 font-mono">
+              Role credentials verified via Spring Boot 3.3 Auth Microservice JWKS.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AdminLayout

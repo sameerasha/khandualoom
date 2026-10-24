@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Plus, Trash2, Sparkles, ChevronDown } from 'lucide-react';
+import { X, Trash2, Sparkles, ChevronDown, Upload } from 'lucide-react';
 import { Product } from '@/types';
 
 interface ProductEditorModalProps {
@@ -14,6 +14,14 @@ interface ProductEditorModalProps {
 
 const CATEGORIES = ['Banarasi', 'Kanjeevaram', 'Chanderi', 'Tussar', 'Patola', 'Paithani', 'Mysore'];
 const BADGES = ['Bestseller', 'Premium', 'Exclusive', 'Heirloom', 'New Arrival', 'Trending', 'Popular', 'Limited Edition'];
+
+const ANGLE_METADATA = [
+  { id: 1, name: 'Angle 1 (Cover)', label: 'Master Front View / Catalog Cover', placeholder: 'https://... or /images/saree_front.png' },
+  { id: 2, name: 'Angle 2 (Pallu)', label: 'Pallu & Grand Zari Artistry', placeholder: 'https://... or /images/saree_pallu.png' },
+  { id: 3, name: 'Angle 3 (Border)', label: 'Border & Selvedge Close-Up', placeholder: 'https://... or /images/saree_border.png' },
+  { id: 4, name: 'Angle 4 (Pleats)', label: 'Pleats & Drape Silhouette', placeholder: 'https://... or /images/saree_pleats.png' },
+  { id: 5, name: 'Angle 5 (Detail)', label: 'Blouse Piece & Reverse Texture', placeholder: 'https://... or /images/saree_blouse.png' },
+];
 
 export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
   isOpen,
@@ -36,15 +44,25 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     images: ['/images/saree_purple_gold.png'],
   });
 
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [angleSlots, setAngleSlots] = useState<string[]>(['', '', '', '', '']);
 
   useEffect(() => {
+    const slots = ['', '', '', '', ''];
     if (product) {
+      if (product.images && product.images.length > 0) {
+        product.images.slice(0, 5).forEach((img, idx) => {
+          slots[idx] = typeof img === 'string' ? img : (img as any).imageUrl || '';
+        });
+      }
+      if (!slots[0] && product.image) {
+        slots[0] = product.image;
+      }
       setFormData({
         ...product,
-        images: product.images && product.images.length > 0 ? [...product.images] : [product.image || '/images/saree_purple_gold.png'],
+        images: slots.filter((s) => s.trim().length > 0),
       });
     } else {
+      slots[0] = '/images/saree_purple_gold.png';
       setFormData({
         name: '',
         category: 'Banarasi',
@@ -59,6 +77,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
         images: ['/images/saree_purple_gold.png'],
       });
     }
+    setAngleSlots(slots);
   }, [product, isOpen]);
 
   if (!isOpen) return null;
@@ -71,26 +90,74 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
     }));
   };
 
-  const handleAddImage = () => {
-    if (newImageUrl.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        images: [...(prev.images || []), newImageUrl.trim()],
+  const handleAngleUrlChange = (index: number, url: string) => {
+    setAngleSlots((prev) => {
+      const updated = [...prev];
+      updated[index] = url;
+      const validImages = updated.filter((u) => u.trim().length > 0);
+      setFormData((f) => ({
+        ...f,
+        image: updated[0] || validImages[0] || f.image || '',
+        images: validImages,
       }));
-      setNewImageUrl('');
-    }
+      return updated;
+    });
   };
 
-  const handleRemoveImage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: (prev.images || []).filter((_, i) => i !== index),
-    }));
+  const handleAngleFileUpload = (index: number, file: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (!dataUrl) return;
+
+      const img = new Image();
+      img.onload = () => {
+        const maxDimension = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          handleAngleUrlChange(index, compressedDataUrl);
+        } else {
+          handleAngleUrlChange(index, dataUrl);
+        }
+      };
+      img.onerror = () => {
+        handleAngleUrlChange(index, dataUrl);
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearAngle = (index: number) => {
+    handleAngleUrlChange(index, '');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave(formData);
+    const validImages = angleSlots.filter((u) => u.trim().length > 0);
+    const finalCover = angleSlots[0] || validImages[0] || formData.image || '/images/saree_purple_gold.png';
+    await onSave({
+      ...formData,
+      image: finalCover,
+      images: validImages.length > 0 ? validImages : [finalCover],
+    });
   };
 
   if (typeof document === 'undefined') return null;
@@ -303,84 +370,116 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               />
             </div>
 
-            {/* Section 4: Imagery Showcase */}
+            {/* Section 4: Imagery Showcase (5 Curated Angles with Direct Upload & URL) */}
             <div className="p-5 rounded-2xl bg-white/[0.02] border border-brand-gold/15 space-y-4">
-              <div className="text-xs font-mono uppercase tracking-wider text-brand-gold/90 border-b border-white/5 pb-2 flex items-center justify-between">
-                <span>4. Master Showcase & Lookbook Angles</span>
-                <span className="text-[10px] text-brand-ivory/50 font-normal">
-                  {formData.images?.length || 1} Total Angles
-                </span>
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
-                  Primary Catalog Cover URL *
-                </label>
-                <div className="flex gap-3 items-center">
-                  <input
-                    type="text"
-                    name="image"
-                    value={formData.image || ''}
-                    onChange={handleChange}
-                    required
-                    placeholder="/images/saree_purple_gold.png"
-                    className="flex-1 bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none transition-colors"
-                  />
-                  {formData.image && (
-                    <div className="w-14 h-14 rounded-xl border border-brand-gold/40 overflow-hidden shrink-0 bg-black shadow-md">
-                      <img src={formData.image} alt="Cover Preview" className="w-full h-full object-cover" />
-                    </div>
-                  )}
+              <div className="border-b border-white/5 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-brand-gold/90 flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+                    <span>4. Master Showcase Angles (Up to 5 Angles)</span>
+                  </h4>
+                  <p className="text-[11px] text-brand-ivory/60 mt-0.5 font-sans">
+                    Upload image files directly or paste valid HTTP/HTTPS URLs for each perspective of the drape.
+                  </p>
+                </div>
+                <div className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold-light w-fit">
+                  {angleSlots.filter((s) => s.trim().length > 0).length} / 5 Angles Configured
                 </div>
               </div>
 
-              {/* Additional Angles */}
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/70 mb-2">
-                  Add Additional Angle URL
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    placeholder="Paste angle image path (e.g. /images/saree_detail_pallu.png)"
-                    className="flex-1 bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-xl px-4 py-2 text-xs text-white placeholder-white/30 focus:outline-none transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddImage}
-                    className="px-4 py-2 rounded-xl bg-brand-gold/20 hover:bg-brand-gold/30 border border-brand-gold/40 text-brand-gold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Attach</span>
-                  </button>
-                </div>
+              {/* 5 Dedicated Angle Cards */}
+              <div className="space-y-3.5">
+                {ANGLE_METADATA.map((angle, idx) => {
+                  const currentUrl = angleSlots[idx] || '';
+                  const hasImage = currentUrl.trim().length > 0;
 
-                {formData.images && formData.images.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                    {formData.images.map((img, i) => (
-                      <div
-                        key={i}
-                        className="relative group rounded-xl border border-brand-gold/25 overflow-hidden h-24 bg-black shadow-md"
-                      >
-                        <img
-                          src={typeof img === 'string' ? img : (img as any).imageUrl}
-                          alt={`Angle ${i}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(i)}
-                          className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/80 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-950"
-                          title="Remove Angle"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                  return (
+                    <div
+                      key={angle.id}
+                      className={`p-3.5 rounded-xl border transition-all ${
+                        hasImage
+                          ? 'bg-black/40 border-brand-gold/35 shadow-sm'
+                          : 'bg-black/20 border-white/10 hover:border-brand-gold/25'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-brand-gold/20 text-brand-gold border border-brand-gold/30">
+                            {angle.name}
+                          </span>
+                          <span className="text-xs text-brand-ivory font-medium font-serif">
+                            {angle.label}
+                          </span>
+                        </div>
+                        {hasImage && (
+                          <button
+                            type="button"
+                            onClick={() => handleClearAngle(idx)}
+                            className="text-[11px] text-red-400/80 hover:text-red-300 flex items-center gap-1 self-start sm:self-auto transition-colors"
+                            title="Remove this angle"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Clear Angle</span>
+                          </button>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
+
+                      <div className="flex items-start gap-3.5">
+                        {/* Live Image Preview / Empty Slot */}
+                        <div className="w-20 h-24 sm:w-24 sm:h-28 rounded-xl border border-brand-gold/30 bg-[#0E0518] overflow-hidden shrink-0 flex items-center justify-center relative group shadow-md">
+                          {hasImage ? (
+                            <img
+                              src={currentUrl}
+                              alt={angle.label}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-2 text-center text-brand-ivory/30">
+                              <Upload className="w-5 h-5 mb-1 text-brand-gold/40" />
+                              <span className="text-[9px] font-mono uppercase">Empty</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Dual Input Controls: File Upload + URL Input */}
+                        <div className="flex-1 space-y-2.5">
+                          {/* Upload File Button */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-gold/15 hover:bg-brand-gold/25 border border-brand-gold/40 text-brand-gold text-xs font-mono uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98]">
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>{hasImage ? 'Replace Image File' : 'Upload Image File'}</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleAngleFileUpload(idx, file);
+                                }}
+                                className="hidden"
+                              />
+                            </label>
+                            <span className="text-[10px] text-brand-ivory/40 font-mono">
+                              PNG, JPG, WebP (Instant Preview)
+                            </span>
+                          </div>
+
+                          {/* HTTP URL input */}
+                          <div>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                value={currentUrl}
+                                onChange={(e) => handleAngleUrlChange(idx, e.target.value)}
+                                placeholder={angle.placeholder}
+                                className="w-full bg-[#0E0518] border border-brand-gold/25 focus:border-brand-gold rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/25 focus:outline-none transition-colors font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

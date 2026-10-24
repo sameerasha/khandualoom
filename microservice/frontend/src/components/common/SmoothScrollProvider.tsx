@@ -8,6 +8,19 @@ interface SmoothScrollProviderProps {
   enabled?: boolean;
 }
 
+export const scrollToTopImmediate = () => {
+  if (typeof window !== 'undefined') {
+    if ((window as any).__lenis) {
+      try {
+        (window as any).__lenis.scrollTo(0, { immediate: true });
+      } catch {}
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+};
+
 export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
   children,
   enabled = true,
@@ -24,6 +37,8 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
       wheelMultiplier: 0.9,
     });
 
+    (window as any).__lenis = lenis;
+
     let animationFrameId: number;
 
     const raf = (time: number) => {
@@ -36,6 +51,7 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameId);
       lenis.destroy();
+      delete (window as any).__lenis;
     };
   }, [reducedMotion, enabled]);
 

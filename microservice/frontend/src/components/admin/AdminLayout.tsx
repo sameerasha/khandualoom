@@ -193,7 +193,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             </div>
           </button>
           <button
-            className="admin-sidebar-toggle-btn"
+            className="admin-sidebar-toggle-btn hidden md:flex"
             onClick={toggleSidebar}
             title={isCollapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'}
             aria-label="Toggle navigation width"

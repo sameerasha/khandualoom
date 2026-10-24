@@ -152,6 +152,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   // Quick Demo fill buttons for hassle-free evaluation
+  const handleQuickFillSuperAdmin = () => {
+    setEmail('superadmin@vastraloom.com');
+    setPassword('Admin@123456');
+    setFieldErrors({});
+  };
+
   const handleQuickFillAdmin = () => {
     setEmail('admin@vastraloom.com');
     setPassword('Admin@123456');
@@ -574,7 +580,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     {/* Quick Demo Credentials Bar */}
                     <div className="auth-quick-fill-bar">
                       <span className="text-brand-ivory/60">Demo Quick Fill:</span>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={handleQuickFillSuperAdmin}
+                          className="auth-quick-fill-btn border-brand-gold/60 text-brand-gold"
+                          title="Fill Super Administrator Credentials"
+                        >
+                          Super Admin
+                        </button>
                         <button
                           type="button"
                           onClick={handleQuickFillAdmin}
