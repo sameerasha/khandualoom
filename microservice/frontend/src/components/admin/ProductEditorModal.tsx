@@ -269,6 +269,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           </span>
         </div>
 
+        {/* Saree Title and Weave Tradition */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Saree Title */}
           <div className="lg:col-span-7">
@@ -312,6 +313,73 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             <p className="text-[11px] text-brand-gold/70 font-mono mt-1.5">
               Origin: {CATEGORIES.find((c) => c.name === formData.category)?.region || 'Indian Handloom Enclave'}
             </p>
+          </div>
+        </div>
+
+        {/* Instant Primary Cover Image & Dropzone (Prominently displayed right in Phase 01) */}
+        <div
+          onDragOver={(e) => handleAngleDragOver(e, 0)}
+          onDragEnter={(e) => handleAngleDragOver(e, 0)}
+          onDragLeave={(e) => handleAngleDragLeave(e, 0)}
+          onDrop={(e) => handleAngleDrop(e, 0)}
+          className={`p-4 rounded-2xl border-2 transition-all relative overflow-hidden ${
+            dragOverIndex === 0
+              ? 'border-brand-gold bg-brand-gold/25 shadow-[0_0_30px_rgba(223,191,122,0.4)] ring-2 ring-brand-gold/60 scale-[1.01]'
+              : 'border-dashed border-brand-gold/40 bg-[#0E0418]/90 hover:border-brand-gold/70'
+          }`}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-20 sm:w-20 sm:h-24 rounded-xl border border-brand-gold/45 bg-black/60 overflow-hidden shrink-0 relative group shadow-md">
+                <img
+                  src={angleSlots[0] || formData.image || '/images/saree_purple_gold.png'}
+                  alt="Cover Preview"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/images/saree_purple_gold.png';
+                  }}
+                />
+                {dragOverIndex === 0 && (
+                  <div className="absolute inset-0 bg-brand-purple-dark/85 backdrop-blur-xs flex flex-col items-center justify-center text-brand-gold text-center p-1 z-10">
+                    <Upload className="w-5 h-5 mb-1 animate-bounce" />
+                    <span className="text-[9px] font-mono font-bold uppercase">Drop Cover</span>
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold px-2 py-0.5 rounded bg-brand-gold/15 border border-brand-gold/30">
+                    PRIMARY CATALOG COVER PHOTO
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-mono">Storefront Anchor</span>
+                </div>
+                <h4 className="font-serif font-bold text-white text-sm sm:text-base mt-1">
+                  Cover Image & 3D Web Canvas Drape
+                </h4>
+                <p className="text-[11px] text-brand-ivory/60 font-sans mt-0.5">
+                  Drag and drop a photo directly onto this card, or click the button to browse your device.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto shrink-0">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-amber-400 text-brand-purple-dark text-xs font-mono font-bold uppercase tracking-wider shadow-md shadow-brand-gold/25 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                <Upload className="w-4 h-4" />
+                <span>Upload Cover Photo</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleAngleFileUpload(0, file);
+                  }}
+                  className="hidden"
+                />
+              </label>
+              <div className="text-[10px] text-brand-gold/80 font-mono px-2 py-1 rounded bg-black/40 border border-brand-gold/20">
+                Or Drag & Drop file
+              </div>
+            </div>
           </div>
         </div>
 
@@ -548,30 +616,55 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           onDragEnter={handleMasterDragOver}
           onDragLeave={handleMasterDragLeave}
           onDrop={handleMasterDrop}
-          className={`p-5 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center relative overflow-hidden ${
+          className={`p-6 sm:p-7 rounded-3xl border-2 border-dashed transition-all text-center relative overflow-hidden ${
             isMasterDragOver
-              ? 'border-brand-gold bg-brand-gold/25 shadow-[0_0_35px_rgba(223,191,122,0.35)] scale-[1.01]'
-              : 'border-brand-gold/30 bg-black/30 hover:border-brand-gold/60 hover:bg-black/40'
+              ? 'border-brand-gold bg-brand-gold/25 shadow-[0_0_40px_rgba(223,191,122,0.4)] scale-[1.01]'
+              : 'border-brand-gold/40 bg-[#0E0418]/90 hover:border-brand-gold/70 hover:bg-[#120520]'
           }`}
         >
-          <div className="flex flex-col items-center justify-center gap-2">
-            <div className="w-11 h-11 rounded-2xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
-              <Upload className={`w-5 h-5 transition-transform ${isMasterDragOver ? '-translate-y-1 scale-110 text-amber-300' : ''}`} />
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-gold/25 via-brand-purple to-brand-gold/10 border border-brand-gold/40 flex items-center justify-center text-brand-gold shadow-md">
+              <Upload className={`w-7 h-7 transition-transform ${isMasterDragOver ? '-translate-y-1 scale-110 text-amber-300' : ''}`} />
             </div>
             <div>
-              <div className="font-serif font-bold text-sm sm:text-base text-white">
-                {isMasterDragOver ? 'Drop Photos Now to Populate Angles' : 'Drag & Drop Saree Perspectives Here'}
-              </div>
-              <p className="text-xs text-brand-ivory/60 mt-0.5 font-sans max-w-lg mx-auto">
-                Drop multiple image files at once to automatically populate Angle 1 to 5 in sequence, or drag photos directly into individual perspective cards below.
+              <h4 className="font-serif font-bold text-base sm:text-lg text-white">
+                {isMasterDragOver ? 'Drop Saree Photos Now!' : 'Upload or Drag & Drop Multiple Saree Photos'}
+              </h4>
+              <p className="text-xs text-brand-ivory/60 mt-1 font-sans max-w-lg mx-auto leading-relaxed">
+                Drag multiple image files at once from your folder, or click the button below. Photos will automatically populate Angle 1 (Cover), Angle 2 (Pallu), Angle 3 (Border), Angle 4 (Pleats), and Angle 5 (Lookbook).
               </p>
             </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-amber-400 text-brand-purple-dark text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-brand-gold/25 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                <Upload className="w-4 h-4" />
+                <span>Browse Files from Device</span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length > 0) {
+                      files.slice(0, 5).forEach((file, idx) => {
+                        handleAngleFileUpload(idx, file);
+                      });
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+              <span className="text-xs text-brand-ivory/50 font-mono">
+                or drag & drop files here
+              </span>
+            </div>
+
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-brand-ivory/60">
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-brand-ivory/60">
                 PNG, JPG, WebP supported
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-gold/10 border border-brand-gold/20 text-brand-gold font-bold">
-                Drag & Drop Ready
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold">
+                Auto-Compressed to 1200px Max
               </span>
             </div>
           </div>
@@ -591,9 +684,9 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                 onDragEnter={(e) => handleAngleDragOver(e, idx)}
                 onDragLeave={(e) => handleAngleDragLeave(e, idx)}
                 onDrop={(e) => handleAngleDrop(e, idx)}
-                className={`p-4 rounded-2xl border transition-all relative overflow-hidden ${
+                className={`p-4 sm:p-5 rounded-2xl border transition-all relative overflow-hidden ${
                   isDraggingOverThis
-                    ? 'border-brand-gold bg-brand-gold/20 shadow-[0_0_30px_rgba(223,191,122,0.4)] ring-2 ring-brand-gold/60 scale-[1.01]'
+                    ? 'border-brand-gold bg-brand-gold/20 shadow-[0_0_35px_rgba(223,191,122,0.4)] ring-2 ring-brand-gold/60 scale-[1.01]'
                     : hasImage
                     ? 'bg-[#10051C]/90 border-brand-gold/40 shadow-[0_4px_20px_rgba(0,0,0,0.3)]'
                     : 'bg-black/25 border-white/10 hover:border-brand-gold/30'
@@ -625,11 +718,11 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                     {hasImage ? (
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-center gap-1">
                         <Check className="w-3 h-3" />
-                        Active
+                        Active Angle
                       </span>
                     ) : (
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-brand-ivory/40">
-                        Drag or Upload Image
+                        Upload or Drag File
                       </span>
                     )}
                     {hasImage && (
@@ -674,9 +767,9 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                   {/* Dual Controls: File Upload & URL */}
                   <div className="flex-1 space-y-3">
                     <div className="flex flex-wrap items-center gap-2.5">
-                      <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-transparent hover:from-brand-gold/30 hover:to-brand-gold/20 border border-brand-gold/45 text-brand-gold text-xs font-mono uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm">
+                      <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-gold/25 via-brand-gold/15 to-transparent hover:from-brand-gold/35 hover:to-brand-gold/25 border border-brand-gold/50 text-brand-gold text-xs font-mono font-bold uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm">
                         <Upload className="w-3.5 h-3.5" />
-                        <span>{hasImage ? 'Replace Image File' : 'Upload or Drag File'}</span>
+                        <span>{hasImage ? 'Replace Image File' : 'Upload Image File'}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -687,12 +780,15 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                           className="hidden"
                         />
                       </label>
-                      <span className="text-[11px] text-brand-ivory/50 font-mono">
-                        Drag & drop photo directly onto this card
+                      <span className="text-[11px] text-brand-gold-light/80 font-mono">
+                        • Drag & drop photo directly onto this card
                       </span>
                     </div>
 
-                    <div className="relative">
+                    <div>
+                      <label className="block text-[10px] font-mono uppercase tracking-wider text-brand-ivory/60 mb-1">
+                        Or Enter Image URL (HTTP / HTTPS):
+                      </label>
                       <input
                         type="text"
                         value={currentUrl}

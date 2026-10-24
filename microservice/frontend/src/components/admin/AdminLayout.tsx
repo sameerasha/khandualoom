@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, ChevronRight, Crown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout } from '@/features/auth/authSlice';
 import { AdminBackground3D } from './AdminBackground3D';
@@ -11,6 +11,15 @@ interface AdminLayoutProps {
   onBackToStore: () => void;
   children: React.ReactNode;
 }
+
+const ROUTE_LABELS: Record<string, { title: string; subtitle: string }> = {
+  dashboard: { title: 'Dashboard', subtitle: 'Atelier Overview' },
+  products: { title: 'Products', subtitle: 'Masterpiece Catalog' },
+  users: { title: 'Customers', subtitle: 'Patron Registry' },
+  orders: { title: 'Orders', subtitle: 'Imperial Dispatches' },
+  settings: { title: 'Social Media', subtitle: 'Atelier Broadcast' },
+  admins: { title: 'Administrators', subtitle: 'Vault Governance' },
+};
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
   currentRoute,
@@ -357,9 +366,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         {/* Sticky Topbar above Content */}
         <div className="admin-topbar">
           <div className="flex items-center gap-3">
+            {/* Collapse button: strictly hidden on mobile view per design requirements */}
             <button
               onClick={toggleSidebar}
-              className="admin-topbar-toggle-btn"
+              className="admin-topbar-toggle-btn hidden md:inline-flex"
               title={isCollapsed ? 'Expand navigation sidebar (Ctrl+B)' : 'Collapse navigation sidebar (Ctrl+B)'}
             >
               {isCollapsed ? (
@@ -374,12 +384,31 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 </>
               )}
             </button>
-            <div className="hidden sm:flex items-center gap-2 text-xs text-brand-ivory/60 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-gold/60" />
-              <span>Atelier Command</span>
-              <span>/</span>
-              <span className="capitalize text-brand-gold font-semibold">{currentRoute}</span>
-            </div>
+
+            {/* Enhanced Royal Breadcrumb (Device-Friendly across Desktop & Mobile) */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => onNavigate('dashboard')}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-brand-gold/40 text-xs font-mono text-brand-ivory/80 hover:text-white transition-all cursor-pointer group shadow-xs"
+                title="Atelier Central Vault"
+              >
+                <Crown className="w-3.5 h-3.5 text-brand-gold group-hover:scale-110 transition-transform" />
+                <span className="font-serif font-bold text-brand-gold-light">Atelier</span>
+              </button>
+
+              <ChevronRight className="w-3.5 h-3.5 text-brand-gold/40 shrink-0" />
+
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-transparent border border-brand-gold/40 text-xs font-mono shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="capitalize font-bold text-white tracking-wide">
+                  {ROUTE_LABELS[currentRoute]?.title || currentRoute}
+                </span>
+                <span className="hidden lg:inline text-[10px] text-brand-gold-light/70 font-sans border-l border-brand-gold/30 pl-2 ml-1">
+                  {ROUTE_LABELS[currentRoute]?.subtitle || 'Active Module'}
+                </span>
+              </div>
+            </nav>
           </div>
 
           <div className="flex items-center gap-4">

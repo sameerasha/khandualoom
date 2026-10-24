@@ -333,6 +333,12 @@
   transition: all 0.2s ease;
 }
 
+@media (max-width: 768px) {
+  .admin-topbar-toggle-btn {
+    display: none !important;
+  }
+}
+
 .admin-topbar-toggle-btn:hover {
   background: rgba(223, 191, 122, 0.18);
   border-color: rgba(223, 191, 122, 0.5);

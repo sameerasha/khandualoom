@@ -288,7 +288,7 @@ export const AtelierMetricsPanel: React.FC<AtelierMetricsPanelProps> = ({ produc
             </div>
           </div>
 
-          {/* Interactive Tradition Pill Grid */}
+          {/* Interactive Tradition Pill Grid - Elevated Luxury Swatch Design without bar icon */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {donutSlices.map((cat, idx) => {
               const isSelected = selectedCategory === cat.name;
@@ -297,37 +297,35 @@ export const AtelierMetricsPanel: React.FC<AtelierMetricsPanelProps> = ({ produc
                   key={idx}
                   type="button"
                   onClick={() => setSelectedCategory(isSelected ? null : cat.name)}
-                  className={`p-3 rounded-xl border text-left transition-all ${
+                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
                     isSelected
-                      ? 'bg-brand-gold/15 border-brand-gold shadow-[0_0_15px_rgba(223,191,122,0.2)] ring-1 ring-brand-gold/60'
-                      : 'bg-white/[0.02] border-white/5 hover:border-brand-gold/30 hover:bg-white/[0.04]'
+                      ? 'bg-gradient-to-br from-brand-gold/20 via-brand-purple/40 to-brand-gold/5 border-brand-gold shadow-[0_0_20px_rgba(223,191,122,0.25)] ring-1 ring-brand-gold/60 scale-[1.02]'
+                      : 'bg-white/[0.03] border-white/10 hover:border-brand-gold/40 hover:bg-white/[0.06]'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1.5 truncate">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 truncate">
                       <div
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm border border-white/20"
                         style={{ backgroundColor: cat.color }}
                       />
-                      <span className="text-xs font-semibold text-white truncate font-serif">
+                      <span className="text-xs font-bold text-white truncate font-serif">
                         {cat.name}
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] text-brand-gold font-bold">
+                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-brand-gold/15 text-brand-gold font-bold border border-brand-gold/30">
                       {cat.pct}%
                     </span>
                   </div>
 
-                  <div className="w-full bg-white/10 rounded-full h-1 overflow-hidden my-1.5">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${cat.pct}%`, backgroundColor: cat.color }}
-                    />
+                  {/* Clean Provenance & Artisan Info (Clean & Refined without bar) */}
+                  <div className="text-[10px] text-brand-ivory/60 font-sans truncate mb-2">
+                    {cat.meta.region}
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] font-mono text-brand-ivory/50">
-                    <span>{cat.count} drapes</span>
-                    <span className="text-emerald-400">GI Tag</span>
+                  <div className="flex items-center justify-between text-[10px] font-mono border-t border-white/5 pt-2">
+                    <span className="text-brand-ivory/70">{cat.count} drapes</span>
+                    <span className="text-emerald-400 font-semibold">✓ Handloom</span>
                   </div>
                 </button>
               );

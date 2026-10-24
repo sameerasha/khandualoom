@@ -16,6 +16,8 @@ import {
   X,
   UserCheck,
   Check,
+  Search,
+  Eye,
 } from 'lucide-react';
 
 export interface UserItem {
@@ -38,14 +40,32 @@ interface UserManagerViewProps {
 
 export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggleRole }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const filteredUsers = users.filter((user) => {
-    const q = searchQuery.toLowerCase();
+    const q = searchQuery.toLowerCase().trim();
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
-    return fullName.includes(q) || user.email.toLowerCase().includes(q) || (user.phone && user.phone.includes(q));
+    const matchesSearch =
+      q === '' ||
+      fullName.includes(q) ||
+      user.email.toLowerCase().includes(q) ||
+      (user.phone && user.phone.includes(q)) ||
+      String(user.id).includes(q);
+
+    const matchesRole =
+      roleFilter === 'ALL'
+        ? true
+        : roleFilter === 'ADMINS'
+        ? user.role === 'ROLE_ADMIN' || user.role === 'ROLE_SUPER_ADMIN'
+        : user.role === roleFilter;
+
+    return matchesSearch && matchesRole;
   });
+
+  const patronsCount = users.filter((u) => u.role === 'ROLE_USER').length;
+  const adminsCount = users.filter((u) => u.role === 'ROLE_ADMIN' || u.role === 'ROLE_SUPER_ADMIN').length;
 
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -54,125 +74,207 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
   };
 
   return (
-    <div className="user-manager">
-      <div className="user-manager__header">
-        <div>
-          <h1 className="user-manager__title">Patron Directory</h1>
-          <p className="user-manager__subtitle">
-            Manage patron accounts, roles, and registration credentials.
-          </p>
-        </div>
-        <div className="user-manager__count">{filteredUsers.length} Registered Patrons</div>
-      </div>
+    <div className="user-manager space-y-6 pb-12 animate-fadeIn">
+      {/* Header with Title and Live Metrics */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#1C0C30] via-[#120622] to-[#0A0214] border border-brand-gold/30 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Search Input */}
-      <div className="user-manager__filters">
-        <div className="user-manager__search-wrap">
-          <svg
-            className="user-manager__search-icon"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            className="user-manager__search-input"
-            placeholder="Search patron by name, email, or telephone..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold px-2.5 py-0.5 rounded-full bg-brand-gold/15 border border-brand-gold/40">
+                PATRON DIRECTORY & CONCIERGE
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            </div>
+            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
+              Patron & Collector Registry
+            </h1>
+            <p className="text-xs sm:text-sm text-brand-ivory/60 mt-1 font-sans">
+              Manage client credentials, concierge access, verified communications, and administrative roles.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="px-4 py-2.5 rounded-2xl bg-black/40 border border-brand-gold/30 backdrop-blur-md">
+              <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Total Patrons</span>
+              <span className="font-mono text-lg font-bold text-brand-gold-light">{users.length} Registered</span>
+            </div>
+            <div className="px-4 py-2.5 rounded-2xl bg-black/40 border border-emerald-500/30 backdrop-blur-md">
+              <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Sovereign Tier</span>
+              <span className="font-mono text-lg font-bold text-emerald-400">{patronsCount} Collectors</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="user-manager__table-wrap">
-        <table className="admin-table">
+      {/* Modern Search & Filter Command Bar */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-[#120622]/90 border border-brand-gold/25 shadow-lg space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Search Box */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-brand-gold absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search patron by name, email, telephone, or Patron ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#0A0214] border border-brand-gold/30 focus:border-brand-gold rounded-xl pl-11 pr-10 py-3 text-sm text-white placeholder-brand-ivory/40 focus:outline-none transition-colors shadow-inner font-sans"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-brand-ivory/70 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Role Filter Tabs */}
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              { id: 'ALL', label: 'All Accounts', count: users.length },
+              { id: 'ROLE_USER', label: 'Patrons Only', count: patronsCount },
+              { id: 'ADMINS', label: 'Administrators', count: adminsCount },
+            ].map((tab) => {
+              const active = roleFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setRoleFilter(tab.id)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-1.5 border cursor-pointer ${
+                    active
+                      ? 'bg-brand-gold text-brand-purple-dark font-bold border-brand-gold shadow-md shadow-brand-gold/20'
+                      : 'bg-black/30 border-white/10 text-brand-ivory/70 hover:border-brand-gold/30 hover:text-white'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                    active ? 'bg-brand-purple-dark/20 text-brand-purple-dark' : 'bg-white/10 text-brand-gold'
+                  }`}>
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Live Filter Indicator */}
+        <div className="flex items-center justify-between text-xs font-mono text-brand-ivory/50 pt-2 border-t border-white/5">
+          <div>
+            Showing <span className="text-brand-gold font-bold">{filteredUsers.length}</span> of {users.length} accounts
+          </div>
+          {searchQuery && (
+            <span className="text-emerald-400">Filtered by query: "{searchQuery}"</span>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop View: Full-Featured Administrative Table */}
+      <div className="hidden md:block rounded-2xl border border-brand-gold/25 bg-[#0D0317]/95 overflow-hidden shadow-2xl">
+        <table className="w-full text-left border-collapse">
           <thead>
-            <tr>
-              <th>Patron</th>
-              <th>Email</th>
-              <th>Telephone</th>
-              <th>Role</th>
-              <th>Registered</th>
-              <th>Actions</th>
+            <tr className="border-b border-brand-gold/20 bg-white/[0.02] text-xs font-mono uppercase tracking-wider text-brand-gold/90">
+              <th className="py-4 px-5">Patron / Collector</th>
+              <th className="py-4 px-5">Email Address</th>
+              <th className="py-4 px-5">Telephone</th>
+              <th className="py-4 px-5">Authorization Role</th>
+              <th className="py-4 px-5">Registered Date</th>
+              <th className="py-4 px-5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-white/5 text-sm">
             {filteredUsers.length > 0 ? (
               filteredUsers.map((u) => {
                 const displayName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Patron';
                 const initials = (
                   (u.firstName?.[0] || '') + (u.lastName?.[0] || u.email[0] || 'P')
                 ).toUpperCase();
+                const isAdmin = u.role === 'ROLE_ADMIN' || u.role === 'ROLE_SUPER_ADMIN';
 
                 return (
-                  <tr key={u.id}>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-brand-gold/20 border border-brand-gold/40 flex items-center justify-center font-bold text-xs text-brand-gold">
-                          {initials}
+                  <tr key={u.id} className="hover:bg-white/[0.03] transition-colors group">
+                    <td className="py-4 px-5">
+                      <div className="flex items-center gap-3.5">
+                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-xs shadow-md border ${
+                          isAdmin
+                            ? 'bg-gradient-to-tr from-brand-gold to-amber-200 text-brand-purple-dark border-brand-gold'
+                            : 'bg-brand-gold/15 border-brand-gold/30 text-brand-gold'
+                        }`}>
+                          {isAdmin ? <Crown className="w-4 h-4" /> : initials}
                         </div>
                         <div>
-                          <div className="font-semibold text-white">{displayName}</div>
-                          <div className="text-xs text-brand-ivory/50">ID #{u.id}</div>
+                          <div className="font-semibold text-white font-serif">{displayName}</div>
+                          <div className="text-[11px] text-brand-ivory/50 font-mono">ID: #PTR-{String(u.id).padStart(4, '0')}</div>
                         </div>
                       </div>
                     </td>
-                    <td>
+
+                    <td className="py-4 px-5">
                       <div className="flex items-center gap-2">
-                        <span className="text-brand-ivory/90">{u.email}</span>
+                        <span className="text-brand-ivory/90 font-sans text-xs">{u.email}</span>
                         {u.emailVerified && (
-                          <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                          <span className="text-[10px] bg-emerald-500/15 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 font-mono">
                             Verified
                           </span>
                         )}
                       </div>
                     </td>
-                    <td>
-                      <span className="text-brand-ivory/70">{u.phone || '—'}</span>
+
+                    <td className="py-4 px-5">
+                      <span className="text-brand-ivory/70 font-mono text-xs">{u.phone || '—'}</span>
                     </td>
-                    <td>
+
+                    <td className="py-4 px-5">
                       <span
-                        className={`text-xs px-2.5 py-1 rounded-full font-mono font-bold ${
-                          u.role === 'ROLE_ADMIN' || u.role === 'ROLE_SUPER_ADMIN'
-                            ? 'bg-brand-gold/20 text-brand-gold border border-brand-gold/40'
-                            : 'bg-white/5 text-brand-ivory/70 border border-white/10'
+                        className={`text-xs px-2.5 py-1 rounded-full font-mono font-bold inline-flex items-center gap-1 border ${
+                          u.role === 'ROLE_SUPER_ADMIN'
+                            ? 'bg-amber-400/20 text-amber-300 border-amber-400/40'
+                            : u.role === 'ROLE_ADMIN'
+                            ? 'bg-brand-gold/20 text-brand-gold border-brand-gold/40'
+                            : 'bg-white/5 text-brand-ivory/70 border-white/10'
                         }`}
                       >
+                        {isAdmin && <ShieldCheck className="w-3 h-3 text-brand-gold" />}
                         {u.role.replace('ROLE_', '')}
                       </span>
                     </td>
-                    <td>
-                      <span className="text-xs text-brand-ivory/60">
+
+                    <td className="py-4 px-5">
+                      <span className="text-xs text-brand-ivory/60 font-mono">
                         {u.createdDate
                           ? new Date(u.createdDate).toLocaleDateString('en-IN', {
                               day: '2-digit',
                               month: 'short',
                               year: 'numeric',
                             })
-                          : 'Active'}
+                          : 'Permanent'}
                       </span>
                     </td>
-                    <td>
-                      <div className="flex items-center gap-2">
+
+                    <td className="py-4 px-5 text-right">
+                      <div className="flex items-center justify-end gap-2">
                         <button
+                          type="button"
                           onClick={() => setSelectedUser(u)}
-                          className="px-2.5 py-1 text-xs rounded border border-brand-gold/30 text-brand-gold hover:bg-brand-gold/10 transition-colors"
+                          className="px-3 py-1.5 text-xs font-mono rounded-xl border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/15 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          title="View Patron Dossier"
                         >
-                          Details
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Dossier</span>
                         </button>
                         <button
+                          type="button"
                           onClick={() => onToggleRole(u.id, u.role)}
-                          className={`px-2.5 py-1 text-xs rounded border transition-colors ${
+                          className={`px-3 py-1.5 text-xs font-mono rounded-xl border transition-all cursor-pointer ${
                             u.role === 'ROLE_ADMIN'
-                              ? 'border-red-500/30 text-red-400 hover:bg-red-500/10'
-                              : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                              ? 'border-red-500/30 text-red-300 hover:bg-red-500/15'
+                              : 'border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/15'
                           }`}
                         >
                           {u.role === 'ROLE_ADMIN' ? 'Demote' : 'Promote'}
@@ -184,13 +286,108 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
               })
             ) : (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-text-muted)' }}>
-                  No patrons match your search query.
+                <td colSpan={6} className="text-center py-12 text-brand-ivory/50 font-sans">
+                  No patrons match your search filter "{searchQuery}".
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile & Tablet View: Device-Friendly Patron Cards */}
+      <div className="md:hidden space-y-3.5">
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map((u) => {
+            const displayName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Patron';
+            const initials = (
+              (u.firstName?.[0] || '') + (u.lastName?.[0] || u.email[0] || 'P')
+            ).toUpperCase();
+            const isAdmin = u.role === 'ROLE_ADMIN' || u.role === 'ROLE_SUPER_ADMIN';
+
+            return (
+              <div
+                key={u.id}
+                className="p-4 rounded-2xl bg-[#120622]/95 border border-brand-gold/25 shadow-lg space-y-3.5"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-sm shadow-md border ${
+                      isAdmin
+                        ? 'bg-gradient-to-tr from-brand-gold to-amber-200 text-brand-purple-dark border-brand-gold'
+                        : 'bg-brand-gold/15 border-brand-gold/30 text-brand-gold'
+                    }`}>
+                      {isAdmin ? <Crown className="w-5 h-5" /> : initials}
+                    </div>
+                    <div>
+                      <h3 className="font-serif font-bold text-white text-base leading-tight">{displayName}</h3>
+                      <span className="text-[11px] font-mono text-brand-ivory/50">ID: #PTR-{String(u.id).padStart(4, '0')}</span>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`text-[10px] px-2.5 py-1 rounded-full font-mono font-bold border inline-flex items-center gap-1 ${
+                      u.role === 'ROLE_SUPER_ADMIN'
+                        ? 'bg-amber-400/20 text-amber-300 border-amber-400/40'
+                        : u.role === 'ROLE_ADMIN'
+                        ? 'bg-brand-gold/20 text-brand-gold border-brand-gold/40'
+                        : 'bg-white/5 text-brand-ivory/70 border-white/10'
+                    }`}
+                  >
+                    {u.role.replace('ROLE_', '')}
+                  </span>
+                </div>
+
+                {/* Contact info list */}
+                <div className="space-y-1.5 p-3 rounded-xl bg-black/30 border border-white/5 text-xs">
+                  <div className="flex items-center justify-between text-brand-ivory/80">
+                    <span className="text-brand-ivory/50 font-mono text-[10px] uppercase">Email</span>
+                    <span className="truncate max-w-[200px] text-white font-medium">{u.email}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-brand-ivory/80">
+                    <span className="text-brand-ivory/50 font-mono text-[10px] uppercase">Phone</span>
+                    <span className="font-mono text-brand-gold-light">{u.phone || 'Unlisted'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-brand-ivory/80">
+                    <span className="text-brand-ivory/50 font-mono text-[10px] uppercase">Enrolled</span>
+                    <span className="font-mono text-brand-ivory/60">
+                      {u.createdDate ? new Date(u.createdDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : 'Active'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedUser(u)}
+                    className="w-full py-2.5 rounded-xl bg-brand-gold text-brand-purple-dark font-serif font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-brand-gold/20 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>View Dossier</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => onToggleRole(u.id, u.role)}
+                    className={`w-full py-2.5 rounded-xl border font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                      u.role === 'ROLE_ADMIN'
+                        ? 'border-red-500/40 bg-red-500/10 text-red-300'
+                        : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
+                    }`}
+                  >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span>{u.role === 'ROLE_ADMIN' ? 'Demote' : 'Promote'}</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="p-8 text-center text-brand-ivory/50 bg-[#120622] rounded-2xl border border-white/5">
+            No patrons found matching "{searchQuery}".
+          </div>
+        )}
       </div>
 
       {/* Patron Details Modal - Enlarged & Enriched Luxury Dossier */}
