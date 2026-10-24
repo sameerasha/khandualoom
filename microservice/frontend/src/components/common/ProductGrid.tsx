@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { SlidersHorizontal, Search, RefreshCw } from 'lucide-react';
+import { SlidersHorizontal, Search, RefreshCw, Sparkles } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Product } from '@/types';
 import { ProductCard } from './ProductCard';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -48,21 +49,18 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
 
     if (selectedCategory && selectedCategory !== 'All') {
       result = result.filter(
-        (p) =>
-          p.category.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-          (selectedCategory === 'Kanjivaram' &&
-            p.category.toLowerCase().includes('kanjeevaram'))
+        (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
+    if (searchQuery && searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase().trim();
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          p.fabric.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q)
+          p.category.toLowerCase().includes(q) ||
+          (p.fabric && p.fabric.toLowerCase().includes(q)) ||
+          (p.weave && p.weave.toLowerCase().includes(q))
       );
     }
 
@@ -84,55 +82,66 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
   };
 
   return (
-    <section id="catalog-section" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="catalog-section" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       {/* Title & Section Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <span className="text-xs uppercase tracking-widest text-brand-gold font-sans font-semibold">
-            Masterpieces of the Loom
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-brand-ivory mt-1">
+          <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+            <span>Masterpieces of the Loom • {filteredProducts.length} Heirloom Sarees</span>
+          </div>
+          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-ivory leading-tight">
             Handcrafted Saree Collection
           </h2>
         </div>
 
         {/* Sort Select */}
-        <div className="flex items-center gap-2 self-start md:self-end">
+        <div className="flex items-center gap-2 self-start md:self-end bg-brand-purple-dark/80 p-1.5 px-3 rounded-xl border border-brand-gold/30 backdrop-blur-md">
           <SlidersHorizontal className="w-4 h-4 text-brand-gold" />
-          <span className="text-xs text-brand-ivory/70">Sort By:</span>
+          <span className="text-xs text-brand-ivory/70 font-sans">Sort By:</span>
           <select
             value={sortBy}
             onChange={(e) => dispatch(setSortBy(e.target.value as any))}
-            className="bg-brand-purple border border-brand-gold/30 rounded-lg text-xs text-brand-ivory py-1.5 px-3 focus:outline-none focus:border-brand-gold"
+            className="bg-transparent border-none text-xs text-brand-gold font-medium py-1 px-2 focus:outline-none cursor-pointer"
           >
-            <option value="featured">Featured Collection</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="rating">Highest Rated</option>
+            <option value="featured" className="bg-[#13091B] text-brand-ivory">Featured Collection</option>
+            <option value="price-low" className="bg-[#13091B] text-brand-ivory">Price: Low to High</option>
+            <option value="price-high" className="bg-[#13091B] text-brand-ivory">Price: High to Low</option>
+            <option value="rating" className="bg-[#13091B] text-brand-ivory">Highest Rated</option>
           </select>
         </div>
       </div>
 
       {/* Category Pills & Active Search Tag */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-10 pb-4 border-b border-brand-gold/15">
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => dispatch(setSelectedCategory(cat))}
-              className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
-                selectedCategory === cat
-                  ? 'bg-brand-gold text-brand-purple-dark shadow-md'
-                  : 'bg-brand-purple/50 text-brand-ivory/80 hover:bg-brand-purple hover:text-brand-gold border border-brand-gold/20'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2.5">
+          {CATEGORIES.map((cat) => {
+            const count =
+              cat === 'All'
+                ? productsToFilter.length
+                : productsToFilter.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
+            const isSelected = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => dispatch(setSelectedCategory(cat))}
+                className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
+                  isSelected
+                    ? 'bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark shadow-lg shadow-brand-gold/20 scale-105 font-bold'
+                    : 'bg-brand-purple-dark/60 text-brand-ivory/80 hover:bg-brand-purple-dark hover:text-brand-gold border border-brand-gold/25 backdrop-blur-sm'
+                }`}
+              >
+                <span>{cat}</span>
+                <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-brand-purple-dark/20 text-brand-purple-dark' : 'bg-white/10 text-brand-ivory/60'}`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {searchQuery && (
-          <div className="flex items-center gap-2 bg-brand-purple px-3 py-1.5 rounded-full border border-brand-gold/40 text-xs">
+          <div className="flex items-center gap-2 bg-brand-purple-dark/90 px-3.5 py-1.5 rounded-full border border-brand-gold/40 text-xs shadow-md">
             <Search className="w-3.5 h-3.5 text-brand-gold" />
             <span className="text-brand-ivory/80">Query: "{searchQuery}"</span>
             <button
@@ -151,7 +160,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <div
               key={n}
-              className="aspect-[3/4] bg-brand-purple/40 animate-pulse rounded-2xl border border-brand-gold/10"
+              className="aspect-[3/4] bg-brand-purple-dark/40 animate-pulse rounded-3xl border border-brand-gold/15"
             />
           ))}
         </div>
@@ -159,14 +168,14 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
 
       {/* Empty State */}
       {!isLoading && filteredProducts.length === 0 && (
-        <div className="text-center py-20 bg-brand-purple/20 rounded-2xl border border-brand-gold/15">
-          <p className="font-serif text-xl text-brand-gold mb-2">No Sarees Found</p>
-          <p className="text-sm text-brand-ivory/60 mb-6">
+        <div className="text-center py-20 bg-brand-purple-dark/40 backdrop-blur-md rounded-3xl border border-brand-gold/20">
+          <p className="font-serif text-2xl text-brand-gold mb-2">No Sarees Found</p>
+          <p className="text-sm text-brand-ivory/60 mb-6 font-light">
             We couldn't find matches for your active filters or search terms.
           </p>
           <button
             onClick={handleResetFilters}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-gold text-brand-purple-dark font-semibold text-xs shadow hover:brightness-110"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-gold text-brand-purple-dark font-semibold text-xs shadow-xl hover:brightness-110"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Reset All Filters
@@ -174,15 +183,22 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
         </div>
       )}
 
-      {/* Product Cards Grid */}
+      {/* Product Cards Grid with Staggered Entrance */}
       {!isLoading && filteredProducts.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => (
-            <ProductCard
+          {filteredProducts.map((product, idx) => (
+            <motion.div
               key={product.id}
-              product={product}
-              onSelect={onSelectProduct}
-            />
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.6, delay: (idx % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <ProductCard
+                product={product}
+                onSelect={onSelectProduct}
+              />
+            </motion.div>
           ))}
         </div>
       )}

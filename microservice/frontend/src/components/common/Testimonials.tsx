@@ -72,7 +72,7 @@ export const Testimonials: React.FC = () => {
   const active = testimonials[currentIndex];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-[#0F0617] via-[#140A1F] to-[#0F0617] text-brand-ivory relative overflow-hidden border-b border-brand-gold/15">
+    <section className="py-24 bg-gradient-to-b from-transparent via-[#140A1F]/50 to-transparent text-brand-ivory relative overflow-hidden border-b border-brand-gold/15">
       {/* Background Watermark Quote */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] text-brand-gold">
         <Quote className="w-[450px] h-[450px]" />

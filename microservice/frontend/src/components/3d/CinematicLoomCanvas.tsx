@@ -8,15 +8,16 @@ import { WebGLFallback } from './WebGLFallback';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface CinematicLoomCanvasProps {
-  scrollProgress: number;
+  scrollProgress: number; // 0.0 (top) to 1.0 (bottom)
   className?: string;
 }
 
 const SceneLighting: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) => {
+  const p = Math.min(Math.max(scrollProgress, 0), 1.0);
   return (
     <>
       {/* 1. Ambient Warm Champagne Light */}
-      <ambientLight color="#FFF8E7" intensity={0.85} />
+      <ambientLight color="#FFF8E7" intensity={0.85 + (p > 0.7 ? 0.3 : 0)} />
 
       {/* 2. Key Gold Studio Directional Light */}
       <directionalLight
@@ -27,17 +28,17 @@ const SceneLighting: React.FC<{ scrollProgress: number }> = ({ scrollProgress })
         shadow-mapSize={[1024, 1024]}
       />
 
-      {/* 3. Fill Light: Royal Amethyst / Wine Glow on Shadowed Folds */}
+      {/* 3. Fill Light: Royal Amethyst Glow */}
       <pointLight
         position={[-6, -4, -2]}
         intensity={3.2}
-        color="#A855F7"
+        color={p > 0.6 ? '#7C3AED' : '#A855F7'}
       />
 
       {/* 4. High-Contrast Zari Rim Light defining the Silk Silhouette */}
       <pointLight
         position={[2, -3, 3]}
-        intensity={2.4 + scrollProgress * 1.2}
+        intensity={2.4 + p * 1.6}
         color="#F59E0B"
       />
 
@@ -88,7 +89,7 @@ export const CinematicLoomCanvas: React.FC<CinematicLoomCanvasProps> = ({
             alpha: true,
           }}
           camera={{
-            position: [0.6, 0.1, 5.4],
+            position: [0.8, 0.1, 5.4],
             fov: 42,
             near: 0.1,
             far: 100,
@@ -98,16 +99,16 @@ export const CinematicLoomCanvas: React.FC<CinematicLoomCanvasProps> = ({
             scene.fog = new THREE.FogExp2('#0F0617', 0.038);
           }}
         >
-          {/* Dynamic 3D Camera Rig responsive to window scroll */}
+          {/* Dynamic 3D Camera Rig responsive to window scroll across all sections */}
           <CinematicCameraRig
             scrollProgress={scrollProgress}
             reducedMotion={reducedMotion}
           />
 
-          {/* Three-Point Art-Directed Lighting */}
+          {/* Multi-Point Art-Directed Studio Lighting */}
           <SceneLighting scrollProgress={scrollProgress} />
 
-          {/* Master 3D Saree Pallu & Flying Handloom Shuttle */}
+          {/* Master 3D Saree, Flying Handloom Shuttle & Multi-Stage Geometry */}
           <SareeHandloomMesh
             scrollProgress={scrollProgress}
             reducedMotion={reducedMotion}
@@ -116,7 +117,7 @@ export const CinematicLoomCanvas: React.FC<CinematicLoomCanvasProps> = ({
           {/* Drifting Golden Zari Stardust */}
           {!reducedMotion && (
             <CinematicGoldDust
-              count={160}
+              count={180}
               scrollProgress={scrollProgress}
             />
           )}

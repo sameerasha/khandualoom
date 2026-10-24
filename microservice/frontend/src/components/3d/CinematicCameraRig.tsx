@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface CinematicCameraRigProps {
-  scrollProgress: number;
+  scrollProgress: number; // 0.0 (top) to 1.0 (bottom)
   reducedMotion?: boolean;
 }
 
@@ -22,33 +22,73 @@ export const CinematicCameraRig: React.FC<CinematicCameraRigProps> = ({
       return;
     }
 
-    // Smooth scroll interpolation (smooth dampening proxy)
-    const factor = 1 - Math.exp(-4.8 * delta);
+    // Smooth scroll interpolation proxy
+    const factor = 1 - Math.exp(-4.5 * delta);
     currentProgress.current = THREE.MathUtils.lerp(
       currentProgress.current,
       scrollProgress,
       factor
     );
 
-    const p = currentProgress.current;
+    const p = Math.min(Math.max(currentProgress.current, 0), 1.0);
 
-    // 1. Calculate Cinematic Camera Coordinates
-    // At p = 0 (Hero): [0.8, 0.1, 5.4] (Front perspective framing right side sculpture)
-    // At p = 0.5 (Mid scroll): [2.8, -1.0, 3.8] (Dramatic macro crane orbit close to zari weave)
-    // At p = 1.0 (End scroll): [-0.4, -2.0, 5.8] (Undercut angle looking up at radiant loom core)
-    // At p > 1.2: [0, -2.8, 6.8] (Pull back into cosmic ambient overview)
-    const targetX = 0.8 + Math.sin(p * Math.PI) * 2.2 - (p > 0.8 ? (p - 0.8) * 1.8 : 0) - state.pointer.x * 0.35;
-    const targetY = 0.1 - p * 1.8 + Math.sin(p * 2.2) * 0.35 + state.pointer.y * 0.25;
-    const targetZ = 5.4 - Math.sin(p * Math.PI * 0.85) * 1.5 + p * 0.7;
+    // Multi-Component Cinematic Camera Coordinates:
+    // 0.00 - 0.22 (Hero): Right-sided frontal view framing the saree drape
+    // 0.22 - 0.42 (Heritage Features): Center panoramic view looking over the 4 celestial trust rings
+    // 0.42 - 0.62 (Craft Showcase): Dynamic macro zoom tracking the flying shuttle
+    // 0.62 - 0.82 (Product Catalog): Broad pulled-back view framing the saree collection with the horizon wave
+    // 0.82 - 1.00 (About & Testimonials): Reverent upward tilt at the ancestral pit loom frame
+    let targetX = 0.8;
+    let targetY = 0.1;
+    let targetZ = 5.4;
+    let targetLookX = 0.6;
+    let targetLookY = 0.0;
+    let targetLookZ = 0.0;
+
+    if (p <= 0.22) {
+      const t = p / 0.22;
+      targetX = 0.8 - t * 0.8;
+      targetY = 0.1 - t * 1.1;
+      targetZ = 5.4 - t * 0.4;
+      targetLookX = 0.6 - t * 0.6;
+      targetLookY = -t * 0.6;
+    } else if (p <= 0.42) {
+      const t = (p - 0.22) / 0.2;
+      targetX = 0.0 + t * 1.6;
+      targetY = -1.0 + t * 0.6;
+      targetZ = 5.0 - t * 0.9;
+      targetLookX = 0.0 + t * 0.7;
+      targetLookY = -0.6 + t * 0.4;
+    } else if (p <= 0.62) {
+      const t = (p - 0.42) / 0.2;
+      targetX = 1.6 - t * 1.6;
+      targetY = -0.4 - t * 1.6;
+      targetZ = 4.1 + t * 2.8;
+      targetLookX = 0.7 - t * 0.7;
+      targetLookY = -0.2 - t * 1.2;
+    } else if (p <= 0.82) {
+      const t = (p - 0.62) / 0.2;
+      targetX = 0.0 + t * 0.9;
+      targetY = -2.0 + t * 0.6;
+      targetZ = 6.9 - t * 1.6;
+      targetLookX = 0.0 + t * 0.3;
+      targetLookY = -1.4 + t * 0.6;
+    } else {
+      const t = (p - 0.82) / 0.18;
+      targetX = 0.9 + t * 0.2;
+      targetY = -1.4 + t * 0.3;
+      targetZ = 5.3 + t * 0.4;
+      targetLookX = 0.3 + t * 0.1;
+      targetLookY = -0.8 + t * 0.3;
+    }
+
+    // Add interactive cursor parallax
+    targetX -= state.pointer.x * 0.35;
+    targetY += state.pointer.y * 0.25;
 
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, 0.08);
     camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.08);
     camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.08);
-
-    // 2. Smoothly steer lookAt focus point
-    const targetLookX = 0.8 - p * 0.9;
-    const targetLookY = -p * 0.95;
-    const targetLookZ = 0;
 
     lookTarget.current.x = THREE.MathUtils.lerp(lookTarget.current.x, targetLookX, 0.08);
     lookTarget.current.y = THREE.MathUtils.lerp(lookTarget.current.y, targetLookY, 0.08);
