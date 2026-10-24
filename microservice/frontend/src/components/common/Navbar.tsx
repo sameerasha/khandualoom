@@ -9,12 +9,14 @@ interface NavbarProps {
   onOpenAuth: () => void;
   onNavigateAdmin?: () => void;
   onOpenProfile?: () => void;
+  onNavigateHome?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
   onNavigateAdmin,
   onOpenProfile,
+  onNavigateHome,
 }) => {
   const dispatch = useAppDispatch();
   const { items } = useAppSelector((state) => state.cart);
@@ -25,6 +27,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
+
+  const handleLogoClick = () => {
+    setMobileMenuOpen(false);
+    if (onNavigateHome) {
+      onNavigateHome();
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  };
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -46,14 +57,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-20">
           
           {/* Brand Logo & Name */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div
+            className="flex items-center gap-3 cursor-pointer select-none group"
+            onClick={handleLogoClick}
+            title="Return to Home"
+          >
             <img
               src="/logo.svg"
               alt="Vastraloom Imperial Logo"
-              className="w-11 h-11 object-contain drop-shadow-[0_2px_10px_rgba(197,160,89,0.4)]"
+              className="w-11 h-11 object-contain drop-shadow-[0_2px_10px_rgba(197,160,89,0.4)] transition-transform duration-300 group-hover:scale-105"
             />
             <div>
-              <span className="font-serif text-2xl tracking-wider text-brand-gold font-bold">
+              <span className="font-serif text-2xl tracking-wider text-brand-gold font-bold transition-colors group-hover:text-brand-gold-light">
                 VASTRALOOM
               </span>
               <p className="text-[10px] tracking-widest text-brand-gold-light/80 uppercase font-sans -mt-1">

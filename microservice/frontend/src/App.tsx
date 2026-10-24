@@ -20,7 +20,6 @@ import { SocialMediaModal } from '@/components/common/SocialMediaModal';
 import { OAuth2RedirectHandler } from '@/components/auth/OAuth2RedirectHandler';
 import { SmoothScrollProvider } from '@/components/common/SmoothScrollProvider';
 import { CinematicLoomCanvas } from '@/components/3d/CinematicLoomCanvas';
-import { ScrollChapterIndicator } from '@/components/common/ScrollChapterIndicator';
 import { Product } from '@/types';
 import { useAppDispatch } from '@/app/hooks';
 import { setSelectedCategory } from '@/features/products/productsSlice';
@@ -86,6 +85,14 @@ export const App: React.FC = () => {
     document.body.scrollTop = 0;
   };
 
+  const handleNavigateHome = () => {
+    setCurrentView('store');
+    setSelectedProduct(null);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
+
   return (
     <SmoothScrollProvider enabled={currentView !== 'admin'}>
       <div className="min-h-screen bg-[#0F0617] text-brand-ivory flex flex-col selection:bg-brand-gold selection:text-brand-purple-dark relative">
@@ -103,12 +110,8 @@ export const App: React.FC = () => {
             onOpenAuth={() => setAuthModalOpen(true)}
             onNavigateAdmin={() => setCurrentView('admin')}
             onOpenProfile={() => setCurrentView('profile')}
+            onNavigateHome={handleNavigateHome}
           />
-        )}
-
-        {/* Floating Luxury Chapter Indicator on Desktop */}
-        {currentView === 'store' && (
-          <ScrollChapterIndicator scrollProgress={globalScrollProgress} />
         )}
 
         {/* Main Content Area */}
@@ -213,6 +216,7 @@ export const App: React.FC = () => {
             onOpenSocial={() => setSocialModalOpen(true)}
             onNavigateHeritage={handleNavigateHeritage}
             onSelectCategory={handleSelectCategoryFromFooter}
+            onNavigateHome={handleNavigateHome}
           />
         )}
       </div>

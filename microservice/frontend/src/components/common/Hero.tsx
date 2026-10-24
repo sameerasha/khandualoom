@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, ArrowRight, Compass, MousePointerClick } from 'lucide-react';
+import { Sparkles, ArrowRight, Compass } from 'lucide-react';
 
 interface HeroProps {
   onSignUpClick?: () => void;
@@ -8,7 +8,7 @@ interface HeroProps {
   scrollProgress?: number;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onSignUpClick, onExploreClick, scrollProgress = 0 }) => {
+export const Hero: React.FC<HeroProps> = ({ onSignUpClick, onExploreClick }) => {
   const scrollToCatalog = () => {
     if (onExploreClick) {
       onExploreClick();
@@ -124,31 +124,8 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick, onExploreClick, scrol
             </motion.div>
           </div>
 
-          {/* Right Column: Spatial Void Framing the Saree & Shuttle 3D Model */}
-          <div className="lg:col-span-5 xl:col-span-4 hidden lg:flex flex-col items-center justify-center pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.2, delay: 0.4 }}
-              className="p-5 rounded-3xl border border-brand-gold/30 bg-brand-purple-dark/60 backdrop-blur-xl shadow-2xl text-center max-w-xs"
-            >
-              <div className="flex items-center justify-center gap-2 text-[10px] tracking-widest uppercase text-brand-gold-light font-mono">
-                <MousePointerClick className="w-3.5 h-3.5 text-brand-gold animate-bounce" />
-                <span>24K Golden Dust Matrix</span>
-              </div>
-              <p className="text-xs text-brand-ivory/80 mt-2 font-serif italic">
-                Scroll or move cursor to orchestrate the fluid golden zari streams, celestial vortexes, and floating embers
-              </p>
-              {scrollProgress > 0 && (
-                <div className="mt-3 w-full bg-white/10 rounded-full h-1 overflow-hidden">
-                  <div
-                    className="bg-brand-gold h-full transition-all duration-150"
-                    style={{ width: `${Math.min(scrollProgress * 100, 100)}%` }}
-                  />
-                </div>
-              )}
-            </motion.div>
-          </div>
+          {/* Right Column: Spatial Void Framing the 3D Master Loom Canvas */}
+          <div className="lg:col-span-5 xl:col-span-4 hidden lg:block pointer-events-none" aria-hidden="true" />
         </div>
       </div>
     </section>

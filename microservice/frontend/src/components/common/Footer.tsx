@@ -19,6 +19,7 @@ interface FooterProps {
   onOpenSocial?: () => void;
   onNavigateHeritage?: () => void;
   onSelectCategory?: (category: string) => void;
+  onNavigateHome?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -27,6 +28,7 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenSocial,
   onNavigateHeritage,
   onSelectCategory,
+  onNavigateHome,
 }) => {
   return (
     <footer className="bg-[#090210] relative z-20 text-brand-ivory border-t-2 border-brand-gold/40 shadow-[0_-20px_50px_rgba(0,0,0,0.95)] pt-14 pb-12">
@@ -71,13 +73,23 @@ export const Footer: React.FC<FooterProps> = ({
           
           {/* Brand Info & Community */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-3 cursor-pointer group select-none w-fit"
+              onClick={() => {
+                if (onNavigateHome) {
+                  onNavigateHome();
+                } else {
+                  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                }
+              }}
+              title="Return to Home"
+            >
               <img
                 src="/logo.svg"
                 alt="Vastraloom Imperial Logo"
-                className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(197,160,89,0.35)]"
+                className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(197,160,89,0.35)] transition-transform duration-300 group-hover:scale-105"
               />
-              <span className="font-serif text-xl tracking-wider text-brand-gold font-bold">
+              <span className="font-serif text-xl tracking-wider text-brand-gold font-bold transition-colors group-hover:text-brand-gold-light">
                 VASTRALOOM
               </span>
             </div>
