@@ -29,13 +29,20 @@ interface ProductEditorModalProps {
 }
 
 const CATEGORIES = [
+  { name: 'Padua', region: 'Koraput, Odisha' },
+  { name: 'Sambalpuri', region: 'Bargarh, Odisha' },
+  { name: 'Khandua', region: 'Nuapatna, Odisha' },
+  { name: 'Bomkai', region: 'Subarnapur, Odisha' },
+  { name: 'Berhampuri', region: 'Berhampur, Odisha' },
+  { name: 'Pasapalli', region: 'Bargarh, Odisha' },
+  { name: 'Kotpad', region: 'Koraput, Odisha' },
+  { name: 'Habaspuri', region: 'Kalahandi, Odisha' },
+  { name: 'Dongria', region: 'Rayagada, Odisha' },
+  { name: 'Maniabandha', region: 'Cuttack, Odisha' },
+  { name: 'Tussar Odia', region: 'Gopalpur, Odisha' },
+  { name: 'Dhalapathar', region: 'Khordha, Odisha' },
   { name: 'Banarasi', region: 'Varanasi, UP' },
   { name: 'Kanjeevaram', region: 'Tamil Nadu' },
-  { name: 'Chanderi', region: 'Madhya Pradesh' },
-  { name: 'Tussar', region: 'Bengal / Bihar' },
-  { name: 'Patola', region: 'Patan, Gujarat' },
-  { name: 'Paithani', region: 'Yeola, Maharashtra' },
-  { name: 'Mysore', region: 'Karnataka' },
 ];
 
 const BADGES = ['Bestseller', 'Heirloom', 'Exclusive', 'Limited Edition', 'New Arrival', 'Trending', 'Artisan Guild'];

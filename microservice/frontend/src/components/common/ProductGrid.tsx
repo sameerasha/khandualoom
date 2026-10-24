@@ -12,9 +12,9 @@ import {
 import { useGetProductsQuery } from '@/features/products/productsApi';
 import { fallbackProducts } from '@/data/fallbackProducts';
 
-const CATEGORIES = ['All', 'Banarasi', 'Kanjivaram', 'Chanderi', 'Tussar'];
-const INITIAL_LIMIT = 15;
-const PAGE_SIZE = 15;
+const PREFERRED_ORDER = ['All', 'Padua', 'Sambalpuri', 'Khandua', 'Bomkai', 'Berhampuri', 'Pasapalli', 'Kotpad', 'Dongria', 'Habaspuri'];
+const INITIAL_LIMIT = 18;
+const PAGE_SIZE = 18;
 
 interface ProductGridProps {
   onSelectProduct: (product: Product) => void;
@@ -47,6 +47,21 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
     return fallbackProducts;
   }, [fetchedProducts]);
 
+  // Dynamically derive available categories from products with Odia & Padua priorities
+  const categories = useMemo(() => {
+    const presentCats = Array.from(new Set(productsToFilter.map((p) => p.category).filter(Boolean)));
+    const ordered = PREFERRED_ORDER.filter(
+      (cat) => cat === 'All' || presentCats.some((c) => c.toLowerCase() === cat.toLowerCase())
+    );
+    // Add any remaining categories
+    presentCats.forEach((cat) => {
+      if (!ordered.some((c) => c.toLowerCase() === cat.toLowerCase())) {
+        ordered.push(cat);
+      }
+    });
+    return ordered;
+  }, [productsToFilter]);
+
   // Client-side filtering & sorting
   const filteredProducts = useMemo(() => {
     let result = [...productsToFilter];
@@ -58,32 +73,35 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
     }
 
     if (searchQuery && searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase().trim();
+      const q = searchQuery.toLowerCase();
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q) ||
-          (p.fabric && p.fabric.toLowerCase().includes(q)) ||
-          (p.weave && p.weave.toLowerCase().includes(q))
+          p.fabric.toLowerCase().includes(q) ||
+          p.color.toLowerCase().includes(q) ||
+          p.weave.toLowerCase().includes(q)
       );
     }
 
-    if (sortBy === 'price-low') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'price-high') {
-      result.sort((a, b) => b.price - a.price);
-    } else if (sortBy === 'rating') {
-      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    switch (sortBy) {
+      case 'price-low':
+        return result.sort((a, b) => a.price - b.price);
+      case 'price-high':
+        return result.sort((a, b) => b.price - a.price);
+      case 'rating':
+        return result.sort((a, b) => b.rating - a.rating);
+      default:
+        return result;
     }
-
-    return result;
   }, [productsToFilter, selectedCategory, searchQuery, sortBy]);
 
-  // Reset visible count back to 15 whenever filters change
+  // Reset pagination when filter criteria changes
   useEffect(() => {
     setVisibleCount(INITIAL_LIMIT);
   }, [selectedCategory, searchQuery, sortBy]);
 
+  // Slice for progressive revealing
   const displayedProducts = useMemo(() => {
     return filteredProducts.slice(0, visibleCount);
   }, [filteredProducts, visibleCount]);
@@ -139,7 +157,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
         {/* Category Pills & Active Search Tag */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-10 pb-4 border-b border-brand-gold/15">
           <div className="flex flex-wrap gap-2.5">
-            {CATEGORIES.map((cat) => {
+            {categories.map((cat) => {
               const count =
                 cat === 'All'
                   ? productsToFilter.length
@@ -227,7 +245,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
               ))}
             </div>
 
-            {/* Load More Button for Next 15 Products */}
+            {/* Load More Button if filtered exceeds visibleCount */}
             {visibleCount < filteredProducts.length ? (
               <div className="mt-14 flex flex-col items-center justify-center text-center space-y-4">
                 <div className="w-full max-w-sm bg-white/5 border border-brand-gold/20 rounded-full h-1.5 overflow-hidden">
@@ -246,7 +264,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
                   onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
                   className="group px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold text-brand-purple-dark font-serif font-bold text-sm tracking-wide shadow-xl shadow-brand-gold/25 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Load Next 15 Masterpieces</span>
+                  <span>Load More Masterpieces</span>
                   <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
                 </button>
               </div>

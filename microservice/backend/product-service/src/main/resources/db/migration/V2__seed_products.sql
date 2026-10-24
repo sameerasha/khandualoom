@@ -1,151 +1,146 @@
 TRUNCATE TABLE product_images, recent_views CASCADE;
 TRUNCATE TABLE products RESTART IDENTITY CASCADE;
 
+-- 1. Padua Koraput Temple Weave (Brand New AI Generated Cover & 3 Side Angles)
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (1, 'Royal Banarasi Silk', 'Banarasi', 24999, 32999, '/images/saree_purple_gold.png', 'Handwoven in Varanasi with pure gold zari work, this regal Banarasi silk saree features intricate mughal-inspired motifs.', 'Pure Silk', 'Handloom', 'Purple & Gold', 4.9, 128, 'Bestseller', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/saree_purple_gold.png');
-INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/saree_master_back.png');
+VALUES (1, 'Padua Koraput Temple Weave', 'Padua', 19999, 26999, '/images/products/p1/front.jpg', 'Handspun organic cotton woven by the master Mirgan weavers of Padua, Koraput, featuring sacred geometric temple spires and deep madder root dyes.', 'Organic Handspun Cotton', 'Mirgan Handloom', 'Earthy Terracotta & Indigo', 4.9, 142, 'GI Certified', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/products/p1/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/products/p1/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/products/p1/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (1, '/images/products/p1/side.jpg');
 
+-- 2. Sambalpuri Royal Bandha Silk (Brand New AI Generated Cover & Pallu)
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (2, 'Kanjeevaram Temple Border', 'Kanjeevaram', 34999, 44999, '/images/saree_crimson_red.png', 'A magnificent Kanjeevaram from the looms of Kanchipuram, featuring traditional temple border and rich contrast pallu.', 'Mulberry Silk', 'Handloom', 'Crimson Red', 5, 89, 'Premium', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/saree_crimson_red.png');
-INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/saree_master_pallu.png');
+VALUES (2, 'Sambalpuri Royal Bandha Silk', 'Sambalpuri', 27999, 35999, '/images/products/p2/front.jpg', 'Masterpiece Sambalpuri Bandha tie-dye silk from Bargarh, featuring intricate shankha (conch) and chakra motifs woven with pure gold zari accents.', 'Pure Mulberry Silk', 'Bandha Tie-Dye', 'Royal Purple & Gold', 5.0, 188, 'Bestseller', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/products/p2/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/products/p2/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/products/p2/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (2, '/images/products/p2/side.jpg');
 
+-- 3. Khandua Pata Gita Govinda Drape (Brand New AI Generated Cover & Pallu)
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (3, 'Chanderi Emerald Dream', 'Chanderi', 12999, 17999, '/images/saree_emerald_green.png', 'Lightweight Chanderi silk with delicate silver zari floral motifs, perfect for elegant occasions and festive celebrations.', 'Chanderi Silk', 'Handloom', 'Emerald Green', 4.7, 156, 'New Arrival', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/saree_emerald_green.png');
-INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/saree_master_border.png');
+VALUES (3, 'Khandua Pata Gita Govinda Drape', 'Khandua', 34999, 44999, '/images/products/p3/front.jpg', 'Sacred Nuapatna Khandua Pata traditionally consecrated for Lord Jagannath, woven with revered Gitagovinda calligraphic verses and lotus medallions.', 'Malda Mulberry Silk', 'Nuapatna Ikat', 'Sanctified Crimson & Gold', 4.9, 115, 'Heirloom', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/products/p3/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/products/p3/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/products/p3/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (3, '/images/products/p3/side.jpg');
 
+-- 4. Bomkai Sonepuri Silk Masterpiece (Brand New AI Generated Cover & Pallu)
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (4, 'Tussar Royal Indigo', 'Tussar', 18999, 24999, '/images/saree_navy_blue.png', 'Luxurious Tussar silk with traditional paisley motifs handwoven by master artisans of Bhagalpur.', 'Tussar Silk', 'Handloom', 'Navy Blue', 4.8, 94, 'Trending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/saree_navy_blue.png');
-INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/saree_master_back.png');
+VALUES (4, 'Bomkai Sonepuri Silk Masterpiece', 'Bomkai', 29999, 39999, '/images/products/p4/front.jpg', 'Legendary Bomkai silk from Subarnapur featuring intricate jhabba pallu and traditional bitter gourd (karela) and peacock motifs woven with extra-weft artistry.', 'Pure Mulberry Silk', 'Extra Weft Jaal', 'Saffron Orange & Gold', 4.8, 96, 'Royal Heritage', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/products/p4/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/products/p4/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/products/p4/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (4, '/images/products/p4/side.jpg');
 
+-- 5. Berhampuri Phoda Kumbha Pata (Brand New AI Generated Cover & Pallu)
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (5, 'Patola Heritage Weave', 'Patola', 89999, 119999, '/images/saree_saffron_orange.png', 'An heirloom double-ikat Patola saree from Patan, Gujarat — each piece takes 6-8 months to weave with geometric precision.', 'Pure Silk', 'Double Ikat', 'Saffron Orange', 5, 42, 'Heirloom', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/saree_saffron_orange.png');
-INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/saree_master_pallu.png');
+VALUES (5, 'Berhampuri Phoda Kumbha Pata', 'Berhampuri', 36999, 46999, '/images/products/p5/front.jpg', 'From the historic Silk City of Berhampur, this GI-tagged pure silk saree showcases distinct needle-interlocked Phoda Kumbha temple spires along the border.', 'Heavy Mulberry Silk', 'Phoda Kumbha Handloom', 'Emerald Green & Ruby', 5.0, 78, 'GI Certified', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/products/p5/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/products/p5/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/products/p5/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (5, '/images/products/p5/side.jpg');
 
+-- 6. Pasapalli Imperial Chessboard Silk (Brand New AI Generated Cover)
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (6, 'Mysore Silk Rosé', 'Mysore', 15999, 21999, '/images/saree_blush_pink.png', 'Graceful Mysore crepe silk in blush pink with rose gold border, embodying South Indian elegance.', 'Mysore Crepe Silk', 'Handloom', 'Blush Pink', 4.6, 203, 'Popular', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/saree_blush_pink.png');
-INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/saree_master_pallu.png');
+VALUES (6, 'Pasapalli Imperial Chessboard Silk', 'Pasapalli', 32999, 41999, '/images/products/p6/front.jpg', 'Iconic Pasapalli saree from Western Odisha, named after the ancient royal dice game (Pasa), woven in an unmistakable contrast chessboard ikat grid.', 'Pure Silk', 'Pasapalli Double Bandha', 'Ebony & Imperial Maroon', 4.9, 134, 'Limited Edition', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/products/p6/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/products/p6/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/products/p6/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (6, '/images/products/p6/side.jpg');
 
+-- 7. Kotpad Organic Aal Tree Mirgan Drape
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (7, 'Paithani Peacock Motif', 'Paithani', 45999, 55999, '/images/saree_front_1.png', 'Authentic Paithani from Maharashtra with rich zari borders and traditional peacock motifs on the pallu.', 'Pure Silk', 'Handloom', 'Peacock Blue', 4.9, 67, 'Exclusive', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/saree_front_1.png');
-INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/saree_master_side.png');
+VALUES (7, 'Kotpad Organic Aal Tree Mirgan Drape', 'Kotpad', 18499, 23999, '/images/products/p7/front.jpg', 'Eco-certified tribal handloom from Kotpad, Koraput, dyed exclusively with non-toxic natural Aal (Madder) root extract and castor oil on hand-spun unbleached cotton.', 'Organic Handspun Cotton', 'Pit Loom Mirgan Weave', 'Rust Ochre & Madder Red', 4.8, 92, 'GI Certified', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/products/p7/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/products/p7/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/products/p7/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (7, '/images/products/p7/side.jpg');
 
+-- 8. Habaspuri Kumbha Heritage Weave
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (8, 'Bandhani Silk Elegance', 'Bandhani', 14999, 19999, '/images/saree_front_2.png', 'Exquisite hand-tied Bandhani patterns on pure silk, crafted by artisans in Gujarat.', 'Pure Silk', 'Tie & Dye', 'Ruby Red', 4.8, 112, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/saree_front_2.png');
-INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/saree_master_back.png');
+VALUES (8, 'Habaspuri Kumbha Heritage Weave', 'Habaspuri', 23999, 30999, '/images/products/p8/front.jpg', 'Rare revival handloom from Kalahandi, Odisha, featuring traditional Kumbha (temple spires), fishes, and geometric flora preserved by master weavers.', 'Fine Cotton Silk', 'Habaspuri Handloom', 'Ivory & Amber Gold', 4.7, 65, 'Artisan Guild', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/products/p8/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/products/p8/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/products/p8/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (8, '/images/products/p8/side.jpg');
 
+-- 9. Dongria Kondh Kapadaganda Tribal Saree
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (9, 'Jamdani Floral Symphony', 'Jamdani', 11999, 15999, '/images/saree_front_3.png', 'Feather-light cotton Jamdani with intricate floral motifs woven directly into the fabric.', 'Cotton Silk', 'Handloom', 'Ivory & Silver', 4.7, 88, 'Summer Pick', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/saree_front_3.png');
-INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/saree_master_border.png');
+VALUES (9, 'Dongria Kondh Kapadaganda Tribal Saree', 'Dongria', 26499, 33999, '/images/products/p9/front.jpg', 'Woven and hand-embroidered by the Dongria Kondh indigenous women of Niyamgiri Hills, Rayagada, featuring symbolic red, green, and yellow mountain motifs.', 'Handloom Coarse Cotton', 'Kapadaganda Embroidery', 'Natural Off-White & Multicolored', 5.0, 53, 'GI Certified', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/products/p9/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/products/p9/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/products/p9/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (9, '/images/products/p9/side.jpg');
 
+-- 10. Padua Mirgan Tribal Handloom
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (10, 'Pochampally Ikat Charm', 'Ikat', 17999, 22999, '/images/saree_front_4.png', 'Vibrant Pochampally Ikat with mesmerizing geometric patterns, handwoven in Telangana.', 'Mercerized Cotton', 'Ikat', 'Mustard Yellow', 4.6, 54, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/saree_front_4.png');
-INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/saree_master_pallu.png');
+VALUES (10, 'Padua Mirgan Tribal Handloom', 'Padua', 21999, 28499, '/images/products/p10/front.jpg', 'Authentic Padua handloom woven on primitive wooden frame looms by Koraput artisans, featuring earthy tribal bird motifs and river-clay washed yarn.', 'Handspun Organic Cotton', 'Tribal Handloom', 'Deep Clay Maroon & Charcoal', 4.8, 86, 'Exclusive', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/products/p10/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/products/p10/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/products/p10/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (10, '/images/products/p10/side.jpg');
 
+-- 11. Maniabandha Buddhist Ikkat Pata
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (11, 'Baluchari Mythological Tales', 'Baluchari', 22999, 28999, '/images/saree_front_5.png', 'Classic Baluchari saree from Bengal featuring intricate woven scenes from Indian epics.', 'Bishnupuri Silk', 'Handloom', 'Deep Maroon', 4.9, 41, 'Heritage', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/saree_front_5.png');
-INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/saree_master_back.png');
+VALUES (11, 'Maniabandha Buddhist Ikkat Pata', 'Maniabandha', 24999, 31999, '/images/products/p11/front.jpg', 'Woven by the vegetarian Buddhist weaver community of Maniabandha, Cuttack, using ethical non-violent Ahimsa silk and delicate tie-dye waves.', 'Ahimsa Silk', 'Single Ikat Bandha', 'Golden Honey & Cobalt', 4.9, 71, 'Ethical Heirloom', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/products/p11/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/products/p11/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/products/p11/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (11, '/images/products/p11/side.jpg');
 
+-- 12. Dhalapathar Rangani Tapestry Saree
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (12, 'Bomkai Golden Temple', 'Bomkai', 19999, 25999, '/images/saree_front_6.png', 'Traditional Bomkai silk from Odisha with exquisite thread work and temple borders.', 'Pure Silk', 'Handloom', 'Golden Yellow', 4.8, 76, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/saree_front_6.png');
-INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/saree_master_side.png');
+VALUES (12, 'Dhalapathar Rangani Tapestry Saree', 'Dhalapathar', 17999, 24999, '/images/products/p12/front.jpg', 'Exceptional heritage weave from Khordha, Odisha, created without drawboys using the indigenous wooden Chiada technique with Lord Jagannath chariot motifs.', 'Handloom Cotton', 'Rangani Tapestry', 'Sky Cyan & Silver', 4.7, 59, 'Heritage Revival', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/products/p12/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/products/p12/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/products/p12/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (12, '/images/products/p12/side.jpg');
 
+-- 13. Sonepuri Hansa & Asavali Zari Silk
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (13, 'Kota Doria Pastel Breeze', 'Kota Doria', 8999, 12999, '/images/saree_front_7.png', 'Ultra-lightweight Kota Doria with delicate zari checks, perfect for warm weather grace.', 'Cotton Silk Blend', 'Handloom', 'Pastel Blue', 4.5, 132, 'Lightweight', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/saree_front_7.png');
-INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/saree_master_pallu.png');
+VALUES (13, 'Sonepuri Hansa & Asavali Zari Silk', 'Bomkai', 31499, 39999, '/images/products/p13/front.jpg', 'Opulent Sonepuri handloom silk from Western Odisha, displaying classical Hansa (sacred swan), lotus bud, and Asavali creeping vine borders.', 'Pure Mulberry Silk', 'Sonepuri Handloom', 'Forest Pine & Antique Gold', 4.9, 104, 'Premium', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/products/p13/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/products/p13/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/products/p13/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (13, '/images/products/p13/side.jpg');
 
+-- 14. Bapta Silk-Cotton Bandha
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (14, 'Maheshwari Regal Border', 'Maheshwari', 13999, 18999, '/images/saree_front_8.png', 'Elegant Maheshwari saree featuring reversible borders and a distinctive striped pallu.', 'Silk Cotton Blend', 'Handloom', 'Forest Green', 4.7, 95, 'Workwear', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/saree_front_8.png');
-INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/saree_master_border.png');
+VALUES (14, 'Bapta Silk-Cotton Bandha', 'Sambalpuri', 16999, 22499, '/images/products/p14/front.jpg', 'Traditional Odia Bapta weave uniting pure silk warp with breathable fine cotton weft, adorned with delicate Bandha tie-dye florets.', 'Silk Cotton Bapta', 'Bandha Weft Ikat', 'Magenta & Golden Zari', 4.8, 122, 'Artisan Guild', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/products/p14/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/products/p14/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/products/p14/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (14, '/images/products/p14/side.jpg');
 
+-- 15. Padua Wild Forest Tussar Drape
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (15, 'Phulkari Floral Heritage', 'Phulkari', 16999, 21999, '/images/saree_front_9.png', 'Vibrant Phulkari embroidery on pure georgette, showcasing the rich textile heritage of Punjab.', 'Georgette', 'Hand Embroidered', 'Vibrant Magenta', 4.8, 62, 'Festive', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/saree_front_9.png');
-INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/saree_master_side.png');
+VALUES (15, 'Padua Wild Forest Tussar Drape', 'Padua', 28499, 36999, '/images/products/p15/front.jpg', 'Hand-reeled wild forest Tussar silk nurtured in the tribal highlands of Padua, Koraput, with natural golden sheen and charcoal temple kumbha.', 'Pure Forest Tussar', 'Tribal Handloom', 'Natural Honey Gold & Charcoal', 4.9, 89, 'Limited Edition', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/products/p15/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/products/p15/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/products/p15/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (15, '/images/products/p15/side.jpg');
 
+-- 16. Barpali Double Ikat Bandha Silk
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (16, 'Chikankari Pearl Drop', 'Chikankari', 21999, 27999, '/images/saree_front_10.png', 'Ethereal Chikankari embroidery from Lucknow with delicate pearl embellishments on soft chiffon.', 'Chiffon', 'Hand Embroidered', 'Pearl White', 4.9, 118, 'Wedding', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/saree_front_10.png');
-INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/saree_master_side.png');
+VALUES (16, 'Barpali Double Ikat Bandha Silk', 'Sambalpuri', 38999, 48999, '/images/products/p16/front.jpg', 'Mathematical perfection in silk by national award-winning weavers of Barpali, featuring double-ikat warp and weft alignment with sacred conch shell motifs.', 'Pure Mulberry Silk', 'Double Ikat Bandha', 'Midnight Indigo & Crimson', 5.0, 68, 'Masterpiece', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/products/p16/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/products/p16/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/products/p16/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (16, '/images/products/p16/side.jpg');
 
+-- 17. Gopalpur GI Tussar Handloom
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (17, 'Gadwal Contrast Grace', 'Gadwal', 28999, 35999, '/images/saree_front_11.png', 'Authentic Gadwal saree featuring a cotton body with pure silk borders attached via the Kuttu technique.', 'Cotton with Silk Border', 'Handloom', 'Charcoal & Pink', 5, 45, 'Premium', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/saree_front_11.png');
-INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/saree_master_side.png');
-INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/saree_master_border.png');
+VALUES (17, 'Gopalpur GI Tussar Handloom', 'Tussar Odia', 22999, 29999, '/images/products/p17/front.jpg', 'Celebrated GI-registered handloom from Gopalpur, Jajpur district, woven from wild Ghicha Tussar silk with rich natural slub texture and tribal motifs.', 'Ghicha Tussar Silk', 'Handloom Ribbed Weave', 'Champagne Gold & Cocoa', 4.8, 114, 'GI Certified', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/products/p17/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/products/p17/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/products/p17/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (17, '/images/products/p17/side.jpg');
 
+-- 18. Nuapatna Khandua Malabati Bridal Pata
 INSERT INTO products (id, name, category, price, original_price, image, description, fabric, weave, color, rating, reviews, badge, created_date, modified_date)
-VALUES (18, 'Kasavu Golden Elegance', 'Kasavu', 9999, 13999, '/images/saree_front_12.png', 'Traditional Kerala Kasavu saree in pure cotton with a wide pure gold zari border.', 'Pure Cotton', 'Handloom', 'Off-White & Gold', 4.8, 185, 'Classic', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/saree_front_12.png');
-INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/saree_master_border.png');
-INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/saree_master_pallu.png');
-INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/saree_master_back.png');
-INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/saree_master_side.png');
-
--- Reset sequence for PostgreSQL if needed (ignores errors on H2)
--- ALTER SEQUENCE products_id_seq RESTART WITH 19;
-
-
+VALUES (18, 'Nuapatna Khandua Malabati Bridal Pata', 'Khandua', 41999, 52999, '/images/products/p18/front.jpg', 'Grand bridal Khandua Pata woven with the signature Malabati border and auspicious floral bandha motifs, consecrated for sacred wedding ceremonies.', 'Pure Mulberry Silk', 'Nuapatna Bridal Ikat', 'Blush Rose & Rich Gold', 5.0, 97, 'Bridal Heritage', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/products/p18/front.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/products/p18/pallu.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/products/p18/border.jpg');
+INSERT INTO product_images (product_id, image_url) VALUES (18, '/images/products/p18/side.jpg');

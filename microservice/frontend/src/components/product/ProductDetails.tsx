@@ -328,19 +328,26 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
             {/* Gallery Angle Thumbnails */}
             <div className="mt-3.5 flex items-center gap-2.5 overflow-x-auto pb-1 w-full max-w-md justify-start sm:justify-center">
-              {galleryImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImage(img)}
-                  className={`w-16 h-20 sm:w-18 sm:h-22 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
-                    activeImage === img
-                      ? 'border-brand-gold scale-105 shadow-md shadow-brand-gold/30'
-                      : 'border-brand-gold/20 opacity-60 hover:opacity-100 hover:border-brand-gold/50'
-                  }`}
-                >
-                  <img src={img} alt={`Angle ${idx + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
+              {galleryImages.map((img, idx) => {
+                const angleLabels = ['Front', 'Pallu', 'Border', 'Pleats', 'Lookbook'];
+                const label = angleLabels[idx] || `Angle ${idx + 1}`;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImage(img)}
+                    className={`relative w-16 h-20 sm:w-18 sm:h-22 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer group ${
+                      activeImage === img
+                        ? 'border-brand-gold scale-105 shadow-md shadow-brand-gold/30'
+                        : 'border-brand-gold/20 opacity-60 hover:opacity-100 hover:border-brand-gold/50'
+                    }`}
+                  >
+                    <img src={img} alt={`Angle ${idx + 1} - ${label}`} className="w-full h-full object-cover" />
+                    <span className="absolute bottom-0 inset-x-0 bg-black/70 backdrop-blur-xs text-[9px] font-mono text-brand-gold-light text-center py-0.5">
+                      {label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Authenticity Certificate Badges */}

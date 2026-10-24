@@ -15,6 +15,78 @@ interface TraditionInfo {
 }
 
 const TRADITION_METADATA: Record<string, TraditionInfo> = {
+  Padua: {
+    region: 'Koraput, Odisha',
+    technique: 'Aal-Dyed Mirgan Tribal Loom',
+    avgPrice: '₹22,500',
+    giTag: true,
+  },
+  Sambalpuri: {
+    region: 'Bargarh, Odisha',
+    technique: 'Bandha Tie-Dye Silk Ikat',
+    avgPrice: '₹28,000',
+    giTag: true,
+  },
+  Khandua: {
+    region: 'Nuapatna, Odisha',
+    technique: 'Gitagovinda Consecrated Ikat',
+    avgPrice: '₹37,500',
+    giTag: true,
+  },
+  Bomkai: {
+    region: 'Subarnapur, Odisha',
+    technique: 'Extra-Weft Jhabba & Temple Borders',
+    avgPrice: '₹30,500',
+    giTag: true,
+  },
+  Berhampuri: {
+    region: 'Silk City Berhampur, Odisha',
+    technique: 'Phoda Kumbha Interlocked Pata',
+    avgPrice: '₹36,999',
+    giTag: true,
+  },
+  Pasapalli: {
+    region: 'Bargarh, Odisha',
+    technique: 'Chessboard Double Bandha',
+    avgPrice: '₹32,999',
+    giTag: true,
+  },
+  Kotpad: {
+    region: 'Koraput, Odisha',
+    technique: 'Organic Mirgan Aal Root Dye',
+    avgPrice: '₹18,500',
+    giTag: true,
+  },
+  Habaspuri: {
+    region: 'Kalahandi, Odisha',
+    technique: 'Kumbha & Aquatic Motif Weave',
+    avgPrice: '₹23,999',
+    giTag: true,
+  },
+  Dongria: {
+    region: 'Niyamgiri Hills, Rayagada',
+    technique: 'Kapadaganda Tribal Embroidery',
+    avgPrice: '₹26,500',
+    giTag: true,
+  },
+  Maniabandha: {
+    region: 'Cuttack, Odisha',
+    technique: 'Buddhist Ahimsa Silk Ikat',
+    avgPrice: '₹24,999',
+    giTag: true,
+  },
+  'Tussar Odia': {
+    region: 'Gopalpur, Jajpur, Odisha',
+    technique: 'Wild Ghicha Tussar Silk',
+    avgPrice: '₹22,999',
+    giTag: true,
+  },
+  Dhalapathar: {
+    region: 'Khordha, Odisha',
+    technique: 'Rangani Wooden Chiada Tapestry',
+    avgPrice: '₹17,999',
+    giTag: true,
+  },
   Banarasi: {
     region: 'Varanasi, Uttar Pradesh',
     technique: 'Kadwa Brocade & Katan Silk',
@@ -27,32 +99,8 @@ const TRADITION_METADATA: Record<string, TraditionInfo> = {
     avgPrice: '₹44,000',
     giTag: true,
   },
-  Chanderi: {
-    region: 'Chanderi, Madhya Pradesh',
-    technique: 'Fine Silk Cotton with Zari Butis',
-    avgPrice: '₹18,500',
-    giTag: true,
-  },
-  Patola: {
-    region: 'Patan, Gujarat',
-    technique: 'Double Ikat Geometrical Grid',
-    avgPrice: '₹75,000',
-    giTag: true,
-  },
-  Paithani: {
-    region: 'Paithan, Maharashtra',
-    technique: 'Oblique Tapestry & Mor Pallu',
-    avgPrice: '₹32,000',
-    giTag: true,
-  },
-  Mysore: {
-    region: 'Mysuru, Karnataka',
-    technique: 'Pure Mulberry Crepe & 24K Gold',
-    avgPrice: '₹28,000',
-    giTag: true,
-  },
   Tussar: {
-    region: 'Champa, Chhattisgarh',
+    region: 'Odisha / Bihar',
     technique: 'Wild Kosa Silk & Tribal Weft',
     avgPrice: '₹22,000',
     giTag: true,
@@ -77,13 +125,20 @@ export const AtelierMetricsPanel: React.FC<AtelierMetricsPanelProps> = ({ produc
   }));
 
   const catColors: Record<string, string> = {
+    Padua: '#E07A5F',
+    Sambalpuri: '#DFBF7A',
+    Khandua: '#C45B8A',
+    Bomkai: '#F59E0B',
+    Berhampuri: '#10B981',
+    Pasapalli: '#3B82F6',
+    Kotpad: '#A855F7',
+    Habaspuri: '#EC4899',
+    Dongria: '#84CC16',
+    Maniabandha: '#06B6D4',
+    'Tussar Odia': '#E8A87C',
+    Dhalapathar: '#64748B',
     Banarasi: '#DFBF7A',
     Kanjeevaram: '#C45B8A',
-    Chanderi: '#3B82F6',
-    Patola: '#10B981',
-    Paithani: '#F59E0B',
-    Mysore: '#A855F7',
-    Tussar: '#E8A87C',
     Other: '#9CA3AF',
   };
 
@@ -103,8 +158,8 @@ export const AtelierMetricsPanel: React.FC<AtelierMetricsPanelProps> = ({ produc
       strokeDashoffset,
       color: catColors[cat.name] || '#DFBF7A',
       meta: TRADITION_METADATA[cat.name] || {
-        region: 'Heritage Weaving Cluster',
-        technique: 'Artisanal Handloom Silk',
+        region: 'Odisha Heritage Weaving Cluster',
+        technique: 'Certified Master Handloom',
         avgPrice: '₹25,000',
         giTag: true,
       },
@@ -117,9 +172,9 @@ export const AtelierMetricsPanel: React.FC<AtelierMetricsPanelProps> = ({ produc
     pct: 100,
     color: '#DFBF7A',
     meta: {
-      region: 'Across 7 Indian Heritage Guilds',
-      technique: 'Certified Pure Silk & Real Zari',
-      avgPrice: '₹34,000',
+      region: 'Odisha Heritage Looms',
+      technique: 'GI Certified Odia Handlooms & Padua Weaves',
+      avgPrice: '₹28,000',
       giTag: true,
     },
   };
@@ -127,210 +182,189 @@ export const AtelierMetricsPanel: React.FC<AtelierMetricsPanelProps> = ({ produc
   const recentEvents = [
     {
       id: 1,
-      title: 'Heirloom Order #VL-1092 Dispatched',
-      subtitle: 'Insured White-Glove Courier to Mumbai',
+      title: 'Padua Tribal Weave #VL-1092 Dispatched',
+      subtitle: 'Insured White-Glove Courier to Bhubaneswar',
       time: '4 mins ago',
       type: 'order',
     },
     {
       id: 2,
-      title: 'Kanjeevaram Gold Tissue Stock Reserved',
+      title: 'Sambalpuri Bandha Silk Stock Reserved',
       subtitle: 'VIP Patron Bridal Consultation confirmed',
       time: '18 mins ago',
       type: 'stock',
     },
     {
       id: 3,
-      title: 'GI Tag Verification Synchronized',
-      subtitle: 'Handloom Silk Board authentic seal validated',
-      time: '42 mins ago',
-      type: 'compliance',
-    },
-    {
-      id: 4,
-      title: 'New Patron Royal Account Enrolled',
-      subtitle: 'Maharani Suite Member from London, UK',
+      title: 'Nuapatna Khandua Pata Verified',
+      subtitle: 'GI Tag & Handloom Board Certification sealed',
       time: '1 hr ago',
-      type: 'user',
+      type: 'gi',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-8">
-      {/* Enhanced Weaving Tradition Portfolio - Radial Donut & Interactive Heritage Hub */}
-      <div className="lg:col-span-2 p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#1A0B2C]/90 via-[#120520]/80 to-[#0A0213]/90 border border-brand-gold/30 backdrop-blur-xl shadow-2xl flex flex-col justify-between relative overflow-hidden">
-        {/* Subtle Ambient Radial Glow */}
-        <div className="absolute -top-16 -right-16 w-64 h-64 bg-brand-gold/10 rounded-full blur-[80px] pointer-events-none" />
-
-        <div>
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-mono tracking-widest px-2.5 py-0.5 rounded-full border border-brand-gold/40 bg-brand-gold/15 text-brand-gold font-bold uppercase">
-                  ATELIER HERITAGE GUILD
-                </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              </div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-                Weaving Tradition Portfolio
-              </h3>
-              <p className="text-xs text-brand-ivory/60 mt-0.5 font-sans">
-                Curatorial distribution, geographical provenance, and active loom allocation.
-              </p>
-            </div>
-            <div className="text-right self-start sm:self-auto bg-black/40 px-3.5 py-2 rounded-xl border border-brand-gold/20">
-              <span className="font-mono text-base font-bold text-brand-gold block">
-                {products.length} Masterpieces
-              </span>
-              <span className="text-[10px] text-brand-ivory/50 font-mono uppercase tracking-wider">
-                {categoriesList.length} Living Traditions
-              </span>
-            </div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Weaving Tradition Portfolio Breakdown */}
+      <div className="lg:col-span-2 p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-[#180A26]/90 via-[#11041D]/80 to-[#0A0212]/90 border border-brand-gold/30 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold-light/70">
+              Loom Portfolio Analysis
+            </span>
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mt-1">
+              Weaving Tradition Portfolio
+            </h3>
           </div>
+          <div className="text-right">
+            <span className="text-xs font-mono text-brand-ivory/60 block">Catalog Volume</span>
+            <span className="font-mono text-lg font-bold text-brand-gold">
+              {products.length} Heirloom Sarees
+            </span>
+          </div>
+        </div>
 
-          {/* Centerpiece: Radial Heritage Donut & Tradition Focus Spotlight */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-5 rounded-2xl bg-black/35 border border-brand-gold/20 mb-6">
-            {/* SVG Donut Chart */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-              <div className="relative w-44 h-44 flex items-center justify-center">
-                <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 140 140">
-                  {/* Background Track */}
+        {/* Donut Chart & Detailed Tradition Dossier */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center mb-6 p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+          {/* Radial Donut Diagram */}
+          <div className="md:col-span-5 flex items-center justify-center">
+            <div className="relative w-36 h-36 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 140 140">
+                {/* Background Ring */}
+                <circle
+                  cx="70"
+                  cy="70"
+                  r={radius}
+                  fill="none"
+                  stroke="rgba(255, 255, 255, 0.05)"
+                  strokeWidth="14"
+                />
+                {/* Category Slices */}
+                {donutSlices.map((slice, i) => (
                   <circle
+                    key={i}
                     cx="70"
                     cy="70"
                     r={radius}
                     fill="none"
-                    stroke="rgba(255, 255, 255, 0.05)"
-                    strokeWidth="14"
+                    stroke={slice.color}
+                    strokeWidth={selectedCategory === slice.name ? '17' : '14'}
+                    strokeDasharray={slice.strokeDasharray}
+                    strokeDashoffset={slice.strokeDashoffset}
+                    className="transition-all duration-500 cursor-pointer hover:opacity-90"
+                    onMouseEnter={() => setSelectedCategory(slice.name)}
+                    onClick={() => setSelectedCategory(slice.name)}
                   />
-                  {/* Category Slices */}
-                  {donutSlices.map((slice, i) => (
-                    <circle
-                      key={i}
-                      cx="70"
-                      cy="70"
-                      r={radius}
-                      fill="none"
-                      stroke={slice.color}
-                      strokeWidth={selectedCategory === slice.name ? '17' : '14'}
-                      strokeDasharray={slice.strokeDasharray}
-                      strokeDashoffset={slice.strokeDashoffset}
-                      className="transition-all duration-500 cursor-pointer hover:opacity-90"
-                      onMouseEnter={() => setSelectedCategory(slice.name)}
-                      onClick={() => setSelectedCategory(slice.name)}
-                    />
-                  ))}
-                </svg>
+                ))}
+              </svg>
 
-                {/* Donut Center Display */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2">
-                  <span className="font-mono text-2xl font-bold text-white tracking-tight">
-                    {selectedCategory ? `${activeFocus.pct}%` : `${products.length}`}
-                  </span>
-                  <span className="text-[10px] font-serif text-brand-gold uppercase tracking-wider truncate max-w-[100px]">
-                    {selectedCategory ? activeFocus.name : 'Master Weaves'}
-                  </span>
-                  <span className="text-[9px] text-brand-ivory/40 font-mono">
-                    {selectedCategory ? `${activeFocus.count} pieces` : 'In Vault'}
-                  </span>
-                </div>
+              {/* Donut Center Display */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2">
+                <span className="font-mono text-2xl font-bold text-white tracking-tight">
+                  {selectedCategory ? `${activeFocus.pct}%` : `${products.length}`}
+                </span>
+                <span className="text-[10px] font-serif text-brand-gold uppercase tracking-wider truncate max-w-[100px]">
+                  {selectedCategory ? activeFocus.name : 'Master Weaves'}
+                </span>
+                <span className="text-[9px] text-brand-ivory/40 font-mono">
+                  {selectedCategory ? `${activeFocus.count} pieces` : 'In Vault'}
+                </span>
               </div>
             </div>
+          </div>
 
-            {/* Selected Tradition Dossier */}
-            <div className="md:col-span-7 flex flex-col justify-center space-y-3 border-t md:border-t-0 md:border-l border-white/10 md:pl-6 pt-4 md:pt-0">
-              <div className="flex items-center justify-between">
+          {/* Selected Tradition Dossier */}
+          <div className="md:col-span-7 flex flex-col justify-center space-y-3 border-t md:border-t-0 md:border-l border-white/10 md:pl-6 pt-4 md:pt-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold-light/70 flex items-center gap-1.5">
+                  <Compass className="w-3.5 h-3.5 text-brand-gold" />
+                  <span>Regional Provenance</span>
+                </span>
+                <h4 className="font-serif text-lg font-bold text-white mt-0.5">
+                  {activeFocus.name} Saree Tradition
+                </h4>
+              </div>
+              <span
+                className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-md"
+                style={{ backgroundColor: activeFocus.color }}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+              <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Origin Cluster</span>
+                <span className="font-medium text-white text-[11px] truncate block mt-0.5">
+                  {activeFocus.meta.region}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Weft Technique</span>
+                <span className="font-medium text-white text-[11px] truncate block mt-0.5">
+                  {activeFocus.meta.technique}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Valuation Range</span>
+                <span className="font-mono font-bold text-brand-gold text-[11px] block mt-0.5">
+                  {activeFocus.meta.avgPrice}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold-light/70 flex items-center gap-1.5">
-                    <Compass className="w-3.5 h-3.5 text-brand-gold" />
-                    <span>Regional Provenance</span>
-                  </span>
-                  <h4 className="font-serif text-lg font-bold text-white mt-0.5">
-                    {activeFocus.name} Saree Tradition
-                  </h4>
-                </div>
-                <span
-                  className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-md"
-                  style={{ backgroundColor: activeFocus.color }}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-                <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
-                  <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Origin Cluster</span>
-                  <span className="font-medium text-white text-[11px] truncate block mt-0.5">
-                    {activeFocus.meta.region}
+                  <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">GI Tag Status</span>
+                  <span className="font-medium text-emerald-400 text-[11px] block mt-0.5">
+                    ✓ GI Certified
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
-                  <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Weft Technique</span>
-                  <span className="font-medium text-white text-[11px] truncate block mt-0.5">
-                    {activeFocus.meta.technique}
-                  </span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
-                  <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">Valuation Range</span>
-                  <span className="font-mono font-bold text-brand-gold text-[11px] block mt-0.5">
-                    {activeFocus.meta.avgPrice}
-                  </span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] text-brand-ivory/50 font-mono uppercase block">GI Tag Status</span>
-                    <span className="font-medium text-emerald-400 text-[11px] block mt-0.5">
-                      ✓ GI Certified
-                    </span>
-                  </div>
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 opacity-80" />
-                </div>
+                <ShieldCheck className="w-4 h-4 text-emerald-400 opacity-80" />
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Interactive Tradition Pill Grid - Elevated Luxury Swatch Design without bar icon */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            {donutSlices.map((cat, idx) => {
-              const isSelected = selectedCategory === cat.name;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setSelectedCategory(isSelected ? null : cat.name)}
-                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
-                    isSelected
-                      ? 'bg-gradient-to-br from-brand-gold/20 via-brand-purple/40 to-brand-gold/5 border-brand-gold shadow-[0_0_20px_rgba(223,191,122,0.25)] ring-1 ring-brand-gold/60 scale-[1.02]'
-                      : 'bg-white/[0.03] border-white/10 hover:border-brand-gold/40 hover:bg-white/[0.06]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2 truncate">
-                      <div
-                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm border border-white/20"
-                        style={{ backgroundColor: cat.color }}
-                      />
-                      <span className="text-xs font-bold text-white truncate font-serif">
-                        {cat.name}
-                      </span>
-                    </div>
-                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-brand-gold/15 text-brand-gold font-bold border border-brand-gold/30">
-                      {cat.pct}%
+        {/* Interactive Tradition Pill Grid - Elevated Luxury Swatch Design without bar icon */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {donutSlices.map((cat, idx) => {
+            const isSelected = selectedCategory === cat.name;
+            return (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setSelectedCategory(isSelected ? null : cat.name)}
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
+                  isSelected
+                    ? 'bg-gradient-to-br from-brand-gold/20 via-brand-purple/40 to-brand-gold/5 border-brand-gold shadow-[0_0_20px_rgba(223,191,122,0.25)] ring-1 ring-brand-gold/60 scale-[1.02]'
+                    : 'bg-white/[0.03] border-white/10 hover:border-brand-gold/40 hover:bg-white/[0.06]'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 truncate">
+                    <div
+                      className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm border border-white/20"
+                      style={{ backgroundColor: cat.color }}
+                    />
+                    <span className="text-xs font-bold text-white truncate font-serif">
+                      {cat.name}
                     </span>
                   </div>
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-brand-gold/15 text-brand-gold font-bold border border-brand-gold/30">
+                    {cat.pct}%
+                  </span>
+                </div>
 
-                  {/* Clean Provenance & Artisan Info (Clean & Refined without bar) */}
-                  <div className="text-[10px] text-brand-ivory/60 font-sans truncate mb-2">
-                    {cat.meta.region}
-                  </div>
+                {/* Clean Provenance & Artisan Info (Clean & Refined without bar) */}
+                <div className="text-[10px] text-brand-ivory/60 font-sans truncate mb-2">
+                  {cat.meta.region}
+                </div>
 
-                  <div className="flex items-center justify-between text-[10px] font-mono border-t border-white/5 pt-2">
-                    <span className="text-brand-ivory/70">{cat.count} drapes</span>
-                    <span className="text-emerald-400 font-semibold">✓ Handloom</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                <div className="flex items-center justify-between text-[10px] font-mono border-t border-white/5 pt-2">
+                  <span className="text-brand-ivory/70">{cat.count} drapes</span>
+                  <span className="text-emerald-400 font-semibold">✓ Handloom</span>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {/* Bottom Efficiency Highlights */}

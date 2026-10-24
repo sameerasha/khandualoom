@@ -82,7 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <form onSubmit={handleSearchSubmit} className="flex items-center relative">
               <input
                 type="text"
-                placeholder="Search Banarasi, Kanjivaram, Silk..."
+                placeholder="Search Padua, Sambalpuri, Khandua, Handloom..."
                 value={searchInput}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
@@ -127,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {['Banarasi Kadwa', 'Kanjeevaram Silk', 'Chanderi Tissue', 'Royal Shikargah', 'Paithani Gold', 'Pure Zari'].map(
+                  {['Padua Handloom', 'Sambalpuri Bandha', 'Khandua Pata', 'Bomkai Silk', 'Berhampuri Pata', 'Pasapalli', 'Kotpad Weave', 'Dongria Kondh'].map(
                     (tag) => (
                       <button
                         key={tag}
