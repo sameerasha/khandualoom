@@ -44,7 +44,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   const [copiedLink, setCopiedLink] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Zoom state for inspecting silk weave
+  // Zoom state for inspecting silk weave (desktop only)
   const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({
     transformOrigin: 'center center',
     transform: 'scale(1)',
@@ -55,9 +55,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   const { data: allProducts } = useGetProductsQuery({});
   const catalogPool = allProducts && allProducts.length > 0 ? allProducts : fallbackProducts;
 
-  // Curate Related & More Masterpieces:
-  // 1. Same category / fabric first
-  // 2. If fewer than 4, fill from remaining catalog pool so there are always 4 stunning sarees!
+  // Curate Related Masterpieces: 4 items
   const relatedProducts = useMemo(() => {
     const isSameCategory = (p: Product) =>
       String(p.id) !== String(product.id) &&
@@ -92,7 +90,8 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
       // Ignore storage errors
     }
     setActiveImage(product.image || '/images/saree_crimson_red.png');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Instant scroll to top on product load so mobile starts clean
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [product]);
 
   // Curated gallery angles
@@ -103,8 +102,12 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
     '/images/saree_master_back.png',
   ];
 
-  // Mouse move zoom handler (2.2x magnification)
+  // Mouse move zoom handler (Desktop fine pointer only)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Disable hover-zoom calculations on mobile touch devices to ensure 100% fluid touch scrolling
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) {
+      return;
+    }
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
@@ -154,17 +157,17 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
       : 0;
 
   return (
-    <div className="min-h-screen bg-[#0D0515] text-brand-ivory selection:bg-brand-gold selection:text-brand-purple-dark pb-24">
+    <div className="w-full min-h-screen bg-[#0A0311] text-brand-ivory selection:bg-brand-gold selection:text-brand-purple-dark pb-20 overflow-x-hidden touch-pan-y">
       {/* Top Sticky Breadcrumb Bar */}
-      <div className="sticky top-0 z-40 bg-[#13091B]/95 backdrop-blur-md border-b border-brand-gold/20 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-[#12051E]/95 backdrop-blur-md border-b border-brand-gold/20 shadow-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           {/* Back Action */}
           <button
             onClick={onClose}
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-brand-gold hover:text-white transition-colors group"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-brand-gold hover:text-white transition-colors group cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            <span className="font-serif">Back to Atelier Collections</span>
+            <span className="font-serif">Back to Gallery</span>
           </button>
 
           {/* Breadcrumb Path */}
@@ -180,14 +183,14 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleShare}
-              className="p-2 rounded-full border border-brand-gold/25 hover:border-brand-gold hover:bg-brand-gold/10 text-brand-gold transition-all"
+              className="p-1.5 sm:p-2 rounded-full border border-brand-gold/25 hover:border-brand-gold hover:bg-brand-gold/10 text-brand-gold transition-all cursor-pointer"
               title="Share Masterpiece"
             >
               <Share2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => setIsWishlisted(!isWishlisted)}
-              className={`p-2 rounded-full border transition-all ${
+              className={`p-1.5 sm:p-2 rounded-full border transition-all cursor-pointer ${
                 isWishlisted
                   ? 'border-brand-crimson bg-brand-crimson/20 text-brand-crimson'
                   : 'border-brand-gold/25 hover:border-brand-gold hover:bg-brand-gold/10 text-brand-gold'
@@ -202,20 +205,21 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
       {copiedLink && (
         <div className="fixed bottom-6 right-6 z-50 bg-brand-gold text-brand-purple-dark px-4 py-2 rounded-full text-xs font-bold shadow-2xl animate-fade-in flex items-center gap-1.5">
-          <Check className="w-4 h-4" />
+          <Check className="w-4 h-4 stroke-[3]" />
           <span>Product link copied to clipboard</span>
         </div>
       )}
 
-      {/* Main Full-Screen Layout Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+      {/* Main Layout Container - Compact & Vibrant */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           
-          {/* ==================== LEFT COLUMN: MULTI-ANGLE GALLERY & ZOOM (6 COLS) ==================== */}
-          <div className="lg:col-span-6 flex flex-col items-center sticky top-20">
+          {/* ==================== LEFT COLUMN: GALLERY & ZOOM (5 COLS) ==================== */}
+          {/* lg:sticky lg:top-20 ensures on mobile it flows normally so touch scrolling is 100% smooth */}
+          <div className="lg:col-span-5 flex flex-col items-center lg:sticky lg:top-20 touch-pan-y">
             {/* Master Zoomable Viewport */}
             <div
-              className="relative aspect-[3/4] w-full max-w-lg rounded-3xl overflow-hidden border border-brand-gold/30 shadow-2xl bg-[#08020D] cursor-crosshair group"
+              className="relative aspect-[3/3.7] w-full max-w-md rounded-2xl overflow-hidden border border-brand-gold/30 shadow-2xl bg-[#08020D] lg:cursor-crosshair group touch-pan-y"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >
@@ -223,44 +227,44 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                 src={activeImage}
                 alt={product.name}
                 style={zoomStyle}
-                className="w-full h-full object-cover object-top transition-transform duration-150 will-change-transform"
+                className="w-full h-full object-cover object-top transition-transform duration-150 will-change-transform touch-pan-y pointer-events-auto"
               />
 
-              {/* Interactive Zoom Pill Notice */}
+              {/* Interactive Zoom Pill Notice (Desktop Only) */}
               <div
-                className={`absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/75 backdrop-blur-md border border-brand-gold/40 text-[11px] text-brand-gold-light flex items-center gap-2 transition-opacity duration-300 pointer-events-none shadow-lg ${
+                className={`hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-brand-gold/40 text-[10px] text-brand-gold-light items-center gap-1.5 transition-opacity duration-300 pointer-events-none shadow-lg ${
                   isZooming ? 'opacity-0' : 'opacity-100'
                 }`}
               >
-                <ZoomIn className="w-3.5 h-3.5 text-brand-gold animate-pulse" />
-                <span className="font-sans font-medium">Hover cursor to inspect pure silk weave (2.2×)</span>
+                <ZoomIn className="w-3 h-3 text-brand-gold" />
+                <span className="font-mono">Hover to inspect silk weave (2.2×)</span>
               </div>
 
-              {/* Top Luxury Ribbon Badge */}
-              {product.badge && (
-                <span className="absolute top-4 left-4 bg-brand-crimson/95 backdrop-blur-md text-white text-[11px] font-bold px-3.5 py-1 rounded-full uppercase tracking-wider shadow-lg">
-                  {product.badge}
-                </span>
-              )}
-
-              {/* Discount Ribbon */}
-              {discountPercent > 0 && (
-                <span className="absolute top-4 right-4 bg-brand-gold text-brand-purple-dark text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
-                  {discountPercent}% OFF
-                </span>
-              )}
+              {/* Top Badges */}
+              <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+                {product.badge && (
+                  <span className="bg-brand-crimson/95 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow">
+                    {product.badge}
+                  </span>
+                )}
+                {discountPercent > 0 && (
+                  <span className="bg-brand-gold text-brand-purple-dark text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow w-fit">
+                    {discountPercent}% OFF
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Gallery Angle Selector Thumbnails */}
-            <div className="mt-5 flex items-center gap-3 overflow-x-auto pb-2 w-full max-w-lg justify-start sm:justify-center">
+            {/* Gallery Angle Thumbnails */}
+            <div className="mt-3.5 flex items-center gap-2.5 overflow-x-auto pb-1 w-full max-w-md justify-start sm:justify-center">
               {galleryImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImage(img)}
-                  className={`w-20 h-24 rounded-2xl overflow-hidden border-2 shrink-0 transition-all ${
+                  className={`w-16 h-20 sm:w-18 sm:h-22 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
                     activeImage === img
-                      ? 'border-brand-gold scale-105 shadow-xl shadow-brand-gold/25'
-                      : 'border-brand-gold/25 opacity-60 hover:opacity-100 hover:border-brand-gold/50'
+                      ? 'border-brand-gold scale-105 shadow-md shadow-brand-gold/30'
+                      : 'border-brand-gold/20 opacity-60 hover:opacity-100 hover:border-brand-gold/50'
                   }`}
                 >
                   <img src={img} alt={`Angle ${idx + 1}`} className="w-full h-full object-cover" />
@@ -269,201 +273,199 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
             </div>
 
             {/* Authenticity Certificate Badges */}
-            <div className="mt-6 w-full max-w-lg grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-brand-purple-dark/60 border border-brand-gold/20">
-                <Award className="w-5 h-5 text-brand-gold shrink-0" />
+            <div className="mt-4 w-full max-w-md grid grid-cols-2 gap-2.5">
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-brand-purple-dark/50 border border-brand-gold/20 shadow-sm">
+                <Award className="w-4 h-4 text-brand-gold shrink-0" />
                 <div>
-                  <p className="text-xs font-bold text-white">Silk Mark India</p>
-                  <p className="text-[10px] text-brand-ivory/60">100% Guaranteed Pure Silk</p>
+                  <p className="text-[11px] font-bold text-white leading-tight">Silk Mark India</p>
+                  <p className="text-[9px] text-brand-ivory/60">100% Pure Silk Certified</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-brand-purple-dark/60 border border-brand-gold/20">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2 p-2.5 rounded-xl bg-brand-purple-dark/50 border border-brand-gold/20 shadow-sm">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                 <div>
-                  <p className="text-xs font-bold text-white">GI Tag Certified</p>
-                  <p className="text-[10px] text-brand-ivory/60">Authentic Heritage Origin</p>
+                  <p className="text-[11px] font-bold text-white leading-tight">GI Tag Certified</p>
+                  <p className="text-[9px] text-brand-ivory/60">Authentic Geographical Origin</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ==================== RIGHT COLUMN: DOSSIER, SPECS & ACTIONS (6 COLS) ==================== */}
-          <div className="lg:col-span-6 flex flex-col space-y-6">
+          {/* ==================== RIGHT COLUMN: COMPACT & VIBRANT DOSSIER (7 COLS) ==================== */}
+          <div className="lg:col-span-7 flex flex-col space-y-4 bg-gradient-to-br from-[#190A2A]/90 via-[#11031D]/85 to-[#0A0112]/95 border border-brand-gold/30 rounded-3xl p-5 sm:p-7 shadow-[0_15px_45px_rgba(0,0,0,0.6)] backdrop-blur-md">
             
-            {/* Category Heritage Header */}
+            {/* Header: Category & Saree Title */}
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold">
+              <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
+                <span className="text-[11px] uppercase tracking-wider text-brand-gold font-mono font-bold bg-brand-gold/10 px-2.5 py-0.5 rounded-full border border-brand-gold/25">
                   {product.category} Royal Atelier
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-gold/40" />
-                <span className="text-xs text-brand-gold-light font-mono">
-                  Loom Lot #{String(product.id).slice(0, 8).toUpperCase()}
+                <span className="text-[10px] text-brand-gold-light/70 font-mono">
+                  Lot #{String(product.id).slice(0, 8).toUpperCase()}
+                </span>
+                <span className="text-[10px] text-emerald-400 font-mono font-medium ml-auto flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  In Stock & Ready to Dispatch
                 </span>
               </div>
 
-              {/* Saree Master Title */}
-              <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white leading-tight">
+              <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
                 {product.name}
               </h1>
 
-              {/* Star Ratings & Patron Feedback */}
-              <div className="flex items-center gap-3 mt-3.5">
+              {/* Star Ratings & Appraisals */}
+              <div className="flex items-center gap-2 mt-2">
                 <div className="flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 ${
+                      className={`w-3.5 h-3.5 ${
                         i < Math.floor(product.rating || 5) ? 'fill-current' : 'opacity-30'
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-sm font-bold text-white">
+                <span className="text-xs font-bold text-white">
                   {product.rating ? product.rating.toFixed(1) : '4.9'}
                 </span>
-                <span className="text-brand-ivory/40">|</span>
-                <span className="text-xs text-brand-gold-light font-medium">
+                <span className="text-brand-ivory/30">|</span>
+                <span className="text-[11px] text-brand-gold-light/80">
                   {product.reviews || 88} Verified Patron Appraisals
                 </span>
-                <span className="text-brand-ivory/40">|</span>
-                <span className="text-xs text-emerald-400 font-medium">In Stock & Ready to Dispatch</span>
               </div>
             </div>
 
-            {/* Price Row */}
-            <div className="p-5 rounded-2xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-wrap items-baseline gap-4">
-              <span className="font-serif text-3xl sm:text-4xl font-bold text-brand-gold">
-                ₹{product.price.toLocaleString('en-IN')}
-              </span>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <>
-                  <span className="text-lg text-brand-ivory/40 line-through">
-                    ₹{product.originalPrice.toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-xs font-bold text-brand-crimson bg-brand-crimson/15 border border-brand-crimson/30 px-3 py-1 rounded-full">
-                    Save ₹{(product.originalPrice - product.price).toLocaleString('en-IN')} ({discountPercent}% OFF)
-                  </span>
-                </>
-              )}
-              <div className="w-full text-xs text-brand-ivory/60 mt-1 flex items-center justify-between">
-                <span>Inclusive of all GST taxes & royal velvet chest packaging</span>
-                <span className="text-emerald-400 font-medium">Free Pan-India Delivery</span>
+            {/* Price & Savings Block - Vibrant */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-gold/15 via-white/[0.03] to-transparent border border-brand-gold/30 flex flex-col gap-1.5">
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <span className="font-serif text-2xl sm:text-3xl font-bold text-brand-gold">
+                  ₹{product.price.toLocaleString('en-IN')}
+                </span>
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <>
+                    <span className="text-base text-brand-ivory/40 line-through font-mono">
+                      ₹{product.originalPrice.toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-[11px] font-bold text-brand-crimson bg-brand-crimson/15 border border-brand-crimson/30 px-2.5 py-0.5 rounded-full">
+                      Save ₹{(product.originalPrice - product.price).toLocaleString('en-IN')} ({discountPercent}% OFF)
+                    </span>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-brand-ivory/60 pt-1 border-t border-brand-gold/10">
+                <span>Inclusive of all GST taxes & royal velvet chest</span>
+                <span className="text-emerald-400 font-semibold">Free Pan-India Insured Dispatch</span>
               </div>
             </div>
 
-            {/* Editorial Description */}
-            <div className="space-y-3">
-              <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2">
-                <Feather className="w-4 h-4 text-brand-gold" />
-                The Loom Narrative
+            {/* The Loom Narrative */}
+            <div className="space-y-1.5">
+              <h3 className="font-serif text-sm font-bold text-brand-gold flex items-center gap-1.5">
+                <Feather className="w-3.5 h-3.5 text-brand-gold" />
+                <span>The Loom Narrative</span>
               </h3>
-              <p className="text-sm text-brand-ivory/80 leading-relaxed font-sans font-light">
+              <p className="text-xs text-brand-ivory/80 leading-relaxed font-sans font-light">
                 {product.description}
               </p>
             </div>
 
-            {/* Full Specifications Table */}
-            <div className="rounded-2xl border border-brand-gold/25 bg-brand-purple/20 p-5 sm:p-6 shadow-inner">
-              <h4 className="font-serif text-sm font-bold text-brand-gold uppercase tracking-wider flex items-center gap-2 mb-4">
-                <Sparkles className="w-4 h-4 text-brand-gold" />
-                Handloom Specification Dossier
+            {/* Compact Specifications Dossier */}
+            <div className="rounded-2xl border border-brand-gold/25 bg-black/30 p-4 shadow-inner">
+              <h4 className="font-serif text-xs font-bold text-brand-gold uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+                <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+                <span>Handloom Specification Dossier</span>
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8 text-xs font-sans">
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Fabric Composition:</span>
-                  <span className="font-semibold text-white">{product.fabric || '100% Pure Mulberry Silk'}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-[11px] font-sans">
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
+                  <span className="text-brand-ivory/60">Fabric:</span>
+                  <span className="font-semibold text-white">{product.fabric || 'Pure Mulberry Silk'}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Weaving Technique:</span>
-                  <span className="font-semibold text-white">{product.weave || 'Traditional Interlocking Kadwa'}</span>
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
+                  <span className="text-brand-ivory/60">Weaving:</span>
+                  <span className="font-semibold text-white">{product.weave || 'Interlocking Kadwa'}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Zari Specification:</span>
-                  <span className="font-semibold text-brand-gold-light">24K Gold Electroplated Silver Thread</span>
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
+                  <span className="text-brand-ivory/60">Zari:</span>
+                  <span className="font-semibold text-brand-gold-light">24K Electroplated Silver Thread</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Color Palette:</span>
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
+                  <span className="text-brand-ivory/60">Color:</span>
                   <span className="font-semibold text-white">{product.color || 'Imperial Heritage Tone'}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
                   <span className="text-brand-ivory/60">Saree Length:</span>
-                  <span className="font-semibold text-white">5.5 Metres Standard Drape</span>
+                  <span className="font-semibold text-white">5.5 Metres Standard</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
                   <span className="text-brand-ivory/60">Blouse Piece:</span>
-                  <span className="font-semibold text-emerald-400">Included (0.8m Matching Running Silk)</span>
+                  <span className="font-semibold text-emerald-400">Included (0.8m Silk)</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
                   <span className="text-brand-ivory/60">Weaving Time:</span>
-                  <span className="font-semibold text-white">18 - 24 Days on Pit Loom</span>
+                  <span className="font-semibold text-white">18 - 24 Days Pitloom</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-brand-gold/10">
-                  <span className="text-brand-ivory/60">Care Instructions:</span>
-                  <span className="font-semibold text-amber-300">Dry Clean Only • Muslin Storage</span>
+                <div className="flex justify-between py-1 border-b border-brand-gold/10">
+                  <span className="text-brand-ivory/60">Care:</span>
+                  <span className="font-semibold text-amber-300">Dry Clean Only</span>
                 </div>
               </div>
             </div>
 
-            {/* Interactive Actions: Quantity + Add To Cart + Instant Checkout */}
-            <div className="space-y-4 pt-4 border-t border-brand-gold/20">
-              <div className="flex items-center gap-4">
+            {/* Interactive Actions: Quantity + Add to Bag + Buy Now */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3">
                 {/* Quantity Counter */}
-                <div className="flex items-center border border-brand-gold/40 rounded-xl px-3 py-2.5 bg-brand-purple-dark/80 shrink-0">
-                  <span className="text-xs text-brand-ivory/60 mr-3 font-medium">Qty:</span>
+                <div className="flex items-center border border-brand-gold/40 rounded-xl px-2.5 py-2 bg-black/40 shrink-0">
                   <button
                     onClick={() => setSelectedQty(Math.max(1, selectedQty - 1))}
-                    className="text-brand-gold px-2.5 text-base font-bold hover:text-white transition-colors"
+                    className="text-brand-gold px-2 text-sm font-bold hover:text-white transition-colors cursor-pointer"
                   >
                     −
                   </button>
-                  <span className="text-sm font-bold px-3 font-mono text-white">{selectedQty}</span>
+                  <span className="text-xs font-bold px-2.5 font-mono text-white">{selectedQty}</span>
                   <button
                     onClick={() => setSelectedQty(selectedQty + 1)}
-                    className="text-brand-gold px-2.5 text-base font-bold hover:text-white transition-colors"
+                    className="text-brand-gold px-2 text-sm font-bold hover:text-white transition-colors cursor-pointer"
                   >
                     +
                   </button>
                 </div>
 
-                {/* Add to Bag Button */}
+                {/* Add to Bag Button with Vibrant Green State */}
                 <button
                   onClick={handleAdd}
-                  className={`flex-1 py-4 px-6 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 border transition-all shadow-lg ${
+                  className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border transition-all shadow-md cursor-pointer ${
                     added
-                      ? 'bg-emerald-600 border-emerald-500 text-white'
-                      : 'bg-brand-purple/70 border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-purple-dark'
+                      ? 'bg-emerald-600 border-emerald-400 text-white shadow-emerald-500/25'
+                      : 'bg-gradient-to-r from-brand-gold/20 via-brand-gold/10 to-transparent border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-purple-dark'
                   }`}
                 >
-                  {added ? <Check className="w-5 h-5" /> : <ShoppingBag className="w-5 h-5" />}
-                  <span className="font-serif text-base">{added ? 'Added to Bag' : 'Add to Bag'}</span>
+                  {added ? <Check className="w-4 h-4 stroke-[3]" /> : <ShoppingBag className="w-4 h-4" />}
+                  <span>{added ? 'Added to Bag' : 'Add to Bag'}</span>
                 </button>
               </div>
 
               {/* Instant Checkout Button */}
               <button
                 onClick={handleBuyNow}
-                className="w-full py-4 px-6 rounded-xl font-serif font-bold text-base bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark hover:brightness-110 shadow-2xl transition-all duration-300 transform active:scale-[0.99]"
+                className="w-full py-3.5 px-5 rounded-xl font-serif font-bold text-sm bg-gradient-to-r from-brand-gold via-amber-400 to-brand-gold text-brand-purple-dark hover:brightness-110 shadow-xl shadow-brand-gold/20 transition-all duration-300 transform active:scale-[0.99] cursor-pointer"
               >
                 Proceed to Secure Checkout
               </button>
 
-              {/* Trust Guarantees Row */}
-              <div className="grid grid-cols-3 gap-3 pt-4 text-[11px] text-center">
-                <div className="flex flex-col items-center p-3 rounded-2xl bg-white/5 border border-brand-gold/15">
-                  <ShieldCheck className="w-5 h-5 text-brand-gold mb-1.5" />
+              {/* Trust Row */}
+              <div className="grid grid-cols-3 gap-2 pt-2 text-[10px] text-center">
+                <div className="flex flex-col items-center p-2 rounded-xl bg-white/[0.03] border border-brand-gold/15">
+                  <ShieldCheck className="w-4 h-4 text-brand-gold mb-1" />
                   <span className="font-bold text-white">Silk Mark Verified</span>
-                  <span className="text-[10px] text-brand-ivory/60 mt-0.5">Zero Synthetic Fibers</span>
                 </div>
-                <div className="flex flex-col items-center p-3 rounded-2xl bg-white/5 border border-brand-gold/15">
-                  <Truck className="w-5 h-5 text-brand-gold mb-1.5" />
-                  <span className="font-bold text-white">Insured Transit</span>
-                  <span className="text-[10px] text-brand-ivory/60 mt-0.5">Free Pan-India Delivery</span>
+                <div className="flex flex-col items-center p-2 rounded-xl bg-white/[0.03] border border-brand-gold/15">
+                  <Truck className="w-4 h-4 text-brand-gold mb-1" />
+                  <span className="font-bold text-white">Insured Courier</span>
                 </div>
-                <div className="flex flex-col items-center p-3 rounded-2xl bg-white/5 border border-brand-gold/15">
-                  <RotateCcw className="w-5 h-5 text-brand-gold mb-1.5" />
+                <div className="flex flex-col items-center p-2 rounded-xl bg-white/[0.03] border border-brand-gold/15">
+                  <RotateCcw className="w-4 h-4 text-brand-gold mb-1" />
                   <span className="font-bold text-white">7-Day Guarantee</span>
-                  <span className="text-[10px] text-brand-ivory/60 mt-0.5">Hassle-Free Return</span>
                 </div>
               </div>
             </div>
@@ -471,109 +473,109 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
           </div>
         </div>
 
-        {/* ==================== CRAFT & ARTISAN HERITAGE STORY SECTION ==================== */}
-        <div className="mt-20 pt-12 border-t border-brand-gold/20">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="p-6 rounded-3xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
+        {/* ==================== CRAFT & ARTISAN HERITAGE STORY ==================== */}
+        <div className="mt-14 sm:mt-16 pt-8 border-t border-brand-gold/20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="p-5 rounded-2xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
               <div>
-                <div className="w-10 h-10 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-4">
-                  <Feather className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-3">
+                  <Feather className="w-4 h-4" />
                 </div>
-                <h3 className="font-serif text-lg font-bold text-white">Kadwa Weaving Tradition</h3>
-                <p className="mt-2 text-xs text-brand-ivory/70 leading-relaxed">
-                  Unlike printing or jacquard powerlooms, every floral booti in this saree is separately hand-woven using pure zari shuttles, leaving zero raw floating threads on the backside.
+                <h3 className="font-serif text-base font-bold text-white">Kadwa Weaving Tradition</h3>
+                <p className="mt-1.5 text-xs text-brand-ivory/70 leading-relaxed font-light">
+                  Every booti is separately hand-woven with pure zari shuttles, leaving zero raw floating threads on the backside.
                 </p>
               </div>
-              <span className="text-[11px] font-mono text-brand-gold-light mt-4 block">Varanasi Chowk Guild</span>
+              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Varanasi Chowk Guild</span>
             </div>
 
-            <div className="p-6 rounded-3xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
               <div>
-                <div className="w-10 h-10 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-4">
-                  <Clock className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-3">
+                  <Clock className="w-4 h-4" />
                 </div>
-                <h3 className="font-serif text-lg font-bold text-white">200+ Man Hours on Pitloom</h3>
-                <p className="mt-2 text-xs text-brand-ivory/70 leading-relaxed">
-                  Two master craftsmen collaborate synchronously across the warp frame, guiding flying shuttles to achieve millimeter precision in pattern symmetry.
+                <h3 className="font-serif text-base font-bold text-white">200+ Man Hours on Pitloom</h3>
+                <p className="mt-1.5 text-xs text-brand-ivory/70 leading-relaxed font-light">
+                  Two master craftsmen collaborate synchronously across the warp frame, guiding flying shuttles with millimeter accuracy.
                 </p>
               </div>
-              <span className="text-[11px] font-mono text-brand-gold-light mt-4 block">Zero Automated Shortcuts</span>
+              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Zero Powerloom Shortcuts</span>
             </div>
 
-            <div className="p-6 rounded-3xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-brand-purple-dark/50 border border-brand-gold/20 flex flex-col justify-between">
               <div>
-                <div className="w-10 h-10 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-4">
-                  <Shield className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold mb-3">
+                  <Shield className="w-4 h-4" />
                 </div>
-                <h3 className="font-serif text-lg font-bold text-white">Heirloom Preservation</h3>
-                <p className="mt-2 text-xs text-brand-ivory/70 leading-relaxed">
-                  Delivered in our bespoke royal velvet chest lined with pure cotton muslin to protect the zari patina for brides, daughters, and granddaughters.
+                <h3 className="font-serif text-base font-bold text-white">Heirloom Preservation</h3>
+                <p className="mt-1.5 text-xs text-brand-ivory/70 leading-relaxed font-light">
+                  Delivered in our bespoke royal velvet chest lined with pure muslin to protect the zari sheen across generations.
                 </p>
               </div>
-              <span className="text-[11px] font-mono text-brand-gold-light mt-4 block">Imperial Atelier Standard</span>
+              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Imperial Atelier Standard</span>
             </div>
           </div>
         </div>
 
         {/* ==================== PATRON REVIEWS & APPRAISALS ==================== */}
-        <div className="mt-16 pt-12 border-t border-brand-gold/20">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+        <div className="mt-12 pt-8 border-t border-brand-gold/20">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
             <div>
-              <span className="text-xs uppercase tracking-widest text-brand-gold font-mono">
+              <span className="text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold">
                 Patron Appraisals
               </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white mt-1">
+              <h2 className="font-serif text-xl sm:text-2xl font-bold text-white mt-0.5">
                 Connoisseur Testimonials
               </h2>
             </div>
-            <div className="flex items-center gap-2 text-sm text-brand-gold-light">
-              <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-              <span className="font-bold text-white text-lg">{product.rating ? product.rating.toFixed(1) : '4.9'}</span>
+            <div className="flex items-center gap-2 text-xs text-brand-gold-light">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-bold text-white text-base">{product.rating ? product.rating.toFixed(1) : '4.9'}</span>
               <span>out of 5.0 (98% Recommendation Rate)</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 space-y-2">
               <div className="flex text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                  <Star key={i} className="w-3 h-3 fill-current" />
                 ))}
               </div>
               <p className="text-xs text-brand-ivory/80 italic leading-relaxed">
                 "The zari shine is regal without being loud. The silk falls like liquid gold. Wore this to my brother’s wedding and received non-stop compliments."
               </p>
-              <div className="pt-2 border-t border-brand-gold/10 flex items-center justify-between text-[11px]">
+              <div className="pt-2 border-t border-brand-gold/10 flex items-center justify-between text-[10px]">
                 <span className="font-bold text-white">Radhika M.</span>
                 <span className="text-emerald-400">Verified Buyer • Mumbai</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 space-y-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 space-y-2">
               <div className="flex text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                  <Star key={i} className="w-3 h-3 fill-current" />
                 ))}
               </div>
               <p className="text-xs text-brand-ivory/80 italic leading-relaxed">
                 "The velvet chest packaging itself is a work of art. You can immediately feel the density of pure silk. The Silk Mark tag gave complete confidence."
               </p>
-              <div className="pt-2 border-t border-brand-gold/10 flex items-center justify-between text-[11px]">
+              <div className="pt-2 border-t border-brand-gold/10 flex items-center justify-between text-[10px]">
                 <span className="font-bold text-white">Ananya S.</span>
                 <span className="text-emerald-400">Verified Buyer • Bangalore</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 space-y-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-brand-purple-dark/40 border border-brand-gold/15 space-y-2">
               <div className="flex text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                  <Star key={i} className="w-3 h-3 fill-current" />
                 ))}
               </div>
               <p className="text-xs text-brand-ivory/80 italic leading-relaxed">
                 "True Kadwa weaving. No floating threads on the reverse side whatsoever. It is a genuine heirloom piece that will stay in the family for decades."
               </p>
-              <div className="pt-2 border-t border-brand-gold/10 flex items-center justify-between text-[11px]">
+              <div className="pt-2 border-t border-brand-gold/10 flex items-center justify-between text-[10px]">
                 <span className="font-bold text-white">Meenakshi I.</span>
                 <span className="text-emerald-400">Verified Buyer • Chennai</span>
               </div>
@@ -583,54 +585,54 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
         {/* ==================== RELATED MASTERPIECES GRID ==================== */}
         {relatedProducts.length > 0 && (
-          <div className="mt-20 pt-12 border-t border-brand-gold/20">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div className="mt-14 pt-8 border-t border-brand-gold/20">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
               <div>
-                <span className="text-xs uppercase tracking-widest text-brand-gold font-mono">
+                <span className="text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold">
                   From The Imperial Handlooms
                 </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white mt-1">
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mt-0.5">
                   More Masterpieces You May Adore
                 </h3>
               </div>
               <button
                 onClick={onClose}
-                className="self-start sm:self-auto px-5 py-2 rounded-full border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 text-xs font-mono uppercase tracking-wider transition-all"
+                className="self-start sm:self-auto px-4 py-1.5 rounded-full border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 text-xs font-mono uppercase tracking-wider transition-all cursor-pointer"
               >
                 Explore Full Catalog →
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {relatedProducts.map((rel: Product) => (
                 <div
                   key={rel.id}
                   onClick={() => onSelectProduct?.(rel)}
-                  className="group rounded-3xl border border-brand-gold/20 overflow-hidden bg-brand-purple-dark/60 hover:border-brand-gold/60 cursor-pointer transition-all hover:shadow-2xl hover:shadow-brand-gold/10 flex flex-col"
+                  className="group rounded-2xl border border-brand-gold/20 overflow-hidden bg-brand-purple-dark/60 hover:border-brand-gold/60 cursor-pointer transition-all hover:shadow-xl hover:shadow-brand-gold/15 flex flex-col"
                 >
-                  <div className="aspect-[3/4] w-full overflow-hidden bg-black relative">
+                  <div className="aspect-[3/3.8] w-full overflow-hidden bg-black relative">
                     <img
                       src={rel.image || '/images/saree_crimson_red.png'}
                       alt={rel.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     {rel.badge && (
-                      <span className="absolute top-3 left-3 bg-brand-crimson text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase shadow">
+                      <span className="absolute top-2.5 left-2.5 bg-brand-crimson text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase shadow">
                         {rel.badge}
                       </span>
                     )}
                   </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
+                  <div className="p-3.5 flex-1 flex flex-col justify-between">
                     <div>
                       <span className="text-[10px] text-brand-gold uppercase tracking-wider block font-mono">
                         {rel.category}
                       </span>
-                      <h4 className="font-serif text-sm font-bold text-white truncate mt-1 group-hover:text-brand-gold transition-colors">
+                      <h4 className="font-serif text-xs sm:text-sm font-bold text-white truncate mt-0.5 group-hover:text-brand-gold transition-colors">
                         {rel.name}
                       </h4>
                     </div>
-                    <div className="mt-3 flex items-center justify-between pt-2 border-t border-brand-gold/10">
-                      <span className="font-serif text-base font-bold text-brand-gold">
+                    <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-brand-gold/10">
+                      <span className="font-serif text-sm sm:text-base font-bold text-brand-gold">
                         ₹{rel.price.toLocaleString('en-IN')}
                       </span>
                       <ChevronRight className="w-4 h-4 text-brand-gold opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
