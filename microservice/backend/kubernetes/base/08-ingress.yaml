@@ -5,10 +5,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: khandualoom-ingress
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app.kubernetes.io/name: khandualoom-ingress
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "120"

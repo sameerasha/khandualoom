@@ -1,50 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config
-  namespace: khandualoom-micro
-  labels:
-    app.kubernetes.io/name: app-config
-    app.kubernetes.io/part-of: khandualoom-platform
-data:
-  # Database Parameters
-  POSTGRES_DB: "khandualoom_db"
-  DB_URL: "jdbc:postgresql://postgres:5432/khandualoom_db"
-  DB_DRIVER: "org.postgresql.Driver"
-  DB_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
-
-  # Caching and Event-Driven Mesh
-  REDIS_HOST: "redis"
-  REDIS_PORT: "6379"
-  KAFKA_BOOTSTRAP_SERVERS: "kafka:29092"
-
-  # Inter-Service Routing
-  AUTH_SERVICE_URL: "http://auth-service:8081"
-  PRODUCT_SERVICE_URL: "http://product-service:8082"
-  ORDER_SERVICE_URL: "http://order-service:8083"
-  NOTIFICATION_SERVICE_URL: "http://notification-service:8084"
-
-  # Observability & Distributed Tracing
-  OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo:4318/v1/traces"
-  TRACING_SAMPLING_PROBABILITY: "1.0"
-  ENVIRONMENT: "production"
-
-  # CORS Allowed Origins
-  CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:30080"
-
-  # Email Gateway
-  MAIL_HOST: "smtp-relay.brevo.com"
-  MAIL_PORT: "587"
-  MAIL_FROM: "concierge@khandualoom.com"
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
   name: observability-config
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app.kubernetes.io/name: observability-config
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
 data:
   prometheus.yml: |
     global:

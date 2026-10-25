@@ -6,12 +6,12 @@ services:
   # ==========================================
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: khandualoom-micro-postgres
+    container_name: postgres
     ports:
       - "5419:5432"
       - "5432:5432"
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-.env.dev}
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -31,7 +31,7 @@ services:
   # ==========================================
   redis:
     image: redis:7-alpine
-    container_name: khandualoom-micro-redis
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
@@ -49,7 +49,7 @@ services:
   # ==========================================
   kafka:
     image: confluentinc/cp-kafka:7.6.0
-    container_name: khandualoom-micro-kafka
+    container_name: kafka
     ports:
       - "9092:9092"
     environment:
@@ -83,7 +83,7 @@ services:
   # ==========================================
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: khandualoom-micro-kafka-ui
+    container_name: kafka-ui
     ports:
       - "8085:8080"
     environment:
@@ -101,11 +101,11 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
-    container_name: khandualoom-micro-auth
+    container_name: auth-service
     ports:
       - "8081:8081"
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-.env.dev}
     environment:
       - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
       - DB_USERNAME=${DB_USERNAME:-postgres}
@@ -124,11 +124,11 @@ services:
     build:
       context: ./product-service
       dockerfile: Dockerfile
-    container_name: khandualoom-micro-product
+    container_name: product-service
     ports:
       - "8082:8082"
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-.env.dev}
     environment:
       - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
       - DB_USERNAME=${DB_USERNAME:-postgres}
@@ -151,11 +151,11 @@ services:
     build:
       context: ./order-service
       dockerfile: Dockerfile
-    container_name: khandualoom-micro-order
+    container_name: order-service
     ports:
       - "8083:8083"
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-.env.dev}
     environment:
       - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
       - DB_USERNAME=${DB_USERNAME:-postgres}
@@ -177,11 +177,11 @@ services:
     build:
       context: ./notification-service
       dockerfile: Dockerfile
-    container_name: khandualoom-micro-notification
+    container_name: notification-service
     ports:
       - "8084:8084"
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-.env.dev}
     environment:
       - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
       - DB_USERNAME=${DB_USERNAME:-postgres}
@@ -203,11 +203,11 @@ services:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
-    container_name: khandualoom-micro-gateway
+    container_name: api-gateway
     ports:
       - "8080:8080"
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-.env.dev}
     environment:
       - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://auth-service:8081}
       - PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL:-http://product-service:8082}
@@ -229,12 +229,12 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
-    container_name: khandualoom-micro-frontend
+    container_name: frontend
     ports:
       - "3000:80"
       - "5174:80"
     env_file:
-      - ../frontend/.env.dev
+      - ${FRONTEND_ENV_FILE:-../frontend/.env.dev}
     depends_on:
       - api-gateway
     networks:
@@ -245,7 +245,7 @@ services:
   # ==========================================
   prometheus:
     image: prom/prometheus:v2.51.0
-    container_name: khandualoom-micro-prometheus
+    container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -264,7 +264,7 @@ services:
   # ==========================================
   tempo:
     image: grafana/tempo:2.4.1
-    container_name: khandualoom-micro-tempo
+    container_name: tempo
     command: ["-config.file=/etc/tempo.yaml"]
     volumes:
       - ./.local/observability/tempo/tempo.yml:/etc/tempo.yaml:ro
@@ -281,7 +281,7 @@ services:
   # ==========================================
   grafana:
     image: grafana/grafana:10.4.1
-    container_name: khandualoom-micro-grafana
+    container_name: grafana
     ports:
       - "3001:3000"
     environment:

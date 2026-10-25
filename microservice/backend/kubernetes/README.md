@@ -1,115 +1,93 @@
 # Khandua Looms Enterprise Kubernetes Orchestration
 
-Production-grade, cloud-native Kubernetes architecture for the **Khandua Looms** distributed microservices platform.
+Production-grade, cloud-native Kubernetes architecture for the **Khandua Looms** distributed microservices platform, fully structured according to Kustomize GitOps best practices.
 
 ---
 
-## 1. Architecture Overview
+## 1. Clean Directory Structure (Base & Overlays)
+
+The directory is split into **shared base manifests** and **environment overlays** (`dev` and `prod`) with zero code duplication:
 
 ```
-                                  [ Client / Browser ]
-                                           │
-                                ┌──────────▼──────────┐
-                                │ Kubernetes Ingress  │
-                                │   (:80 / :443)      │
-                                └────┬───────────┬────┘
-                                     │           │
-                 ┌───────────────────┘           └──────────────────┐
-                 │                                                  │
-                 ▼                                                  ▼
-     ┌───────────────────────┐                          ┌───────────────────────┐
-     │  Frontend Service     │                          │  API Gateway Service  │
-     │  (React 19 / Nginx)   │                          │  (Spring Cloud :8080) │
-     │  NodePort :30080      │                          └───────────┬───────────┘
-     └───────────────────────┘                                      │
-                                         ┌──────────────┬───────────┴──┬──────────────┐
-                                         │              │              │              │
-                                         ▼              ▼              ▼              ▼
-                                  ┌─────────────┐┌─────────────┐┌─────────────┐┌─────────────┐
-                                  │Auth Service ││Product Svc  ││Order Service││Notification │
-                                  │   (:8081)   ││   (:8082)   ││   (:8083)   ││   (:8084)   │
-                                  └──────┬──────┘└──────┬──────┘└──────┬──────┘└──────┬──────┘
-                                         │              │              │              │
-                 ┌───────────────────────┴──────────────┴──────────────┴──────────────┘
-                 │
-                 ▼
- ┌────────────────────────────────────────────────────────────────────────┐
- │                        Data & Messaging Plane                          │
- │  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐  │
- │  │  PostgreSQL 16   │    │     Redis 7      │    │  Apache Kafka    │  │
- │  │ (pgvector :5432) │    │  (Cache :6379)   │    │  (KRaft :29092)  │  │
- │  └──────────────────┘    └──────────────────┘    └──────────────────┘  │
- └────────────────────────────────────────────────────────────────────────┘
+microservice/backend/kubernetes/
+├── base/                          # Shared Core Infrastructure & Microservices
+│   ├── 01-namespace.yml          # Namespace boundary (khandualoom)
+│   ├── 02-configmaps.yaml         # Observability file mounts (Prometheus, Tempo, Grafana, Nginx)
+│   ├── 03-persistent-volumes.yaml # PVCs for Postgres, Kafka, Redis, Prometheus, Tempo, Grafana
+│   ├── 04-infra.yaml              # Databases & brokers: postgres, redis, kafka, kafka-ui
+│   ├── 05-backend.yaml            # Spring Boot microservices with startup & health probes
+│   ├── 06-observability.yaml      # Telemetry: prometheus, tempo, grafana
+│   ├── 07-frontend.yaml           # React Storefront UI on NodePort 30080
+│   ├── 08-ingress.yaml            # Ingress controller rules
+│   └── kustomization.yaml         # Base Kustomize definition
+│
+├── overlays/                      # Environment Configurations
+│   ├── dev/
+│   │   └── kustomization.yaml     # Dev overlay (single replicas, fast local dev)
+│   └── prod/
+│       ├── 09-hpa.yaml            # Horizontal Pod Autoscalers (1–8 replicas, CPU 70%, RAM 80%)
+│       └── kustomization.yaml     # Prod overlay (enables HPA & production policies)
+│
+├── 00-secrets.template.yml       # Template for secrets (NO plaintext secrets in Git)
+├── k8s-start.ps1                  # PowerShell dynamic launcher (.env.dev / .env.prod)
+├── k8s-start.sh                   # Bash dynamic launcher (.env.dev / .env.prod)
+├── kustomization.yaml             # Root Kustomize definition (defaults to overlays/dev)
+└── README.md
 ```
 
 ---
 
-## 2. Directory Structure
+## 2. Dynamic Secret Ingestion (Zero Plaintext Secrets)
 
-| File | Purpose |
-| :--- | :--- |
-| `00-namespace.yaml` | Namespace isolation (`khandualoom-micro`) with metadata labels |
-| `01-secrets.yaml` | Application secrets: Database credentials, JWT 256-bit secret, Brevo SMTP credentials, OAuth IDs, Razorpay keys |
-| `02-configmaps.yaml` | ConfigMaps: `app-config` for microservice network coordinates & `observability-config` for Prometheus/Tempo/Grafana |
-| `03-persistent-volumes.yaml` | PVCs for PostgreSQL, Redis, Kafka, Prometheus, Tempo, and Grafana |
-| `04-infra.yaml` | Infrastructure services: PostgreSQL 16 (pgvector), Redis 7, Apache Kafka (KRaft mode), Kafka UI |
-| `05-backend.yaml` | Spring Boot 3.3.x Microservices: Auth, Product, Order, Notification, and API Gateway |
-| `06-observability.yaml` | Observability stack: Prometheus (:9090), Grafana Tempo (:3200, :4318), Grafana Dashboards (:3000) |
-| `07-frontend.yaml` | Storefront: High-performance Nginx reverse-proxy & React app (NodePort :30080) |
-| `08-ingress.yaml` | Ingress resource with Nginx annotations for `/` (Frontend) and `/api` (API Gateway) |
-| `09-hpa.yaml` | Horizontal Pod Autoscalers (HPA v2) for API Gateway, Auth, Product, and Order microservices |
-| `kustomization.yaml` | Kustomize manifest for single-command declarative deployment |
-| `manifest.yaml` | Generated all-in-one manifest for standard `kubectl apply -f manifest.yaml` |
+Credentials (passwords, JWT signing keys, payment keys, SMTP logins) are **never stored in YAML files**:
+- `k8s-start.ps1` and `k8s-start.sh` read credentials directly from your local `.env.dev` or `.env.prod` file.
+- The Kubernetes Secret `app-secrets` is generated in memory and injected securely:
+  ```bash
+  kubectl create secret generic app-secrets \
+    --namespace=khandualoom \
+    --from-env-file=../.env.dev \
+    --dry-run=client -o yaml | kubectl apply -f -
+  ```
 
 ---
 
-## 3. Quickstart Deployment
+## 3. Quickstart Commands
 
-### Option A: Declarative Kustomize Deployment (Recommended)
-```bash
-cd microservice/backend/kubernetes
-kubectl apply -k .
+### Deploy Development Mode (Reads `.env.dev`)
+```powershell
+.\k8s-start.ps1 dev
+# Or with bash:
+./k8s-start.sh dev
 ```
 
-### Option B: Single-File Manifest Deployment
-```bash
-kubectl apply -f microservice/backend/kubernetes/manifest.yaml
+### Deploy Production Mode (Reads `.env.prod`, Enables HPA)
+```powershell
+.\k8s-start.ps1 prod
+# Or with bash:
+./k8s-start.sh prod
+```
+
+### Check Cluster Status
+```powershell
+.\k8s-start.ps1 status
+```
+
+### Stop (Scale Down) All Containers
+```powershell
+.\k8s-start.ps1 stop
 ```
 
 ---
 
-## 4. Verification and Health Checks
+## 4. Endpoints & Access
 
-### Check All Resources
-```bash
-kubectl get all -n khandualoom-micro
-```
+| Service | Target URL | Description |
+| :--- | :--- | :--- |
+| **Storefront Web UI** | `http://localhost:30080` | React Luxury E-commerce Storefront |
+| **Storefront API Gateway** | `http://localhost:30080/api/products` | Public Catalog API |
+| **Auth Login API** | `POST http://localhost:30080/api/auth/login` | JWT Authentication Endpoint |
+| **Kafka Management UI** | Internal Service `kafka-ui:8080` | Topic Inspector & Consumer Groups |
+| **Prometheus Metrics** | Internal Service `prometheus:9090` | Scrapes `/actuator/prometheus` |
+| **Grafana Dashboards** | Internal Service `grafana:3000` | Pre-provisioned Microservices Dashboards |
+| **Tempo Tracing** | Internal Service `tempo:3200` | Distributed Trace Visualizer |
 
-### Check Horizontal Pod Autoscaling (HPA)
-```bash
-kubectl get hpa -n khandualoom-micro
-```
-
-### Verify Spring Boot Actuator Probes
-All Spring Boot microservices feature dual Actuator probes:
-- **Liveness Probe**: `/actuator/health/liveness` (Detects deadlocks and initiates safe restarts)
-- **Readiness Probe**: `/actuator/health/readiness` (Verifies datastore and broker availability before routing traffic)
-
----
-
-## 5. Local Access & Port-Forwarding
-
-| Service | Protocol / Access | Port | Description |
-| :--- | :--- | :--- | :--- |
-| **Storefront** | HTTP NodePort | `http://localhost:30080` | Production React Storefront & Admin Portal |
-| **API Gateway** | Port Forward | `kubectl port-forward svc/api-gateway 8080:8080 -n khandualoom-micro` | Direct Spring Cloud Gateway route |
-| **Kafka UI** | Port Forward | `kubectl port-forward svc/kafka-ui 8085:8080 -n khandualoom-micro` | Kafka topics, consumer groups & broker monitor |
-| **Grafana** | Port Forward | `kubectl port-forward svc/grafana 3001:3000 -n khandualoom-micro` | Observability dashboards (admin / admin) |
-| **Prometheus** | Port Forward | `kubectl port-forward svc/prometheus 9090:9090 -n khandualoom-micro` | Prometheus time-series metric browser |
-
----
-
-## 6. Teardown
-```bash
-kubectl delete -k microservice/backend/kubernetes
-```

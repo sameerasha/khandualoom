@@ -1,5 +1,6 @@
 # ===================================================================
 # Horizontal Pod Autoscaling (HPA v2) — Elastic Scale Policy
+# Targets: api-gateway, order-service, product-service, auth-service
 # ===================================================================
 
 # 1. API Gateway Autoscaler
@@ -7,10 +8,10 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: api-gateway-hpa
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app.kubernetes.io/name: api-gateway-hpa
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -38,10 +39,10 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: order-service-hpa
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app.kubernetes.io/name: order-service-hpa
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -69,10 +70,10 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: product-service-hpa
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app.kubernetes.io/name: product-service-hpa
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -100,10 +101,10 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: auth-service-hpa
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app.kubernetes.io/name: auth-service-hpa
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

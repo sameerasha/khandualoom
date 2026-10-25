@@ -1,15 +1,16 @@
 # ===================================================================
 # React TypeScript Luxury Storefront
+# Clean Container Name: frontend
 # ===================================================================
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app: frontend
     app.kubernetes.io/name: frontend
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
 spec:
   replicas: 1
   strategy:
@@ -27,7 +28,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: khandualoom-micro-frontend:latest
+          image: khandualoom-frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -72,11 +73,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend
-  namespace: khandualoom-micro
+  namespace: khandualoom
   labels:
     app: frontend
     app.kubernetes.io/name: frontend
-    app.kubernetes.io/part-of: khandualoom-platform
+    app.kubernetes.io/part-of: khandualoom
 spec:
   type: NodePort
   selector:
