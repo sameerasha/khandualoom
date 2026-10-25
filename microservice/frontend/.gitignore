@@ -7,6 +7,13 @@ dist-ssr/
 # AI Agent configuration
 .agent/
 
+# Environment and Secrets (exclude from Git commits)
+.env
+.env.*
+*.env
+*.env.*
+!.env.example
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

@@ -9,8 +9,14 @@
 *.tsbuildinfo
 **/coverage/
 
-# Environment and IDE
-.env.local
+# Environment and Secrets (exclude from Git commits)
+.env
+.env.*
+*.env
+*.env.*
+!.env.example
+
+# IDE and OS
 .DS_Store
 .idea/
 .vscode/

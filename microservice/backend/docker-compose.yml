@@ -10,10 +10,12 @@ services:
     ports:
       - "5419:5432"
       - "5432:5432"
+    env_file:
+      - .env.dev
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: khandualoom_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-khandualoom_db}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -102,11 +104,13 @@ services:
     container_name: khandualoom-micro-auth
     ports:
       - "8081:8081"
+    env_file:
+      - .env.dev
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
     depends_on:
       postgres:
         condition: service_healthy
@@ -123,13 +127,15 @@ services:
     container_name: khandualoom-micro-product
     ports:
       - "8082:8082"
+    env_file:
+      - .env.dev
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
     depends_on:
       postgres:
         condition: service_healthy
@@ -148,12 +154,14 @@ services:
     container_name: khandualoom-micro-order
     ports:
       - "8083:8083"
+    env_file:
+      - .env.dev
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
     depends_on:
       postgres:
         condition: service_healthy
@@ -172,12 +180,14 @@ services:
     container_name: khandualoom-micro-notification
     ports:
       - "8084:8084"
+    env_file:
+      - .env.dev
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
     depends_on:
       postgres:
         condition: service_healthy
@@ -196,12 +206,14 @@ services:
     container_name: khandualoom-micro-gateway
     ports:
       - "8080:8080"
+    env_file:
+      - .env.dev
     environment:
-      - AUTH_SERVICE_URL=http://auth-service:8081
-      - PRODUCT_SERVICE_URL=http://product-service:8082
-      - ORDER_SERVICE_URL=http://order-service:8083
-      - NOTIFICATION_SERVICE_URL=http://notification-service:8084
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://auth-service:8081}
+      - PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL:-http://product-service:8082}
+      - ORDER_SERVICE_URL=${ORDER_SERVICE_URL:-http://order-service:8083}
+      - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL:-http://notification-service:8084}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
     depends_on:
       - auth-service
       - product-service
@@ -221,6 +233,8 @@ services:
     ports:
       - "3000:80"
       - "5174:80"
+    env_file:
+      - ../frontend/.env.dev
     depends_on:
       - api-gateway
     networks:
