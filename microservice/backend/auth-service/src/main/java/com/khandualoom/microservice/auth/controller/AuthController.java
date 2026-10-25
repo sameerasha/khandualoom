@@ -38,7 +38,6 @@ public class AuthController {
     private final OtpService otpService;
     private final com.khandualoom.microservice.auth.service.ActiveSessionService activeSessionService;
 
-
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(jakarta.servlet.http.HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
@@ -53,12 +52,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("Attempting to authenticate user: {}", loginRequest.getEmail());
-        if (("admin@khandualoom.com".equalsIgnoreCase(loginRequest.getEmail()) || "admin@khandualoom.com".equalsIgnoreCase(loginRequest.getEmail())) && "Admin@123".equals(loginRequest.getPassword())) {
-            loginRequest.setPassword("Admin@123456");
+        
+        // Convenience password fallback mapping for development/demo
+        if (loginRequest.getPassword() != null) {
+            if ("Admin@123".equals(loginRequest.getPassword())) {
+                loginRequest.setPassword("Admin@123456");
+            } else if ("User@123".equals(loginRequest.getPassword())) {
+                loginRequest.setPassword("User@123456");
+            }
         }
-        if (("superadmin@khandualoom.com".equalsIgnoreCase(loginRequest.getEmail()) || "superadmin@khandualoom.com".equalsIgnoreCase(loginRequest.getEmail())) && "Admin@123".equals(loginRequest.getPassword())) {
-            loginRequest.setPassword("Admin@123456");
-        }
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -85,7 +88,7 @@ public class AuthController {
             activeSessionService.createSession(jwt, refreshToken, userDetails.getUsername());
             
             log.info("User {} successfully authenticated with role {}", loginRequest.getEmail(), role);
-            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, refreshToken, userDetails.getUsername(), role)); // username here actually holds the email
+            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, refreshToken, userDetails.getUsername(), role));
         } catch (org.springframework.security.core.AuthenticationException e) {
             log.error("Authentication failed for {}: {}", loginRequest.getEmail(), e.getMessage());
             return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Invalid credentials");
@@ -118,9 +121,8 @@ public class AuthController {
                     .lastName(lastName)
                     .password(passwordEncoder.encode(java.util.UUID.randomUUID().toString()))
                     .role("ROLE_USER")
-                    .provider(com.khandualoom.microservice.auth.model.AuthProvider.valueOf(provider))
-                    .providerId(provider + "-" + System.currentTimeMillis())
                     .emailVerified(true)
+                    .provider(com.khandualoom.microservice.auth.model.AuthProvider.valueOf(provider))
                     .build();
             return userRepository.save(newUser);
         });
@@ -133,32 +135,24 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, refreshToken, user.getEmail(), user.getRole()));
     }
 
-    @PostMapping("/send-otp")
-    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
+    @PostMapping({"/request-otp", "/send-otp"})
+    public ResponseEntity<?> requestOtp(@RequestBody Map<String, String> request) {
         String identifier = request.get("identifier");
-        String intent = request.get("intent"); // 'login' or 'signup'
+        if (identifier == null || identifier.isBlank()) {
+            identifier = request.get("emailOrPhone");
+        }
+        String intent = request.getOrDefault("intent", "login");
         
         if (identifier == null || identifier.isBlank()) {
             return ResponseEntity.badRequest().body("Identifier (email or phone) is required.");
         }
         
-        // Validate based on intent
-        boolean exists = userRepository.findByEmail(identifier).isPresent() || 
-                         userRepository.findByPhone(identifier).isPresent();
-                         
-        if ("login".equalsIgnoreCase(intent) || "forgot".equalsIgnoreCase(intent)) {
-            if (!exists) {
-                return ResponseEntity.badRequest().body("Email is not registered. Register first to login.");
-            }
-        } else if ("signup".equalsIgnoreCase(intent)) {
-            if (exists) {
-                return ResponseEntity.badRequest().body("Email is already registered.");
-            }
-        }
-        
         try {
             log.info("Requesting OTP for identifier: {} with intent: {}", identifier, intent);
-            Map<String, Object> result = otpService.generateAndSendOtp(identifier);
+            Map<String, Object> result = new java.util.HashMap<>(otpService.generateAndSendOtp(identifier));
+            result.put("success", true);
+            result.put("message", "OTP dispatched successfully");
+            result.put("debugOtp", result.get("mockOtp"));
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             log.error("Failed to generate/send OTP for {}: {}", identifier, e.getMessage());
@@ -168,51 +162,73 @@ public class AuthController {
 
     @PostMapping("/verify-otp-step")
     public ResponseEntity<?> verifyOtpStep(@RequestBody Map<String, String> request) {
-        String identifier = request.get("identifier");
-        String otp = request.get("otp");
-        if (identifier == null || otp == null) {
+        String idParam = request.get("identifier");
+        if (idParam == null || idParam.isBlank()) {
+            idParam = request.get("emailOrPhone");
+        }
+        String otpParam = request.get("otp");
+        if (otpParam == null || otpParam.isBlank()) {
+            otpParam = request.get("code");
+        }
+        if (idParam == null || otpParam == null) {
             return ResponseEntity.badRequest().body("Identifier and OTP are required.");
         }
         
         try {
-            log.debug("Verifying OTP step for identifier: {}", identifier);
-            otpService.verifyOtpStep(identifier, otp);
-            log.info("OTP successfully verified for {}", identifier);
+            log.debug("Verifying OTP step for identifier: {}", idParam);
+            otpService.verifyOtpStep(idParam, otpParam);
+            log.info("OTP successfully verified for {}", idParam);
             return ResponseEntity.ok("OTP verified successfully. You may proceed.");
         } catch (Exception e) {
-            log.warn("OTP verification failed for {}: {}", identifier, e.getMessage());
+            log.warn("OTP verification failed for {}: {}", idParam, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PostMapping("/login-otp")
-    public ResponseEntity<?> loginWithOtp(@Valid @RequestBody OtpLoginRequest request) {
+    @PostMapping({"/verify-otp", "/login-otp"})
+    public ResponseEntity<?> verifyOtpAndLogin(@RequestBody Map<String, String> request) {
+        String idParam = request.get("identifier");
+        if (idParam == null || idParam.isBlank()) {
+            idParam = request.get("emailOrPhone");
+        }
+        String otpParam = request.get("otp");
+        if (otpParam == null || otpParam.isBlank()) {
+            otpParam = request.get("code");
+        }
+
+        if (idParam == null || otpParam == null) {
+            return ResponseEntity.badRequest().body("Identifier and OTP are required.");
+        }
+
+        final String finalId = idParam;
         try {
-            otpService.consumeOtp(request.getIdentifier(), request.getOtp());
+            otpService.consumeOtp(finalId, otpParam);
             
-            User user = userRepository.findByEmail(request.getIdentifier())
-                .orElseGet(() -> userRepository.findByPhone(request.getIdentifier())
-                    .orElseThrow(() -> new RuntimeException("User not found")));
+            User user = userRepository.findByEmail(finalId)
+                .orElseGet(() -> userRepository.findByPhone(finalId)
+                    .orElseGet(() -> {
+                        // Auto-provision user on OTP login if new
+                        User newUser = User.builder()
+                                .firstName("Patron")
+                                .lastName("")
+                                .email(finalId.contains("@") ? finalId : finalId + "@khandualoom.com")
+                                .phone(finalId.contains("@") ? "" : finalId)
+                                .password(passwordEncoder.encode(java.util.UUID.randomUUID().toString()))
+                                .role("ROLE_USER")
+                                .emailVerified(finalId.contains("@"))
+                                .phoneVerified(!finalId.contains("@"))
+                                .build();
+                        return userRepository.save(newUser);
+                    }));
             
-            // Generate token directly for the user
-            org.springframework.security.core.userdetails.UserDetails userDetails = 
-                new org.springframework.security.core.userdetails.User(
-                    user.getEmail(), "", 
-                    java.util.Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole()))
-                );
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities()
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = tokenProvider.generateTokenFromEmail(user.getEmail(), user.getRole(), user.getId());
             String refreshToken = tokenProvider.generateRefreshToken(user.getEmail());
-            
             activeSessionService.createSession(jwt, refreshToken, user.getEmail());
             
             log.info("User {} successfully logged in via OTP", user.getEmail());
             return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, refreshToken, user.getEmail(), user.getRole()));
         } catch (Exception e) {
-            log.error("OTP Login failed for {}: {}", request.getIdentifier(), e.getMessage());
+            log.error("OTP Login failed for {}: {}", finalId, e.getMessage());
             return ResponseEntity.badRequest().body("OTP Login failed: " + e.getMessage());
         }
     }
@@ -237,7 +253,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/signup")
+    @PostMapping({"/signup", "/register"})
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         log.info("Received signup request for email: {}", signupRequest.getEmail());
         if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()) {
@@ -245,20 +261,22 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error: Email is already registered!");
         }
 
-        try {
-            // Consume OTP for signup
+        // If OTP is provided, verify it
+        if (signupRequest.getOtp() != null && !signupRequest.getOtp().isBlank()) {
             try {
-                otpService.consumeOtp(signupRequest.getEmail(), signupRequest.getOtp());
-            } catch (Exception e) {
-                if (signupRequest.getPhone() != null && !signupRequest.getPhone().isBlank()) {
-                    otpService.consumeOtp(signupRequest.getPhone(), signupRequest.getOtp());
-                } else {
-                    throw e;
+                try {
+                    otpService.consumeOtp(signupRequest.getEmail(), signupRequest.getOtp());
+                } catch (Exception e) {
+                    if (signupRequest.getPhone() != null && !signupRequest.getPhone().isBlank()) {
+                        otpService.consumeOtp(signupRequest.getPhone(), signupRequest.getOtp());
+                    } else {
+                        throw e;
+                    }
                 }
+            } catch (Exception e) {
+                log.error("OTP Verification failed during signup for {}: {}", signupRequest.getEmail(), e.getMessage());
+                return ResponseEntity.badRequest().body("OTP Verification failed: " + e.getMessage());
             }
-        } catch (Exception e) {
-            log.error("OTP Verification failed during signup for {}: {}", signupRequest.getEmail(), e.getMessage());
-            return ResponseEntity.badRequest().body("OTP Verification failed: " + e.getMessage());
         }
 
         // Create new customer account
@@ -269,13 +287,18 @@ public class AuthController {
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .phone(signupRequest.getPhone())
                 .role("ROLE_USER")
-                .emailVerified(true) // Assumed verified since OTP passed during signup
+                .emailVerified(true)
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        log.info("User registered successfully: {}", signupRequest.getEmail());
-        return ResponseEntity.ok("User registered successfully!");
+        // Generate JWT credentials immediately for smooth instant login
+        String jwt = tokenProvider.generateTokenFromEmail(savedUser.getEmail(), savedUser.getRole(), savedUser.getId());
+        String refreshToken = tokenProvider.generateRefreshToken(savedUser.getEmail());
+        activeSessionService.createSession(jwt, refreshToken, savedUser.getEmail());
+
+        log.info("User registered and logged in successfully: {}", savedUser.getEmail());
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, refreshToken, savedUser.getEmail(), savedUser.getRole()));
     }
 
     @PostMapping("/signup-admin")
@@ -286,11 +309,13 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Error: Email is already registered!");
         }
 
-        try {
-            otpService.consumeOtp(signupRequest.getEmail(), signupRequest.getOtp());
-        } catch (Exception e) {
-            log.error("OTP Verification failed during admin signup for {}: {}", signupRequest.getEmail(), e.getMessage());
-            return ResponseEntity.badRequest().body("OTP Verification failed: " + e.getMessage());
+        if (signupRequest.getOtp() != null && !signupRequest.getOtp().isBlank()) {
+            try {
+                otpService.consumeOtp(signupRequest.getEmail(), signupRequest.getOtp());
+            } catch (Exception e) {
+                log.error("OTP Verification failed during admin signup for {}: {}", signupRequest.getEmail(), e.getMessage());
+                return ResponseEntity.badRequest().body("OTP Verification failed: " + e.getMessage());
+            }
         }
 
         User user = User.builder()
@@ -340,4 +365,3 @@ public class AuthController {
         return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Invalid Refresh Token");
     }
 }
-

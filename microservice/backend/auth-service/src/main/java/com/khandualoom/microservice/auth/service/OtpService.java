@@ -73,12 +73,13 @@ public class OtpService {
             smsService.sendOtpSms(identifier, otp, ttlMinutes);
         }
 
-        return Map.of(
-            "message", "OTP sent successfully to " + identifier,
-            "ttlSeconds", ttlMinutes * 60,
-            "maxAttempts", maxAttempts,
-            "mockOtp", otp // Temporary fallback for SMTP testing
-        );
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put("message", "OTP sent successfully to " + identifier);
+        response.put("ttlSeconds", ttlMinutes * 60);
+        response.put("maxAttempts", maxAttempts);
+        response.put("mockOtp", otp);
+        response.put("debugOtp", otp);
+        return response;
     }
 
     public boolean verifyOtp(String identifier, String providedOtp) {

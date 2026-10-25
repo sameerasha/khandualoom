@@ -31,7 +31,5 @@ public class SignupRequest {
     @Pattern(regexp = "^$|^(?:\\+91|91|0)?[6789]\\d{9}$", message = "Must be a valid Indian phone number")
     private String phone;
 
-    @NotBlank(message = "OTP is required for verification")
     private String otp;
 }
-
