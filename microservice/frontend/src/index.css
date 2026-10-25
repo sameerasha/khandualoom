@@ -18,3 +18,28 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Custom Gold Scrollbar for Data Tables & Modals */
+.custom-gold-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(223, 191, 122, 0.45) rgba(223, 191, 122, 0.05);
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar-track {
+  background: rgba(223, 191, 122, 0.05);
+  border-radius: 4px;
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(223, 191, 122, 0.4);
+  border-radius: 4px;
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(223, 191, 122, 0.75);
+}

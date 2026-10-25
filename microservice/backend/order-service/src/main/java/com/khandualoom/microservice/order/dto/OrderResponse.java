@@ -34,4 +34,9 @@ public class OrderResponse {
     private String razorpayPaymentId;
     private LocalDateTime createdDate;
     private List<OrderItemResponse> items;
+
+    @com.fasterxml.jackson.annotation.JsonProperty("status")
+    public String getStatus() {
+        return orderStatus != null ? orderStatus.name() : null;
+    }
 }

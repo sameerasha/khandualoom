@@ -1356,3 +1356,313 @@
     padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }
+
+/* =========================================================
+   CUSTOM GOLD SCROLLBAR (Data Tables, Long Dossiers & Modals)
+   ========================================================= */
+.custom-gold-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(223, 191, 122, 0.45) rgba(223, 191, 122, 0.05);
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar-track {
+  background: rgba(223, 191, 122, 0.05);
+  border-radius: 4px;
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(223, 191, 122, 0.4);
+  border-radius: 4px;
+}
+
+.custom-gold-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(223, 191, 122, 0.75);
+}
+
+/* =========================================================
+   PRINT MANIFEST — SCREEN HIDING & A4 PORTRAIT PRINT STYLING
+   ========================================================= */
+.print-manifest-container {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide entire screen UI */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Unhide the dedicated A4 dispatch manifest */
+  #khandua-a4-manifest,
+  #khandua-a4-manifest * {
+    visibility: visible !important;
+  }
+
+  #khandua-a4-manifest {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    z-index: 9999999 !important;
+    box-shadow: none !important;
+  }
+
+  .manifest-page {
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    padding: 16px !important;
+    border: 2px solid #111111 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .manifest-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    border-bottom: 2px solid #111111 !important;
+    padding-bottom: 12px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .manifest-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .manifest-logo {
+    width: 46px !important;
+    height: 46px !important;
+    background: #111111 !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 900 !important;
+    font-size: 20px !important;
+    letter-spacing: 2px !important;
+    border-radius: 4px !important;
+  }
+
+  .manifest-title {
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    letter-spacing: 1.5px !important;
+    margin: 0 !important;
+    color: #111111 !important;
+    font-family: Georgia, serif !important;
+    line-height: 1.1 !important;
+  }
+
+  .manifest-subtitle {
+    font-size: 10.5px !important;
+    color: #444444 !important;
+    margin: 3px 0 0 0 !important;
+    font-style: italic !important;
+  }
+
+  .manifest-reg {
+    font-size: 8.5px !important;
+    color: #666666 !important;
+    margin: 4px 0 0 0 !important;
+    font-family: monospace !important;
+  }
+
+  .manifest-barcode-box {
+    text-align: right !important;
+  }
+
+  .manifest-barcode {
+    font-family: monospace !important;
+    font-size: 20px !important;
+    letter-spacing: 3px !important;
+    font-weight: 700 !important;
+    color: #000000 !important;
+    line-height: 1 !important;
+  }
+
+  .manifest-consignment {
+    font-family: monospace !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    margin-top: 3px !important;
+  }
+
+  .manifest-date {
+    font-size: 9px !important;
+    color: #555555 !important;
+    margin-top: 2px !important;
+  }
+
+  .manifest-courier-band {
+    background: #111111 !important;
+    color: #ffffff !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 6px 12px !important;
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    font-family: monospace !important;
+    margin-bottom: 12px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .manifest-address-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 14px !important;
+    border: 1px solid #333333 !important;
+    padding: 10px 12px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .manifest-address-col {
+    font-size: 9.5px !important;
+    line-height: 1.45 !important;
+  }
+
+  .manifest-consignee {
+    border-left: 1px dashed #999999 !important;
+    padding-left: 14px !important;
+  }
+
+  .manifest-col-title {
+    font-size: 8.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    color: #555555 !important;
+    margin-bottom: 4px !important;
+    font-family: monospace !important;
+  }
+
+  .manifest-name {
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    color: #000000 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .manifest-address-line {
+    color: #222222 !important;
+  }
+
+  .manifest-contact {
+    font-size: 8.5px !important;
+    color: #555555 !important;
+    margin-top: 6px !important;
+  }
+
+  .manifest-provenance-box {
+    border: 1px solid #111111 !important;
+    background: #f7f7f7 !important;
+    padding: 8px 12px !important;
+    margin-bottom: 12px !important;
+    font-size: 8.5px !important;
+    line-height: 1.45 !important;
+    color: #222222 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .manifest-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 14px !important;
+    font-size: 9.5px !important;
+  }
+
+  .manifest-table th,
+  .manifest-table td {
+    border: 1px solid #333333 !important;
+    padding: 6px 8px !important;
+  }
+
+  .manifest-table th {
+    background: #eaeaea !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 8.5px !important;
+    letter-spacing: 0.5px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .manifest-total-row td {
+    background: #f4f4f4 !important;
+    border-top: 2px solid #111111 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .manifest-instructions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+    margin-bottom: 24px !important;
+    font-size: 8.5px !important;
+    line-height: 1.4 !important;
+    color: #333333 !important;
+  }
+
+  .manifest-care,
+  .manifest-courier-note {
+    border: 1px dashed #888888 !important;
+    padding: 6px 8px !important;
+  }
+
+  .manifest-signatures {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px !important;
+    margin-top: 24px !important;
+  }
+
+  .manifest-sig-box {
+    text-align: center !important;
+  }
+
+  .manifest-sig-line {
+    border-bottom: 1px solid #111111 !important;
+    height: 32px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .manifest-sig-label {
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #444444 !important;
+  }
+}

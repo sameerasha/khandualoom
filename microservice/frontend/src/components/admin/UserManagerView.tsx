@@ -175,20 +175,31 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
         </div>
       </div>
 
-      {/* Desktop View: Full-Featured Administrative Table */}
+      {/* Desktop View: Full-Featured Administrative Table with Horizontal Scroll */}
       <div className="hidden md:block rounded-2xl border border-brand-gold/25 bg-[#0D0317]/95 overflow-hidden shadow-2xl">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-brand-gold/20 bg-white/[0.02] text-xs font-mono uppercase tracking-wider text-brand-gold/90">
-              <th className="py-4 px-5">Patron / Collector</th>
-              <th className="py-4 px-5">Email Address</th>
-              <th className="py-4 px-5">Telephone</th>
-              <th className="py-4 px-5">Authorization Role</th>
-              <th className="py-4 px-5">Registered Date</th>
-              <th className="py-4 px-5 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5 text-sm">
+        <div className="px-5 py-2.5 bg-brand-gold/5 border-b border-brand-gold/15 flex items-center justify-between text-[11px] font-mono text-brand-gold/80">
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-brand-gold animate-ping" />
+            Active Patron Records
+          </span>
+          <span className="flex items-center gap-1.5 text-brand-ivory/50">
+            <span>Scroll horizontally to view complete dossier coordinates</span>
+            <span className="text-brand-gold font-bold">⟷</span>
+          </span>
+        </div>
+        <div className="overflow-x-auto custom-gold-scrollbar">
+          <table className="w-full min-w-[980px] text-left border-collapse">
+            <thead>
+              <tr className="border-b border-brand-gold/20 bg-white/[0.02] text-xs font-mono uppercase tracking-wider text-brand-gold/90">
+                <th className="py-4 px-5 whitespace-nowrap min-w-[220px]">Patron / Collector</th>
+                <th className="py-4 px-5 whitespace-nowrap min-w-[220px]">Email Address</th>
+                <th className="py-4 px-5 whitespace-nowrap min-w-[150px]">Telephone</th>
+                <th className="py-4 px-5 whitespace-nowrap min-w-[160px]">Authorization Role</th>
+                <th className="py-4 px-5 whitespace-nowrap min-w-[140px]">Registered Date</th>
+                <th className="py-4 px-5 text-right whitespace-nowrap min-w-[180px]">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5 text-sm">
             {filteredUsers.length > 0 ? (
               filteredUsers.map((u) => {
                 const displayName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Patron';
@@ -293,6 +304,7 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Mobile & Tablet View: Device-Friendly Patron Cards */}
