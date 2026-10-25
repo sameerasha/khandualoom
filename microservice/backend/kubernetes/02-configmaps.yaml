@@ -35,7 +35,7 @@ data:
   # Email Gateway
   MAIL_HOST: "smtp-relay.brevo.com"
   MAIL_PORT: "587"
-  MAIL_FROM: "asha.rabinarayan@gmail.com"
+  MAIL_FROM: "concierge@khandualoom.com"
 ---
 apiVersion: v1
 kind: ConfigMap
