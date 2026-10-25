@@ -11,12 +11,12 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.vastraloom.microservice</groupId>
+    <groupId>com.khandualoom.microservice</groupId>
     <artifactId>microservice-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>microservice-parent</name>
-    <description>Vastraloom Enterprise Microservices Architecture</description>
+    <description>Khandualoom Enterprise Microservices Architecture</description>
 
     <modules>
         <module>common-library</module>
@@ -28,9 +28,9 @@
     </modules>
 
     <properties>
-        <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <spring-ai.version>1.0.0-M1</spring-ai.version>
         <jjwt.version>0.12.5</jjwt.version>
@@ -70,7 +70,7 @@
 
             <!-- Internal Common Library -->
             <dependency>
-                <groupId>com.vastraloom.microservice</groupId>
+                <groupId>com.khandualoom.microservice</groupId>
                 <artifactId>common-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -106,6 +106,13 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+
+            <!-- Structured JSON Logging (Logstash Logback Encoder) -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>7.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

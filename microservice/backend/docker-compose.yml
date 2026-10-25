@@ -1,0 +1,299 @@
+name: khandualoom-micro
+
+services:
+  # ==========================================
+  # 1. PostgreSQL 16 with pgvector Extension
+  # ==========================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: khandualoom-micro-postgres
+    ports:
+      - "5419:5432"
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: khandualoom_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d khandualoom_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 2. Redis 7 Cache & Session Store
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: khandualoom-micro-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 3. Apache Kafka (KRaft Mode - No Zookeeper)
+  # ==========================================
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: khandualoom-micro-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 4. Kafka UI Web Console
+  # ==========================================
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: khandualoom-micro-kafka-ui
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: khandualoom-kafka
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 5. Auth Microservice (:8081)
+  # ==========================================
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: khandualoom-micro-auth
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 6. Product Microservice (:8082)
+  # ==========================================
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: khandualoom-micro-product
+    ports:
+      - "8082:8082"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 7. Order Microservice (:8083)
+  # ==========================================
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: khandualoom-micro-order
+    ports:
+      - "8083:8083"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 8. Notification Microservice (:8084)
+  # ==========================================
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: khandualoom-micro-notification
+    ports:
+      - "8084:8084"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/khandualoom_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 9. Spring Cloud API Gateway (:8080)
+  # ==========================================
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: khandualoom-micro-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8081
+      - PRODUCT_SERVICE_URL=http://product-service:8082
+      - ORDER_SERVICE_URL=http://order-service:8083
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8084
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318/v1/traces
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - notification-service
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 10. React TypeScript Luxury Storefront (:3000 / :5174)
+  # ==========================================
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: khandualoom-micro-frontend
+    ports:
+      - "3000:80"
+      - "5174:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 11. Prometheus Observability Metrics (:9090)
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: khandualoom-micro-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./.local/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 12. Grafana Tempo Distributed Tracing (:3200, :4318)
+  # ==========================================
+  tempo:
+    image: grafana/tempo:2.4.1
+    container_name: khandualoom-micro-tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./.local/observability/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    ports:
+      - "3200:3200" # Tempo UI / API
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    networks:
+      - khandualoom-micro-net
+
+  # ==========================================
+  # 13. Grafana Observability Dashboards (:3001)
+  # ==========================================
+  grafana:
+    image: grafana/grafana:10.4.1
+    container_name: khandualoom-micro-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./.local/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./.local/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./.local/observability/grafana/dashboards:/etc/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - tempo
+    networks:
+      - khandualoom-micro-net
+
+volumes:
+  postgres-data:
+  redis-data:
+  kafka-data:
+  prometheus-data:
+  tempo-data:
+  grafana-data:
+
+networks:
+  khandualoom-micro-net:
+    name: khandualoom-micro-net
+    driver: bridge

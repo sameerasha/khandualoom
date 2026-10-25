@@ -153,13 +153,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   // Quick Demo fill buttons for hassle-free evaluation
   const handleQuickFillSuperAdmin = () => {
-    setEmail('superadmin@khadualooms.com');
+    setEmail('superadmin@khandualoom.com');
     setPassword('Admin@123456');
     setFieldErrors({});
   };
 
   const handleQuickFillAdmin = () => {
-    setEmail('admin@khadualooms.com');
+    setEmail('admin@khandualoom.com');
     setPassword('Admin@123456');
     setFieldErrors({});
   };
@@ -190,7 +190,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const res = await loginMutation({ email, password }).unwrap();
       handleAuthSuccess(res);
     } catch (err: any) {
-      console.error('[VASTRALOOM AUTH] Login failed:', err);
+      console.error('[KHANDUALOOM AUTH] Login failed:', err);
       setError(err?.data?.message || err?.data || 'Invalid credentials. Please verify your email and password.');
     } finally {
       setIsLoading(false);
@@ -453,7 +453,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
       handleAuthSuccess(res);
     } catch (err: any) {
-      console.error('[VASTRALOOM AUTH] SSO fallback failed:', err);
+      console.error('[KHANDUALOOM AUTH] SSO fallback failed:', err);
       setError(err?.data?.message || `SSO authentication with ${provider} failed. Please use email & password.`);
     } finally {
       setIsLoading(false);
@@ -478,8 +478,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           >
             <div className="auth-modal-visual__overlay" />
             <div className="auth-modal-visual__content">
-              <img src="/logo.svg" alt="Khadua Looms Emblem" className="visual-logo-badge" />
-              <h2>Khadua Looms</h2>
+              <img src="/logo.svg" alt="Khandua Looms Emblem" className="visual-logo-badge" />
+              <h2>Khandua Looms</h2>
               <p>
                 Woven in Tradition. Wrapped in Elegance. Discover exquisite Odisha handloom sarees
                 crafted by generations of master weavers.
@@ -542,7 +542,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           setEmail(e.target.value);
                           setFieldErrors({ ...fieldErrors, email: null });
                         }}
-                        placeholder="patron@domain.com or admin@khadualooms.com"
+                        placeholder="patron@domain.com or admin@khandualoom.com"
                         autoComplete="email"
                       />
                       {fieldErrors.email && <small className="field-error-msg">{fieldErrors.email}</small>}

@@ -1,0 +1,13 @@
+package com.khandualoom.microservice.notification.repository;
+
+import com.khandualoom.microservice.notification.model.SocialMedia;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface SocialMediaRepository extends JpaRepository<SocialMedia, Long> {
+    Optional<SocialMedia> findByPlatform(String platform);
+}
+

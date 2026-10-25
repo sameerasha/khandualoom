@@ -73,13 +73,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div
             className="flex items-center gap-3 cursor-pointer select-none group shrink-0"
             onClick={handleLogoClick}
-            title="Khadua Looms • Return to Home"
+            title="Khandua Looms • Return to Home"
           >
             <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-brand-gold via-brand-gold-light to-brand-gold-dark p-0.5 shadow-[0_2px_12px_rgba(197,160,89,0.45)] group-hover:scale-105 transition-transform duration-300">
               <div className="w-full h-full rounded-full bg-[#12051E] flex items-center justify-center overflow-hidden">
                 <img
                   src="/logo.svg"
-                  alt="Khadua Looms Logo"
+                  alt="Khandua Looms Logo"
                   className="w-7 h-7 object-contain"
                 />
               </div>
@@ -347,7 +347,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleScrollTo('why-us-section')}
               className="text-left py-2 px-3 rounded-lg hover:bg-brand-gold/10 text-brand-ivory hover:text-brand-gold"
             >
-              Why Khadua Looms?
+              Why Khandua Looms?
             </button>
           </div>
 

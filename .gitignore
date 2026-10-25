@@ -15,3 +15,7 @@
 .idea/
 .vscode/
 *.log
+
+# AI Agent configuration
+**/.agent/
+.agent/

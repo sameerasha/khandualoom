@@ -36,7 +36,7 @@ export const RecentViews: React.FC<RecentViewsProps> = ({ onSelectProduct }) => 
 
   const loadLocalRecentViews = () => {
     try {
-      const stored = localStorage.getItem('khadualooms_recent_products') || localStorage.getItem('vastraloom_recent_products');
+      const stored = localStorage.getItem('khandualoom_recent_products') || localStorage.getItem('khandualoom_recent_products');
       if (stored) {
         const parsed: Product[] = JSON.parse(stored);
         if (Array.isArray(parsed)) {

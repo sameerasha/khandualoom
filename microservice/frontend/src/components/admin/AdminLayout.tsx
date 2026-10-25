@@ -29,11 +29,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { role, user } = useAppSelector((state) => state.auth);
-  const isSuperAdmin = role === 'ROLE_SUPER_ADMIN' || user?.email === 'superadmin@khadualooms.com' || user?.email === 'superadmin@vastraloom.com';
+  const isSuperAdmin = role === 'ROLE_SUPER_ADMIN' || user?.email === 'superadmin@khandualoom.com' || user?.email === 'superadmin@khandualoom.com';
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try {
-      return localStorage.getItem('khadualooms_admin_collapsed') === 'true' || localStorage.getItem('vastraloom_admin_collapsed') === 'true';
+      return localStorage.getItem('khandualoom_admin_collapsed') === 'true' || localStorage.getItem('khandualoom_admin_collapsed') === 'true';
     } catch {
       return false;
     }
@@ -48,7 +48,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     setIsCollapsed((prev) => {
       const next = !prev;
       try {
-        localStorage.setItem('khadualooms_admin_collapsed', String(next));
+        localStorage.setItem('khandualoom_admin_collapsed', String(next));
       } catch {}
       return next;
     });
@@ -194,10 +194,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Sidebar */}
       <aside className={`admin-sidebar ${isCollapsed ? 'admin-sidebar--collapsed' : ''}`} data-lenis-prevent="true">
         <div className="admin-sidebar__header">
-          <button className="admin-sidebar__logo" onClick={() => onNavigate('dashboard')} title="Khadua Looms Store">
-            <img src="/logo.svg" alt="Khadua Looms Logo" className="admin-sidebar__logo-icon" />
+          <button className="admin-sidebar__logo" onClick={() => onNavigate('dashboard')} title="Khandua Looms Store">
+            <img src="/logo.svg" alt="Khandua Looms Logo" className="admin-sidebar__logo-icon" />
             <div className="admin-sidebar__logo-text">
-              <span className="admin-sidebar__logo-main">Khadua Looms</span>
+              <span className="admin-sidebar__logo-main">Khandua Looms</span>
               <span className="admin-sidebar__logo-sub">Admin Panel</span>
             </div>
           </button>

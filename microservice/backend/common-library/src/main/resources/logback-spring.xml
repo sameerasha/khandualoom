@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+    <springProperty scope="context" name="springAppName" source="spring.application.name" defaultValue="unknown-service"/>
+
+    <!-- Profile: Docker / Production / Staging (Enterprise Structured JSON Logging) -->
+    <springProfile name="docker,prod,production,staging">
+        <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp>
+                        <timeZone>UTC</timeZone>
+                    </timestamp>
+                    <version/>
+                    <logLevel/>
+                    <loggerName/>
+                    <threadName/>
+                    <context/>
+                    <pattern>
+                        <pattern>
+                            {
+                                "service": "${springAppName}",
+                                "traceId": "%mdc{traceId:-}",
+                                "spanId": "%mdc{spanId:-}",
+                                "dt.trace_id": "%mdc{traceId:-}",
+                                "dt.span_id": "%mdc{spanId:-}",
+                                "correlationId": "%mdc{correlationId:-}",
+                                "pid": "${PID:-}"
+                            }
+                        </pattern>
+                    </pattern>
+                    <message/>
+                    <stackTrace/>
+                </providers>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="JSON_CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- Profile: Local / Dev (Human-Readable Colorized Output with Trace Correlation) -->
+    <springProfile name="!docker &amp; !prod &amp; !production &amp; !staging">
+        <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+        <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+        <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([${springAppName},%X{traceId:-},%X{spanId:-}]){yellow} %clr(%logger{39}){cyan} %clr(:){faint} %m%n%wEx</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+</configuration>

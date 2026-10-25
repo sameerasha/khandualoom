@@ -44,7 +44,7 @@ export const AdminManagerView: React.FC<AdminManagerViewProps> = ({ admins, onCr
 
   const generateSecureKey = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
-    let res = 'Vastra@';
+    let res = 'Khandua@';
     for (let i = 0; i < 6; i++) {
       res += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -391,7 +391,7 @@ export const AdminManagerView: React.FC<AdminManagerViewProps> = ({ admins, onCr
                         <input
                           type="email"
                           required
-                          placeholder="admin@khadualooms.com"
+                          placeholder="admin@khandualoom.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none transition-colors"

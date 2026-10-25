@@ -7,7 +7,7 @@ export const baseApi = createApi({
     baseUrl: import.meta.env.VITE_API_URL || '',
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState;
-      const token = state.auth?.token || localStorage.getItem('vastra_token');
+      const token = state.auth?.token || localStorage.getItem('khandua_token');
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }

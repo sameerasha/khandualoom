@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: "optional:classpath:application-common.yml"
   application:
     name: api-gateway
   cloud:
@@ -46,12 +48,3 @@ spring:
           uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/api/v1/contact/**, /api/v1/social/**, /api/contact/**, /api/social-media/**, /api/admin/social-media/**
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, prometheus
-  endpoint:
-    health:
-      show-details: always

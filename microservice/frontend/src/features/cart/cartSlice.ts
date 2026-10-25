@@ -6,7 +6,7 @@ interface CartState {
   isOpen: boolean;
 }
 
-const CART_STORAGE_KEY = 'vastra_cart';
+const CART_STORAGE_KEY = 'khandua_cart';
 
 const loadCartFromStorage = (): CartItem[] => {
   try {

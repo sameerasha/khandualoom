@@ -12,10 +12,10 @@ interface AuthState {
   error: string | null;
 }
 
-const TOKEN_KEY = 'vastra_token';
-const REFRESH_TOKEN_KEY = 'vastra_refresh_token';
-const ROLE_KEY = 'vastra_role';
-const USERNAME_KEY = 'vastra_username';
+const TOKEN_KEY = 'khandua_token';
+const REFRESH_TOKEN_KEY = 'khandua_refresh_token';
+const ROLE_KEY = 'khandua_role';
+const USERNAME_KEY = 'khandua_username';
 
 const initialToken = localStorage.getItem(TOKEN_KEY);
 const initialRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);

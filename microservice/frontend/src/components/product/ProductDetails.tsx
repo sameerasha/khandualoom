@@ -99,10 +99,10 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   // Auto-record in recent views & reset active image on product change
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('khadualooms_recent_products');
+      const stored = localStorage.getItem('khandualoom_recent_products');
       let list: Product[] = stored ? JSON.parse(stored) : [];
       list = [product, ...list.filter((p) => p.id !== product.id)].slice(0, 8);
-      localStorage.setItem('khadualooms_recent_products', JSON.stringify(list));
+      localStorage.setItem('khandualoom_recent_products', JSON.stringify(list));
     } catch {
       // Ignore storage errors
     }
@@ -165,7 +165,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
     if (navigator.share) {
       navigator.share({
         title: product.name,
-        text: `Behold this authentic Odisha handloom saree from Khadua Looms: ${product.name}`,
+        text: `Behold this authentic Odisha handloom saree from Khandua Looms: ${product.name}`,
         url: window.location.href,
       }).catch(() => {});
     } else {
@@ -597,7 +597,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                   Delivered in protective packaging with muslin wrapping guidance to preserve the silk drape for years to come.
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Khadua Looms Standard</span>
+              <span className="text-[10px] font-mono text-brand-gold mt-3 block">Khandua Looms Standard</span>
             </div>
           </div>
         </div>

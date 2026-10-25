@@ -15,10 +15,10 @@ interface SocialMediaModalProps {
 }
 
 const defaultSocials: SocialMediaItem[] = [
-  { id: 1, platform: 'instagram', url: 'https://instagram.com/khadualooms' },
+  { id: 1, platform: 'instagram', url: 'https://instagram.com/khandualoom' },
   { id: 2, platform: 'whatsapp', url: 'https://wa.me/916742918844' },
-  { id: 3, platform: 'facebook', url: 'https://facebook.com/khadualooms' },
-  { id: 4, platform: 'youtube', url: 'https://youtube.com/@khadualooms' },
+  { id: 3, platform: 'facebook', url: 'https://facebook.com/khandualoom' },
+  { id: 4, platform: 'youtube', url: 'https://youtube.com/@khandualoom' },
 ];
 
 export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onClose }) => {
@@ -78,7 +78,7 @@ export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onCl
           <div className="flex items-center justify-between pb-4 border-b border-brand-gold/20">
             <div>
               <h3 className="font-serif text-xl font-bold text-brand-ivory">
-                The Khadua Looms Community
+                The Khandua Looms Community
               </h3>
               <p className="text-xs text-brand-ivory/60 mt-0.5">
                 Immerse in Odisha weaver stories, lookbooks & heritage drapes
@@ -111,7 +111,7 @@ export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onCl
                       {item.platform}
                     </h4>
                     <span className="text-[11px] text-brand-ivory/50 font-mono">
-                      @khadualooms official
+                      @khandualoom official
                     </span>
                   </div>
                 </div>
@@ -123,7 +123,7 @@ export const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ isOpen, onCl
 
           <div className="mt-6 pt-4 border-t border-brand-gold/15 text-center">
             <p className="text-[11px] text-brand-ivory/60 font-light italic">
-              Tag #KhaduaLooms on social channels to share your handloom story.
+              Tag #KhanduaLooms on social channels to share your handloom story.
             </p>
           </div>
         </motion.div>

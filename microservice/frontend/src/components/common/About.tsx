@@ -23,7 +23,7 @@ export const About: React.FC = () => {
     },
     {
       year: 'Modern Era',
-      title: 'Khadua Looms Online Heritage Store',
+      title: 'Khandua Looms Online Heritage Store',
       desc: 'Connecting saree connoisseurs, brides, and collectors worldwide directly with authentic Odisha handloom craftsmanship, honoring timeless cultural identity.',
     },
   ];
@@ -99,7 +99,7 @@ export const About: React.FC = () => {
             <div className="w-20 h-0.5 bg-gradient-to-r from-brand-gold to-transparent my-6" />
 
             <p className="text-base sm:text-lg text-brand-ivory/85 font-sans leading-relaxed font-light">
-              Khadua Looms celebrates the rich textile heritage of Odisha. Our collection brings together traditional weaving styles, intricate patterns, and timeless designs for women who value craftsmanship and cultural identity.
+              Khandua Looms celebrates the rich textile heritage of Odisha. Our collection brings together traditional weaving styles, intricate patterns, and timeless designs for women who value craftsmanship and cultural identity.
             </p>
 
             <p className="mt-4 text-xs sm:text-sm text-brand-ivory/70 font-sans leading-relaxed font-light">

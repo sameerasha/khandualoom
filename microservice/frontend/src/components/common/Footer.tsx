@@ -53,7 +53,7 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
             <div>
               <h4 className="font-serif text-lg sm:text-xl font-bold text-white tracking-wide">
-                Khadua Looms Customer Advisory & Support
+                Khandua Looms Customer Advisory & Support
               </h4>
               <p className="text-xs text-brand-ivory/70 mt-1 max-w-xl leading-relaxed">
                 Connect with our dedicated saree specialists for weave consultations, bridal orders, or care guidance for authentic Odisha handlooms.
@@ -93,13 +93,13 @@ export const Footer: React.FC<FooterProps> = ({
                   window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
                 }
               }}
-              title="Khadua Looms • Return to Home"
+              title="Khandua Looms • Return to Home"
             >
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-gold to-brand-gold-dark p-0.5">
                 <div className="w-full h-full rounded-full bg-[#12051E] flex items-center justify-center">
                   <img
                     src="/logo.svg"
-                    alt="Khadua Looms Logo"
+                    alt="Khandua Looms Logo"
                     className="w-5 h-5 object-contain"
                   />
                 </div>
@@ -215,7 +215,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => handleScrollTo('why-us-section')}
                   className="hover:text-brand-gold transition-colors text-left cursor-pointer"
                 >
-                  Why Khadua Looms
+                  Why Khandua Looms
                 </button>
               </li>
               <li>
@@ -287,7 +287,7 @@ export const Footer: React.FC<FooterProps> = ({
                 className="flex items-center gap-2.5 cursor-pointer hover:text-brand-gold transition-colors"
               >
                 <Mail className="w-4 h-4 text-brand-gold shrink-0" />
-                <span>support@khadualooms.com</span>
+                <span>support@khandualoom.com</span>
               </li>
             </ul>
             <button
@@ -302,7 +302,7 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Bottom Credits */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-brand-ivory/50 gap-4">
-          <p>© 2026 Khadua Looms. All rights reserved.</p>
+          <p>© 2026 Khandua Looms. All rights reserved.</p>
           <p className="flex items-center gap-1">
             Handcrafted with <Heart className="w-3.5 h-3.5 text-brand-crimson fill-current inline" /> for Authentic Odisha Weaves
           </p>

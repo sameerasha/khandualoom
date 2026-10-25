@@ -117,8 +117,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBackToStore }) => {
                 <Mail className="w-5 h-5 text-brand-gold" />
                 <div>
                   <span className="text-[11px] text-brand-ivory/60 uppercase font-mono block">Direct Support</span>
-                  <a href="mailto:support@khadualooms.com" className="text-sm font-medium hover:text-brand-gold transition-colors">
-                    support@khadualooms.com
+                  <a href="mailto:support@khandualoom.com" className="text-sm font-medium hover:text-brand-gold transition-colors">
+                    support@khandualoom.com
                   </a>
                 </div>
               </div>

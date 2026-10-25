@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS social_media (
 );
 
 INSERT INTO social_media (platform, url, icon, active) VALUES
-('Instagram', 'https://instagram.com/vastraloom', 'Instagram', true),
-('Facebook', 'https://facebook.com/vastraloom', 'Facebook', true),
-('Pinterest', 'https://pinterest.com/vastraloom', 'Pinterest', true)
+('Instagram', 'https://instagram.com/khandualoom', 'Instagram', true),
+('Facebook', 'https://facebook.com/khandualoom', 'Facebook', true),
+('Pinterest', 'https://pinterest.com/khandualoom', 'Pinterest', true)
 ON CONFLICT DO NOTHING;

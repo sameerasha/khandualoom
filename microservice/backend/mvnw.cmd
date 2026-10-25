@@ -1,5 +1,9 @@
 @echo off
 setlocal
+if exist "C:\Users\ashar\.jdks\jdk-21" (
+    set "JAVA_HOME=C:\Users\ashar\.jdks\jdk-21"
+    set "PATH=C:\Users\ashar\.jdks\jdk-21\bin;%PATH%"
+)
 set MAVEN_VERSION=3.9.16
 set MAVEN_DIR=%~dp0.maven
 set MVN_CMD=%MAVEN_DIR%\apache-maven-%MAVEN_VERSION%\bin\mvn.cmd

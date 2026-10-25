@@ -147,7 +147,7 @@ export const App: React.FC = () => {
               {/* Section 4: Bestselling Sarees & Filterable Catalog */}
               <ProductGrid onSelectProduct={handleSelectProduct} />
 
-              {/* Section 5: Why Choose Khadua Looms? */}
+              {/* Section 5: Why Choose Khandua Looms? */}
               <HeritageFeaturesSection />
 
               {/* Section 6: Our Heritage: A Legacy Woven Through Generations */}

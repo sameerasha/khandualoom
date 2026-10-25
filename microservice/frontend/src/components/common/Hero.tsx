@@ -47,7 +47,7 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick: _onSignUpClick, onExp
               className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-brand-gold/40 bg-brand-purple-dark/80 backdrop-blur-md text-brand-gold-light text-xs font-semibold tracking-widest uppercase mb-8 shadow-lg shadow-black/40"
             >
               <Sparkles className="w-3.5 h-3.5 text-brand-gold animate-pulse" />
-              <span>Khadua Looms • Premium Odisha Handlooms</span>
+              <span>Khandua Looms • Premium Odisha Handlooms</span>
             </motion.div>
 
             {/* Headline */}

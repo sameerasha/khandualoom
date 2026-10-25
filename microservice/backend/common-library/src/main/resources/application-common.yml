@@ -1,0 +1,114 @@
+# ===================================================================
+# Khandua Looms Microservices - Unified Shared Application Properties
+# Imported by microservices via:
+#   spring:
+#     config:
+#       import: "optional:classpath:application-common.yml"
+# ===================================================================
+
+spring:
+  # Concurrency: Enable High-Throughput Virtual Threads (Java 21)
+  threads:
+    virtual:
+      enabled: true
+
+  # Default Relational Datastore Configuration (PostgreSQL + HikariCP)
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5419/khandualoom_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    hikari:
+      pool-name: KhanduaLoomsHikariPool
+      maximum-pool-size: 15
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+
+  # Default JPA & Hibernate Standards
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+
+  # Default Flyway Migration Standards
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  # Default Jackson Serialization
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  # Default Kafka Broker Coordinates
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+# ===================================================================
+# Actuator & Observability Standards (Pillar 1: Metrics, Pillar 2: Traces)
+# ===================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        spring.ai.chat.client: true
+    tags:
+      application: ${spring.application.name:unknown-service}
+      environment: ${ENVIRONMENT:development}
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+
+  # Dynatrace APM Metrics Integration (Micrometer v2 Ingest)
+  dynatrace:
+    metrics:
+      export:
+        enabled: ${DYNATRACE_METRICS_ENABLED:false}
+        uri: ${DYNATRACE_URI:https://your-environment-id.live.dynatrace.com/api/v2/metrics/ingest}
+        api-token: ${DYNATRACE_API_TOKEN:}
+        device-id: ${spring.application.name:unknown-service}
+        group: khadua-looms-microservices
+        batch-size: 1000
+        step: 1m
+
+# Khandua Looms Enterprise Application Domain Settings
+khandualoom:
+  jwt:
+    secret: ${JWT_SECRET:9a4f2c8d3b7a1e6f5c8d0b2a4f6e8d1c3b5a7f9e2d4c6b8a0f1e3d5c7b9a2f4}
+    expiration-ms: 86400000 # 24 hours
+    refresh-expiration-ms: 604800000 # 7 days
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:5174}
+  superadmin:
+    email: ${SUPERADMIN_EMAIL:admin@khandualoom.com}
+    password: ${SUPERADMIN_PASSWORD:Admin@123456}
+  admin:
+    email: ${ADMIN_EMAIL:admin@khandualoom.com}
+    password: ${ADMIN_PASSWORD:Admin@123456}

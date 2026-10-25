@@ -14,7 +14,7 @@ export const fallbackProducts: Product[] = [
       '/images/products/p3/border.jpg',
       '/images/products/p3/side.jpg',
     ],
-    description: 'A signature Khadua Looms masterpiece woven with sacred calligraphic motifs and lotus medallions in sanctified crimson and gold zari.',
+    description: 'A signature Khandua Looms masterpiece woven with sacred calligraphic motifs and lotus medallions in sanctified crimson and gold zari.',
     fabric: 'Pure Mulberry Silk',
     weave: 'Nuapatna Khadua Ikat',
     color: 'Crimson Red & Gold',

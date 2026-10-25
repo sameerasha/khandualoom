@@ -1,0 +1,19 @@
+# Node dependencies & build artifacts
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# AI Agent configuration
+.agent/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store

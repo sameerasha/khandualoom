@@ -1,4 +1,4 @@
-# Vastraloom Enterprise AI Microservices Platform
+# Khandua Looms Enterprise AI Microservices Platform
 
 A cloud-native, event-driven luxury handloom e-commerce platform built with Spring Boot 3.3.x, Java 17/21, Apache Kafka, PostgreSQL with pgvector, Redis, and React 18+ TypeScript with Redux Toolkit and Motion.
 

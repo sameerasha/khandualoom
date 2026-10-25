@@ -93,7 +93,7 @@ export const Testimonials: React.FC = () => {
           </h2>
           <div className="w-16 h-0.5 bg-brand-gold mx-auto mt-4 mb-3" />
           <p className="text-xs sm:text-sm text-brand-ivory/70 font-light">
-            Illustrative customer experiences highlighting the drape, weave details, and artistry of Khadua Looms sarees.
+            Illustrative customer experiences highlighting the drape, weave details, and artistry of Khandua Looms sarees.
           </p>
         </div>
 

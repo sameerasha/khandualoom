@@ -625,7 +625,7 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
                             Royal Shikargah Kadwa Silk Saree
                           </div>
                           <div className="text-[10px] font-mono text-brand-ivory/50 flex items-center gap-2 mt-0.5">
-                            <span>Order #VASTRA-9842</span>
+                            <span>Order #KHANDUA-9842</span>
                             <span>•</span>
                             <span className="text-brand-gold">Pure Katan Silk</span>
                           </div>
@@ -657,7 +657,7 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
                             Imperial Kanjeevaram Pure Gold Tissue
                           </div>
                           <div className="text-[10px] font-mono text-brand-ivory/50 flex items-center gap-2 mt-0.5">
-                            <span>Order #VASTRA-9210</span>
+                            <span>Order #KHANDUA-9210</span>
                             <span>•</span>
                             <span className="text-brand-gold">Korvai Temple Border</span>
                           </div>
@@ -689,7 +689,7 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
                             Chanderi Handloom Floral Motifs
                           </div>
                           <div className="text-[10px] font-mono text-brand-ivory/50 flex items-center gap-2 mt-0.5">
-                            <span>Order #VASTRA-8814</span>
+                            <span>Order #KHANDUA-8814</span>
                             <span>•</span>
                             <span className="text-brand-gold">Silk-Cotton Weave</span>
                           </div>
@@ -749,7 +749,7 @@ export const UserManagerView: React.FC<UserManagerViewProps> = ({ users, onToggl
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-5 border-t border-brand-gold/20 gap-3">
               <div className="flex items-center gap-2 text-xs font-mono text-brand-ivory/50">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Khadua Looms Cryptographic JWKS Directory • Immutable Record</span>
+                <span>Khandua Looms Cryptographic JWKS Directory • Immutable Record</span>
               </div>
               <button
                 type="button"

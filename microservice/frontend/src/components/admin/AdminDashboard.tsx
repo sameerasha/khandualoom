@@ -33,7 +33,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
   const isAdminUser = isAuthenticated && (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN');
 
   const [loginMutation, { isLoading: isLoggingIn }] = useLoginMutation();
-  const [adminEmail, setAdminEmail] = useState('superadmin@khadualooms.com');
+  const [adminEmail, setAdminEmail] = useState('superadmin@khandualoom.com');
   const [adminPassword, setAdminPassword] = useState('Admin@123456');
   const [selectedRoleType, setSelectedRoleType] = useState<'super' | 'admin'>('super');
   const [showPassword, setShowPassword] = useState(false);
@@ -115,7 +115,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       id: 1,
       firstName: 'Imperial',
       lastName: 'Admin',
-      email: 'admin@khadualooms.com',
+      email: 'admin@khandualoom.com',
       role: 'ROLE_ADMIN',
       createdDate: '2026-05-01T00:00:00Z',
     },
@@ -123,17 +123,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       id: 2,
       firstName: 'Supreme',
       lastName: 'Curator',
-      email: 'superadmin@khadualooms.com',
+      email: 'superadmin@khandualoom.com',
       role: 'ROLE_SUPER_ADMIN',
       createdDate: '2026-04-15T00:00:00Z',
     },
   ]);
 
   const [socialsList, setSocialsList] = useState<SocialItem[]>([
-    { id: 1, platform: 'instagram', url: 'https://instagram.com/khadualooms' },
+    { id: 1, platform: 'instagram', url: 'https://instagram.com/khandualoom' },
     { id: 2, platform: 'whatsapp', url: 'https://wa.me/916742918844' },
-    { id: 3, platform: 'facebook', url: 'https://facebook.com/khadualooms' },
-    { id: 4, platform: 'youtube', url: 'https://youtube.com/@khadualooms' },
+    { id: 3, platform: 'facebook', url: 'https://facebook.com/khandualoom' },
+    { id: 4, platform: 'youtube', url: 'https://youtube.com/@khandualoom' },
   ]);
 
   // Load backend data if available
@@ -319,7 +319,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               <Shield className="w-7 h-7" />
             </div>
             <h2 className="font-serif text-2xl font-bold tracking-wide text-white">
-              Khadua Looms Vault
+              Khandua Looms Vault
             </h2>
             <p className="text-xs text-brand-ivory/70 font-sans leading-relaxed">
               Administrative authentication portal for Super Administrators & Store Managers.
@@ -332,7 +332,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               type="button"
               onClick={() => {
                 setSelectedRoleType('super');
-                setAdminEmail('superadmin@khadualooms.com');
+                setAdminEmail('superadmin@khandualoom.com');
                 setAdminPassword('Admin@123456');
                 setAuthError(null);
               }}
@@ -349,7 +349,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               type="button"
               onClick={() => {
                 setSelectedRoleType('admin');
-                setAdminEmail('admin@khadualooms.com');
+                setAdminEmail('admin@khandualoom.com');
                 setAdminPassword('Admin@123456');
                 setAuthError(null);
               }}
@@ -380,7 +380,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                 required
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
-                placeholder="admin@khadualooms.com"
+                placeholder="admin@khandualoom.com"
                 className="w-full bg-[#07010E] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors"
               />
             </div>

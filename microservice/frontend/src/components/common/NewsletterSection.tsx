@@ -48,7 +48,7 @@ export const NewsletterSection: React.FC = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-brand-gold/30 bg-brand-gold/10 text-brand-gold text-xs font-mono uppercase tracking-widest mb-4">
             <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-            <span>Khadua Looms Dispatch</span>
+            <span>Khandua Looms Dispatch</span>
           </div>
 
           {/* Heading */}
@@ -58,7 +58,7 @@ export const NewsletterSection: React.FC = () => {
 
           {/* Description */}
           <p className="mt-3 text-xs sm:text-sm text-brand-ivory/80 max-w-xl mx-auto font-light leading-relaxed">
-            Discover new collections, timeless styles, and updates from Khadua Looms.
+            Discover new collections, timeless styles, and updates from Khandua Looms.
           </p>
 
           {/* Form */}
@@ -108,7 +108,7 @@ export const NewsletterSection: React.FC = () => {
                 className="mt-3 text-xs text-emerald-400 flex items-center justify-center gap-1.5 font-sans"
               >
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>Thank you! You are now subscribed to Khadua Looms updates.</span>
+                <span>Thank you! You are now subscribed to Khandua Looms updates.</span>
               </motion.div>
             )}
 

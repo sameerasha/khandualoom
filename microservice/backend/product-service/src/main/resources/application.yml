@@ -2,36 +2,19 @@ server:
   port: 8082
 
 spring:
+  config:
+    import: "optional:classpath:application-common.yml"
   application:
     name: product-service
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5419/vastraloom_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    open-in-view: false
-    show-sql: false
+  flyway:
+    table: flyway_schema_history_product
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       timeout: 2000ms
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
-    table: flyway_schema_history_product
   web:
     resources:
       static-locations:
-        - "file:D:/Project/Antigravity/vastraloom/frontend/public/"
+        - "${FRONTEND_PUBLIC_DIR:file:./../frontend/public/}"
         - "classpath:/static/"
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, prometheus

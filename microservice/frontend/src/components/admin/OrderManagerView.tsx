@@ -203,7 +203,7 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
                     <td>
                       <div>
                         <div className="font-semibold text-white">{order.customerName || 'Handloom Patron'}</div>
-                        <div className="text-xs text-brand-ivory/60">{order.customerEmail || 'patron@khadualooms.com'}</div>
+                        <div className="text-xs text-brand-ivory/60">{order.customerEmail || 'patron@khandualoom.com'}</div>
                       </div>
                     </td>
                     <td>

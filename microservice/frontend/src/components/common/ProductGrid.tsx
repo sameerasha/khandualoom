@@ -60,7 +60,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onSelectProduct }) => 
     return fallbackProducts;
   }, [fetchedProducts]);
 
-  // Dynamically derive available categories from products with Khadua Looms order
+  // Dynamically derive available categories from products with Khandua Looms order
   const categories = useMemo(() => {
     const presentCats = Array.from(new Set(productsToFilter.map((p) => p.category).filter(Boolean)));
     const ordered = PREFERRED_COLLECTIONS.filter(

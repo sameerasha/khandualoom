@@ -58,7 +58,7 @@ export const HeritageFeaturesSection: React.FC = () => {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-gold/30 bg-brand-purple-dark/80 backdrop-blur-md text-brand-gold-light text-xs font-mono uppercase tracking-widest mb-4"
           >
             <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-            <span>The Khadua Looms Promise</span>
+            <span>The Khandua Looms Promise</span>
           </motion.div>
 
           <motion.h2
@@ -68,7 +68,7 @@ export const HeritageFeaturesSection: React.FC = () => {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight"
           >
-            Why Choose Khadua Looms?
+            Why Choose Khandua Looms?
           </motion.h2>
 
           <motion.p
