@@ -45,6 +45,9 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 0
+    validate-on-migrate: false
+    out-of-order: true
+    clean-disabled: true
     locations: classpath:db/migration
 
   # Default Jackson Serialization

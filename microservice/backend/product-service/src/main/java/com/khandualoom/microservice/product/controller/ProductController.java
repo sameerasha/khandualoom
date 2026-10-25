@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping({"/api/products", "/api/v1/products"})
+@RequestMapping("/api/products")
 @Slf4j
 @SuppressWarnings("null")
 @RequiredArgsConstructor

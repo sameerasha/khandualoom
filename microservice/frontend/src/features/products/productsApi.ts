@@ -16,7 +16,7 @@ export const productsApi = baseApi.injectEndpoints({
           queryParams.append('query', params.search);
         }
         const qs = queryParams.toString();
-        return `/api/v1/products${qs ? `?${qs}` : ''}`;
+        return `/api/products${qs ? `?${qs}` : ''}`;
       },
       providesTags: (result) =>
         result
@@ -27,12 +27,12 @@ export const productsApi = baseApi.injectEndpoints({
           : [{ type: 'Products', id: 'LIST' }],
     }),
     getProductById: builder.query<Product, number>({
-      query: (id) => `/api/v1/products/${id}`,
+      query: (id) => `/api/products/${id}`,
       providesTags: (_result, _error, id) => [{ type: 'Products', id }],
     }),
     createProduct: builder.mutation<Product, Partial<Product>>({
       query: (body) => ({
-        url: '/api/v1/admin/products',
+        url: '/api/admin/products',
         method: 'POST',
         body,
       }),
@@ -40,7 +40,7 @@ export const productsApi = baseApi.injectEndpoints({
     }),
     updateProduct: builder.mutation<Product, { id: number; data: Partial<Product> }>({
       query: ({ id, data }) => ({
-        url: `/api/v1/admin/products/${id}`,
+        url: `/api/admin/products/${id}`,
         method: 'PUT',
         body: data,
       }),
@@ -51,7 +51,7 @@ export const productsApi = baseApi.injectEndpoints({
     }),
     deleteProduct: builder.mutation<void, number>({
       query: (id) => ({
-        url: `/api/v1/admin/products/${id}`,
+        url: `/api/admin/products/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: [{ type: 'Products', id: 'LIST' }],

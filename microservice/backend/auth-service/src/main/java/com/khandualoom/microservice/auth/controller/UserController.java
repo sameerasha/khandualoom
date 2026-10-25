@@ -13,9 +13,11 @@ import com.khandualoom.microservice.auth.service.OtpService;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/users")
+@Slf4j
 @RequiredArgsConstructor
 public class UserController {
 
@@ -23,6 +25,82 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
 
+    /**
+     * Get all users. Restricted to ADMIN and SUPER_ADMIN only.
+     * Regular users receive 403 Forbidden.
+     */
+    @GetMapping
+    public ResponseEntity<?> getAllUsers(
+            @RequestHeader(value = "X-User-Role", required = false) String headerUserRole
+    ) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getName()
+                : null;
+        User currentUser = (currentEmail != null && !"anonymousUser".equals(currentEmail))
+                ? userRepository.findByEmail(currentEmail).orElse(null)
+                : null;
+        String role = currentUser != null ? currentUser.getRole() : headerUserRole;
+
+        if (!"ROLE_ADMIN".equalsIgnoreCase(role) && !"ROLE_SUPER_ADMIN".equalsIgnoreCase(role)) {
+            log.warn("Access Denied: User {} attempted to list all users", currentEmail);
+            return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                    .body(Map.of("status", 403, "error", "Forbidden", "message", "Access Denied: Insufficient permissions to list all users."));
+        }
+        return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    /**
+     * Get user details by ID.
+     * Enforces ownership: A normal USER can ONLY access their own details.
+     * Other users' details cannot be accessed (returns 403 Forbidden).
+     * ADMIN and SUPER_ADMIN can access any user's details.
+     */
+    @GetMapping("/{id:[0-9]+}")
+    public ResponseEntity<?> getUserById(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,
+            @RequestHeader(value = "X-User-Role", required = false) String headerUserRole
+    ) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getName()
+                : null;
+
+        User currentUser = null;
+        if (currentEmail != null && !"anonymousUser".equals(currentEmail)) {
+            currentUser = userRepository.findByEmail(currentEmail).orElse(null);
+        }
+
+        Long authenticatedUserId = currentUser != null ? currentUser.getId() : headerUserId;
+        String authenticatedRole = currentUser != null ? currentUser.getRole() : headerUserRole;
+
+        boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(authenticatedRole)
+                || "ROLE_SUPER_ADMIN".equalsIgnoreCase(authenticatedRole);
+
+        if (!isAdmin) {
+            if (authenticatedUserId == null || !authenticatedUserId.equals(id)) {
+                log.warn("IDOR violation attempt: Authenticated user {} tried to access details of user ID {}",
+                        authenticatedUserId != null ? authenticatedUserId : currentEmail, id);
+                return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                        .body(Map.of("status", 403, "error", "Forbidden", "message", "Access Denied: You cannot access other users' details."));
+            }
+        }
+
+        return userRepository.findById(id)
+                .map(user -> {
+                    UserProfileResponse response = UserProfileResponse.builder()
+                            .id(user.getId())
+                            .firstName(user.getFirstName())
+                            .lastName(user.getLastName())
+                            .email(user.getEmail())
+                            .phone(user.getPhone())
+                            .emailVerified(user.isEmailVerified())
+                            .phoneVerified(user.isPhoneVerified())
+                            .addresses(user.getAddresses())
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     // GET /api/users/profile
     @GetMapping("/profile")

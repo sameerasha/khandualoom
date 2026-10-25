@@ -6,8 +6,6 @@ spring:
     import: "optional:classpath:application-common.yml"
   application:
     name: auth-service
-  flyway:
-    table: flyway_schema_history_auth
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}

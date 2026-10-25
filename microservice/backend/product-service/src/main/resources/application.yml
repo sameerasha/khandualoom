@@ -6,8 +6,6 @@ spring:
     import: "optional:classpath:application-common.yml"
   application:
     name: product-service
-  flyway:
-    table: flyway_schema_history_product
   data:
     redis:
       host: ${REDIS_HOST:localhost}

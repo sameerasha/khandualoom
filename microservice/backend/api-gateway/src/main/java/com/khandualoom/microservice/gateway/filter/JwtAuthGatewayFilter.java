@@ -27,7 +27,7 @@ import java.util.Set;
  * Enterprise API Gateway Perimeter Authorization Filter.
  * Enforces Role-Based Access Control (RBAC):
  *  - Super Admin APIs (/api/super-admin/**) -> SUPER_ADMIN only.
- *  - Admin APIs (/api/admin/**, /api/v1/admin/**) -> ADMIN and SUPER_ADMIN only.
+ *  - Admin APIs (/api/admin/**) -> ADMIN and SUPER_ADMIN only.
  *    (Rejects USER role with HTTP 403 Forbidden).
  *  - User APIs (/api/users/**, /api/orders/**, etc.) -> USER, ADMIN, and SUPER_ADMIN.
  *  - Public APIs -> Unauthenticated access permitted.
@@ -47,54 +47,40 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
             "/images/**",
             "/favicon.ico",
             "/api/health",
-            "/api/v1/health",
             "/api/auth/**",
-            "/api/v1/auth/**",
-            "/api/v1/ai/**"
+            "/api/ai/**"
     );
 
     // Public GET endpoints
     private static final List<String> PUBLIC_GET_PATTERNS = List.of(
             "/api/products/**",
             "/api/products",
-            "/api/v1/products/**",
-            "/api/v1/products",
             "/api/social-media/**",
-            "/api/social-media",
-            "/api/v1/social/**",
-            "/api/v1/social-media/**"
+            "/api/social-media"
     );
 
     // Public POST endpoints
     private static final List<String> PUBLIC_POST_PATTERNS = List.of(
             "/api/contact/**",
-            "/api/contact",
-            "/api/v1/contact/**",
-            "/api/v1/contact"
+            "/api/contact"
     );
 
     // Super Admin endpoints (ROLE_SUPER_ADMIN only)
     private static final List<String> SUPER_ADMIN_PATTERNS = List.of(
-            "/api/super-admin/**",
-            "/api/v1/super-admin/**"
+            "/api/super-admin/**"
     );
 
     // Admin endpoints (ROLE_ADMIN, ROLE_SUPER_ADMIN only)
     private static final List<String> ADMIN_PATTERNS = List.of(
-            "/api/admin/**",
-            "/api/v1/admin/**"
+            "/api/admin/**"
     );
 
     // User endpoints (ROLE_USER, ROLE_ADMIN, ROLE_SUPER_ADMIN)
     private static final List<String> USER_PATTERNS = List.of(
             "/api/users/**",
-            "/api/v1/users/**",
             "/api/orders/**",
-            "/api/v1/orders/**",
             "/api/checkout/**",
-            "/api/v1/checkout/**",
-            "/api/payment/**",
-            "/api/v1/payments/**"
+            "/api/payment/**"
     );
 
     @Override

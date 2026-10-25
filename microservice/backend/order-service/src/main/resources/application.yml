@@ -6,8 +6,6 @@ spring:
     import: "optional:classpath:application-common.yml"
   application:
     name: order-service
-  flyway:
-    table: flyway_schema_history_order
   kafka:
     producer:
       acks: all

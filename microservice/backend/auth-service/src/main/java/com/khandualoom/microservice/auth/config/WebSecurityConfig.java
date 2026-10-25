@@ -48,34 +48,34 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Health & Actuator & H2
-                        .requestMatchers("/api/health", "/api/v1/health").permitAll()
+                        .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
 
                         // Auth APIs (Public)
-                        .requestMatchers("/api/auth/**", "/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
 
                         // Public Products APIs
-                        .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/v1/products/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/v1/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
 
                         // Public Social Media
-                        .requestMatchers(HttpMethod.GET, "/api/social-media/**", "/api/v1/social/**", "/api/v1/social-media/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/social-media/**").permitAll()
 
                         // Public Contact Form
-                        .requestMatchers(HttpMethod.POST, "/api/contact/**", "/api/v1/contact/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/contact/**").permitAll()
 
                         // Super Admin Restricted APIs (SUPER_ADMIN role only)
-                        .requestMatchers("/api/super-admin/**", "/api/v1/super-admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
 
                         // Admin Restricted APIs (ADMIN and SUPER_ADMIN roles only)
-                        .requestMatchers("/api/admin/**", "/api/v1/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
 
-                        // User Profile & User APIs (USER, ADMIN, SUPER_ADMIN all have access)
-                        .requestMatchers("/api/users/**", "/api/v1/users/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
-                        .requestMatchers("/api/orders/**", "/api/v1/orders/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
-                        .requestMatchers("/api/checkout/**", "/api/v1/checkout/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
-                        .requestMatchers("/api/payment/**", "/api/v1/payments/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
+                        // User Profile, Orders, Checkout & Payment APIs
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
+                        .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
+                        .requestMatchers("/api/checkout/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
+                        .requestMatchers("/api/payment/**").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
 
                         // Any other requests require authentication
                         .anyRequest().authenticated());

@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.List;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -34,112 +36,72 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @SuppressWarnings("null")
     public void run(String... args) throws Exception {
-        // 1. Sync Super Admin (Strict ENV enforcement)
-        userRepository.findByEmail(superAdminEmail).ifPresentOrElse(
-            superAdmin -> {
-                superAdmin.setPassword(passwordEncoder.encode(superAdminPassword));
-                superAdmin.setRole("ROLE_SUPER_ADMIN");
-                superAdmin.setEmailVerified(true);
-                superAdmin.setPhoneVerified(true);
-                userRepository.save(superAdmin);
-                log.info("Super Admin account synchronized with ENV variables: {}", superAdminEmail);
-            },
-            () -> {
-                User superAdmin = User.builder()
-                        .firstName("Imperial")
-                        .lastName("SuperAdmin")
-                        .email(superAdminEmail)
-                        .password(passwordEncoder.encode(superAdminPassword))
-                        .phone("0000000000")
-                        .role("ROLE_SUPER_ADMIN")
-                        .emailVerified(true)
-                        .phoneVerified(true)
-                        .provider(AuthProvider.local)
-                        .build();
-                userRepository.save(superAdmin);
-                log.info("Super Admin account created: {}", superAdminEmail);
-            }
-        );
+        log.info("Initializing & synchronizing security credentials...");
 
-        // 2. Safely Initialize standard Admin (Only if missing, or update password)
-        userRepository.findByEmail(adminEmail).ifPresentOrElse(
-            admin -> {
-                admin.setRole("ROLE_ADMIN");
-                admin.setPassword(passwordEncoder.encode(adminPassword));
-                admin.setEmailVerified(true);
-                admin.setPhoneVerified(true);
-                userRepository.save(admin);
-                log.info("Standard Admin account synchronized: {}", adminEmail);
-            },
-            () -> {
-                User admin = User.builder()
-                        .firstName("Atelier")
-                        .lastName("Admin")
-                        .email(adminEmail)
-                        .password(passwordEncoder.encode(adminPassword))
-                        .phone("9999999999")
-                        .role("ROLE_ADMIN")
-                        .emailVerified(true)
-                        .phoneVerified(true)
-                        .provider(AuthProvider.local)
-                        .build();
-                userRepository.save(admin);
-                log.info("Default Standard Admin account created: {} / Admin@123456", adminEmail);
-            }
+        // 1. Super Admin Canonical & Aliases
+        List<String> superAdminEmails = List.of(
+                superAdminEmail,
+                "superadmin@khandualoom.com",
+                "superadmin@khadualooms.com",
+                "superadmin@khandualooms.com",
+                "superadmin@khadualoom.com"
         );
+        for (String email : superAdminEmails) {
+            upsertUser(email, "Imperial", "SuperAdmin", superAdminPassword, "ROLE_SUPER_ADMIN", "0000000000");
+        }
 
-        // 3. Demo Regular User Account (user@khandualoom.com / User@123456)
-        userRepository.findByEmail("user@khandualoom.com").ifPresentOrElse(
-            user -> {
-                user.setPassword(passwordEncoder.encode("User@123456"));
-                user.setRole("ROLE_USER");
-                user.setEmailVerified(true);
-                user.setPhoneVerified(true);
-                userRepository.save(user);
-                log.info("Demo user synchronized: user@khandualoom.com");
-            },
-            () -> {
-                User user = User.builder()
-                        .firstName("Ananya")
-                        .lastName("Patnaik")
-                        .email("user@khandualoom.com")
-                        .password(passwordEncoder.encode("User@123456"))
-                        .phone("9876543210")
-                        .role("ROLE_USER")
-                        .emailVerified(true)
-                        .phoneVerified(true)
-                        .provider(AuthProvider.local)
-                        .build();
-                userRepository.save(user);
-                log.info("Demo User account created: user@khandualoom.com / User@123456");
-            }
+        // 2. Standard Admin Canonical & Aliases
+        List<String> adminEmails = List.of(
+                adminEmail,
+                "admin@khandualoom.com",
+                "admin@khadualooms.com",
+                "admin@khandualooms.com",
+                "admin@khadualoom.com"
         );
+        for (String email : adminEmails) {
+            upsertUser(email, "Atelier", "Admin", adminPassword, "ROLE_ADMIN", "9999999999");
+        }
 
-        // 4. Demo Customer Account (customer@khandualoom.com / User@123456)
-        userRepository.findByEmail("customer@khandualoom.com").ifPresentOrElse(
-            cust -> {
-                cust.setPassword(passwordEncoder.encode("User@123456"));
-                cust.setRole("ROLE_USER");
-                cust.setEmailVerified(true);
-                cust.setPhoneVerified(true);
-                userRepository.save(cust);
-                log.info("Demo customer synchronized: customer@khandualoom.com");
-            },
-            () -> {
-                User cust = User.builder()
-                        .firstName("Priya")
-                        .lastName("Mohanty")
-                        .email("customer@khandualoom.com")
-                        .password(passwordEncoder.encode("User@123456"))
-                        .phone("9123456789")
-                        .role("ROLE_USER")
-                        .emailVerified(true)
-                        .phoneVerified(true)
-                        .provider(AuthProvider.local)
-                        .build();
-                userRepository.save(cust);
-                log.info("Demo Customer account created: customer@khandualoom.com / User@123456");
-            }
+        // 3. Demo Patron Account (AuthModal quick-fill)
+        upsertUser("priya.sharma@gmail.com", "Priya", "Sharma", "Patron@123", "ROLE_USER", "9876543211");
+
+        // 4. Regular Demo User Account
+        upsertUser("user@khandualoom.com", "Ananya", "Patnaik", "User@123456", "ROLE_USER", "9876543210");
+
+        // 5. Demo Customer Account
+        upsertUser("customer@khandualoom.com", "Priya", "Mohanty", "User@123456", "ROLE_USER", "9123456789");
+
+        log.info("All user credentials initialized and verified successfully.");
+    }
+
+    private void upsertUser(String email, String firstName, String lastName, String rawPassword, String role, String phone) {
+        userRepository.findByEmail(email).ifPresentOrElse(
+                user -> {
+                    user.setFirstName(firstName);
+                    user.setLastName(lastName);
+                    user.setPassword(passwordEncoder.encode(rawPassword));
+                    user.setRole(role);
+                    user.setPhone(phone);
+                    user.setEmailVerified(true);
+                    user.setPhoneVerified(true);
+                    userRepository.save(user);
+                    log.info("Synchronized credentials for: {} [{}]", email, role);
+                },
+                () -> {
+                    User newUser = User.builder()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .email(email)
+                            .password(passwordEncoder.encode(rawPassword))
+                            .phone(phone)
+                            .role(role)
+                            .emailVerified(true)
+                            .phoneVerified(true)
+                            .provider(AuthProvider.local)
+                            .build();
+                    userRepository.save(newUser);
+                    log.info("Created account for: {} [{}]", email, role);
+                }
         );
     }
 }

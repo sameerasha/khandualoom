@@ -6,8 +6,6 @@ spring:
     import: "optional:classpath:application-common.yml"
   application:
     name: notification-service
-  flyway:
-    table: flyway_schema_history_notification
   kafka:
     consumer:
       group-id: notification-service-group

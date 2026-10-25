@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping({"/api/admin/products", "/api/v1/admin/products"})
+@RequestMapping("/api/admin/products")
 @RequiredArgsConstructor
 public class AdminProductController {
 
