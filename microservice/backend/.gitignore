@@ -2,9 +2,6 @@
 target/
 *.class
 
-# AI Agent configuration
-.agent/
-
 # Local development and observability stack (local only, ignored by Git)
 .local/
 local/

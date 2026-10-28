@@ -4,9 +4,6 @@ dist/
 dist-ssr/
 *.local
 
-# AI Agent configuration
-.agent/
-
 # Environment and Secrets (exclude from Git commits)
 .env
 .env.*
