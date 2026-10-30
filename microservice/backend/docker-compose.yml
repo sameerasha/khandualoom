@@ -1,4 +1,4 @@
-name: khandualoom-micro
+name: khandualoom
 
 services:
   # ==========================================
@@ -23,7 +23,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 2. Redis 7 Cache & Session Store
@@ -41,7 +41,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 3. Apache Kafka (KRaft Mode - No Zookeeper)
@@ -75,7 +75,7 @@ services:
       retries: 5
       start_period: 15s
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 4. Kafka UI Web Console
@@ -91,7 +91,7 @@ services:
     depends_on:
       - kafka
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 5. Auth Microservice (:8081)
@@ -100,6 +100,7 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
+    image: khandualoom-auth-service:latest
     container_name: auth-service
     ports:
       - "8081:8081"
@@ -114,7 +115,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 6. Product Microservice (:8082)
@@ -123,6 +124,7 @@ services:
     build:
       context: ./product-service
       dockerfile: Dockerfile
+    image: khandualoom-product-service:latest
     container_name: product-service
     ports:
       - "8082:8082"
@@ -141,7 +143,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 7. Order Microservice (:8083)
@@ -150,6 +152,7 @@ services:
     build:
       context: ./order-service
       dockerfile: Dockerfile
+    image: khandualoom-order-service:latest
     container_name: order-service
     ports:
       - "8083:8083"
@@ -167,7 +170,7 @@ services:
       kafka:
         condition: service_healthy
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 8. Notification Microservice (:8084)
@@ -176,6 +179,7 @@ services:
     build:
       context: ./notification-service
       dockerfile: Dockerfile
+    image: khandualoom-notification-service:latest
     container_name: notification-service
     ports:
       - "8084:8084"
@@ -193,7 +197,7 @@ services:
       kafka:
         condition: service_healthy
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 9. Spring Cloud API Gateway (:8080)
@@ -202,6 +206,7 @@ services:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
+    image: khandualoom-api-gateway:latest
     container_name: api-gateway
     ports:
       - "${API_GATEWAY_HOST_PORT:-8090}:8080"
@@ -219,7 +224,7 @@ services:
       - order-service
       - notification-service
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 10. React TypeScript Luxury Storefront (:3000 / :5174)
@@ -228,6 +233,7 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
+    image: khandualoom-frontend:latest
     container_name: frontend
     ports:
       - "3000:80"
@@ -237,7 +243,7 @@ services:
     depends_on:
       - api-gateway
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 11. Prometheus Observability Metrics (:9090)
@@ -256,7 +262,7 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 12. Grafana Tempo Distributed Tracing (:3200, :4318)
@@ -273,7 +279,7 @@ services:
       - "4317:4317" # OTLP gRPC
       - "4318:4318" # OTLP HTTP
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
   # ==========================================
   # 13. Grafana Observability Dashboards (:3001)
@@ -296,7 +302,7 @@ services:
       - prometheus
       - tempo
     networks:
-      - khandualoom-micro-net
+      - khandualoom-net
 
 volumes:
   postgres-data:
@@ -307,6 +313,6 @@ volumes:
   grafana-data:
 
 networks:
-  khandualoom-micro-net:
-    name: khandualoom-micro-net
+  khandualoom-net:
+    name: khandualoom-net
     driver: bridge
