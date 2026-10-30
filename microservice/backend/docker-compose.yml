@@ -8,8 +8,7 @@ services:
     image: pgvector/pgvector:pg16
     container_name: postgres
     ports:
-      - "5419:5432"
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -205,7 +204,7 @@ services:
       dockerfile: Dockerfile
     container_name: api-gateway
     ports:
-      - "8080:8080"
+      - "${API_GATEWAY_HOST_PORT:-8090}:8080"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
