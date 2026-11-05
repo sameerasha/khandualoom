@@ -1,5 +1,6 @@
 # ===================================================================
-# Khandua Looms Microservices - Common Observability & Telemetry Standards
+# Khandua Looms – Shared Observability & Telemetry Configuration
+# Actuator Health Probes, Prometheus Metrics, and Tempo OTLP Distributed Tracing
 # ===================================================================
 management:
   endpoints:
@@ -17,6 +18,7 @@ management:
     distribution:
       percentiles-histogram:
         http.server.requests: true
+        spring.ai.chat.client: true
     tags:
       application: ${spring.application.name:unknown-service}
       environment: ${ENVIRONMENT:development}
@@ -26,6 +28,8 @@ management:
   otlp:
     tracing:
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+
+  # Dynatrace APM Metrics Integration (Optional)
   dynatrace:
     metrics:
       export:
@@ -33,3 +37,6 @@ management:
         uri: ${DYNATRACE_URI:https://your-environment-id.live.dynatrace.com/api/v2/metrics/ingest}
         api-token: ${DYNATRACE_API_TOKEN:}
         device-id: ${spring.application.name:unknown-service}
+        group: khandua-looms-microservices
+        batch-size: 1000
+        step: 1m
