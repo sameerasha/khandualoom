@@ -5,9 +5,12 @@ import com.khandualoom.microservice.inventory.application.dto.StockAdjustmentReq
 import com.khandualoom.microservice.inventory.application.dto.StockCheckResponse;
 import com.khandualoom.microservice.inventory.application.dto.StockReservationDto;
 import com.khandualoom.microservice.inventory.application.service.InventoryService;
+import com.khandualoom.microservice.inventory.domain.exception.SkuContentionException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,5 +58,17 @@ public class InventoryController {
     @PostMapping("/adjust")
     public ResponseEntity<StockCheckResponse> adjustStock(@Valid @RequestBody StockAdjustmentRequest request) {
         return ResponseEntity.ok(inventoryService.adjustStock(request));
+    }
+
+    @ExceptionHandler(SkuContentionException.class)
+    public ResponseEntity<Map<String, Object>> handleSkuContention(SkuContentionException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, "2")
+                .body(Map.of(
+                        "status", 429,
+                        "error", "Too Many Requests",
+                        "message", ex.getMessage(),
+                        "retryAfterSeconds", 2
+                ));
     }
 }

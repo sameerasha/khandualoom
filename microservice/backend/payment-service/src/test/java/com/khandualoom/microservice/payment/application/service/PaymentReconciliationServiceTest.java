@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khandualoom.microservice.payment.domain.model.Payment;
 import com.khandualoom.microservice.payment.domain.model.PaymentStatus;
 import com.khandualoom.microservice.payment.domain.repository.PaymentRepository;
+import com.khandualoom.microservice.payment.infrastructure.persistence.entity.PaymentOperationLedgerJpaEntity;
 import com.khandualoom.microservice.payment.infrastructure.persistence.entity.PaymentOutboxJpaEntity;
+import com.khandualoom.microservice.payment.infrastructure.persistence.repository.PaymentOperationLedgerRepository;
 import com.khandualoom.microservice.payment.infrastructure.persistence.repository.PaymentOutboxRepository;
 import com.khandualoom.microservice.payment.infrastructure.razorpay.RazorpayClientService;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,9 @@ class PaymentReconciliationServiceTest {
     private PaymentOutboxRepository outboxRepository;
 
     @Mock
+    private PaymentOperationLedgerRepository ledgerRepository;
+
+    @Mock
     private RazorpayClientService razorpayClientService;
 
     private PaymentReconciliationService reconciliationService;
@@ -44,6 +49,7 @@ class PaymentReconciliationServiceTest {
         reconciliationService = new PaymentReconciliationService(
                 paymentRepository,
                 outboxRepository,
+                ledgerRepository,
                 razorpayClientService,
                 objectMapper
         );
@@ -70,6 +76,7 @@ class PaymentReconciliationServiceTest {
 
         assertThat(outcome).isEqualTo("ORDER_RECOVERED");
         verify(outboxRepository).save(any(PaymentOutboxJpaEntity.class));
+        verify(ledgerRepository).save(any(PaymentOperationLedgerJpaEntity.class));
         verifyNoInteractions(razorpayClientService);
     }
 
@@ -96,12 +103,15 @@ class PaymentReconciliationServiceTest {
 
         assertThat(outcome).isEqualTo("REFUND_INITIATED");
 
-        // Verify state transition to REFUNDED
+        // Verify state transition to REFUND_PENDING / initiated
         ArgumentCaptor<Payment> paymentCaptor = ArgumentCaptor.forClass(Payment.class);
         verify(paymentRepository).save(paymentCaptor.capture());
         Payment saved = paymentCaptor.getValue();
-        assertThat(saved.getStatus()).isEqualTo(PaymentStatus.REFUNDED);
+        assertThat(saved.getStatus()).isEqualTo(PaymentStatus.REFUND_PENDING);
         assertThat(saved.getRefundId()).isEqualTo("rfnd_auto_999");
+
+        // Verify ledger recorded
+        verify(ledgerRepository, atLeastOnce()).save(any(PaymentOperationLedgerJpaEntity.class));
 
         // Verify outbox event created for notification and audit
         ArgumentCaptor<PaymentOutboxJpaEntity> outboxCaptor = ArgumentCaptor.forClass(PaymentOutboxJpaEntity.class);

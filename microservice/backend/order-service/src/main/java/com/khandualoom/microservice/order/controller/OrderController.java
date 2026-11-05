@@ -1,5 +1,6 @@
 package com.khandualoom.microservice.order.controller;
 
+import com.khandualoom.microservice.common.security.InternalAssertionTokenService;
 import com.khandualoom.microservice.order.dto.OrderRequest;
 import com.khandualoom.microservice.order.dto.OrderResponse;
 import com.khandualoom.microservice.order.dto.OrderStatusUpdateRequest;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class OrderController {
 
     private final OrderService orderService;
+    private final InternalAssertionTokenService internalAssertionTokenService;
 
     @PostMapping({"", "/checkout"})
     public ResponseEntity<OrderResponse> createOrder(
@@ -54,9 +56,9 @@ public class OrderController {
         String role = headerUserRole != null ? headerUserRole : "";
         boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(role) || "ROLE_SUPER_ADMIN".equalsIgnoreCase(role);
 
-        // Security Defense-in-Depth: Reject spoofed admin headers that did not pass through API Gateway
-        if (isAdmin && (gatewayToken == null || !gatewayToken.equals("khandualoom-gateway-verified")) && principal == null) {
-            log.warn("Blocked unverified direct admin access attempt to /api/orders without gateway token");
+        // Security Defense-in-Depth: Reject spoofed admin headers that did not pass through API Gateway with cryptographic assertion
+        if (isAdmin && (gatewayToken == null || !internalAssertionTokenService.validateToken(gatewayToken)) && principal == null) {
+            log.warn("Blocked unverified direct admin access attempt to /api/orders without valid cryptographic gateway assertion");
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("status", 403, "error", "Forbidden", "message", "Direct internal microservice admin access denied."));
         }

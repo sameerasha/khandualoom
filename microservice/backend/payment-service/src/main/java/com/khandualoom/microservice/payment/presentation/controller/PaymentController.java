@@ -47,6 +47,7 @@ public class PaymentController {
 
     /**
      * Unified Razorpay asynchronous webhook ingestion endpoint.
+     * Supports payment.captured, payment.failed, refund.processed, and refund.failed.
      */
     @PostMapping("/webhook")
     public ResponseEntity<PaymentResponse> handleWebhook(
@@ -58,8 +59,21 @@ public class PaymentController {
         try {
             JsonNode root = objectMapper.readTree(rawPayload);
             String eventType = root.path("event").asText("");
-            JsonNode paymentEntity = root.path("payload").path("payment").path("entity");
 
+            // Route refund webhooks
+            if (eventType.startsWith("refund.")) {
+                JsonNode refundEntity = root.path("payload").path("refund").path("entity");
+                String refundId = refundEntity.path("id").asText(null);
+                String paymentId = refundEntity.path("payment_id").asText(null);
+                String refundStatus = refundEntity.path("status").asText("processed");
+
+                PaymentResponse response = paymentService.processRefundWebhook(
+                        refundId, paymentId, refundStatus, eventId, rawPayload, signature);
+                return ResponseEntity.ok(response);
+            }
+
+            // Route payment webhooks
+            JsonNode paymentEntity = root.path("payload").path("payment").path("entity");
             String razorpayOrderId = paymentEntity.path("order_id").asText(null);
             String razorpayPaymentId = paymentEntity.path("id").asText(null);
             long amountInPaise = paymentEntity.path("amount").asLong(0);

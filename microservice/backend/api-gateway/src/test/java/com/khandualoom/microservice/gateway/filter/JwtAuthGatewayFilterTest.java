@@ -1,5 +1,6 @@
 package com.khandualoom.microservice.gateway.filter;
 
+import com.khandualoom.microservice.common.security.InternalAssertionTokenService;
 import com.khandualoom.microservice.common.security.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.*;
 class JwtAuthGatewayFilterTest {
 
     private JwtUtils jwtUtils;
+    private InternalAssertionTokenService tokenService;
     private JwtAuthGatewayFilter filter;
 
     @Mock
@@ -40,7 +42,8 @@ class JwtAuthGatewayFilterTest {
     @BeforeEach
     void setUp() {
         jwtUtils = new JwtUtils(secret, expirationMs, refreshExpirationMs);
-        filter = new JwtAuthGatewayFilter(jwtUtils);
+        tokenService = new InternalAssertionTokenService("cluster-secret-test-32b-min-length!", 60000L);
+        filter = new JwtAuthGatewayFilter(jwtUtils, tokenService);
         when(chain.filter(any())).thenReturn(Mono.empty());
     }
 

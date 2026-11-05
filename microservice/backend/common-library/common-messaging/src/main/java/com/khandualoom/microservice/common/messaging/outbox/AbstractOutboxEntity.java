@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.slf4j.MDC;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -49,6 +50,15 @@ public abstract class AbstractOutboxEntity {
     @Column(name = "last_error", columnDefinition = "TEXT")
     private String lastError;
 
+    @Column(name = "traceparent", length = 128)
+    private String traceparent;
+
+    @Column(name = "correlation_id", length = 128)
+    private String correlationId;
+
+    @Column(name = "causation_id", length = 128)
+    private String causationId;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
@@ -62,5 +72,21 @@ public abstract class AbstractOutboxEntity {
         this.status = OutboxStatus.PENDING;
         this.retryCount = 0;
         this.createdAt = Instant.now();
+
+        // Capture distributed tracing context from MDC if active
+        String corrId = MDC.get("correlationId");
+        if (corrId == null) {
+            corrId = MDC.get("X-Correlation-ID");
+        }
+        this.correlationId = corrId != null ? corrId : UUID.randomUUID().toString();
+
+        String tp = MDC.get("traceparent");
+        if (tp != null) {
+            this.traceparent = tp;
+        }
+        String cause = MDC.get("causationId");
+        if (cause != null) {
+            this.causationId = cause;
+        }
     }
 }

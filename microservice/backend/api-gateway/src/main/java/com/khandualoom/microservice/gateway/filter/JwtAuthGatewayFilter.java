@@ -1,5 +1,6 @@
 package com.khandualoom.microservice.gateway.filter;
 
+import com.khandualoom.microservice.common.security.InternalAssertionTokenService;
 import com.khandualoom.microservice.common.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ import java.util.Set;
 public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
 
     private final JwtUtils jwtUtils;
+    private final InternalAssertionTokenService internalAssertionTokenService;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     // Whitelisted public endpoints
@@ -94,6 +96,17 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
         HttpMethod method = request.getMethod();
+
+        // 0. Defense-in-depth: Strip any client-supplied internal spoofing headers
+        ServerHttpRequest sanitizedRequest = request.mutate()
+                .headers(h -> {
+                    h.remove(InternalAssertionTokenService.GATEWAY_IDENTITY_HEADER);
+                    h.remove(InternalAssertionTokenService.GATEWAY_ASSERTION_HEADER);
+                    h.remove("X-Internal-Secret");
+                })
+                .build();
+        exchange = exchange.mutate().request(sanitizedRequest).build();
+        request = sanitizedRequest;
 
         // 1. Allow Preflight CORS OPTIONS requests
         if (HttpMethod.OPTIONS.equals(method)) {
@@ -212,6 +225,7 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
         String email = jwtUtils.extractUsername(token);
         String role = jwtUtils.extractRole(token);
         Long userId = jwtUtils.extractUserId(token);
+        String assertionToken = internalAssertionTokenService.generateToken();
 
         return request.mutate()
                 .headers(headers -> {
@@ -224,7 +238,8 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
                     if (userId != null) {
                         headers.set("X-User-Id", String.valueOf(userId));
                     }
-                    headers.set("X-Gateway-Identity", "khandualoom-gateway-verified");
+                    headers.set(InternalAssertionTokenService.GATEWAY_IDENTITY_HEADER, assertionToken);
+                    headers.set(InternalAssertionTokenService.GATEWAY_ASSERTION_HEADER, assertionToken);
                 })
                 .build();
     }

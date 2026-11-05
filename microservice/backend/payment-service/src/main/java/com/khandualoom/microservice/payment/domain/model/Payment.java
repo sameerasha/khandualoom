@@ -75,4 +75,9 @@ public class Payment {
         this.refundId = refundId;
         this.refundStatus = "PROCESSED";
     }
+
+    public void markRefundFailed(String reason) {
+        transitionTo(PaymentStatus.REFUND_FAILED, reason);
+        this.refundStatus = "FAILED";
+    }
 }

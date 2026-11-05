@@ -2,12 +2,15 @@ package com.khandualoom.microservice.inventory.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khandualoom.microservice.common.event.OrderItemEvent;
+import com.khandualoom.microservice.inventory.domain.exception.SkuContentionException;
 import com.khandualoom.microservice.inventory.domain.model.ReservationStatus;
 import com.khandualoom.microservice.inventory.domain.model.StockReservation;
 import com.khandualoom.microservice.inventory.domain.repository.InventoryRepository;
 import com.khandualoom.microservice.inventory.domain.repository.ReservationRepository;
+import com.khandualoom.microservice.inventory.infrastructure.concurrency.SkuAdmissionControl;
 import com.khandualoom.microservice.inventory.infrastructure.persistence.repository.InventoryOutboxRepository;
 import com.khandualoom.microservice.inventory.infrastructure.persistence.repository.SpringDataInventoryRepository;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +23,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,17 +42,20 @@ class InventoryServiceTest {
     @Mock
     private InventoryOutboxRepository outboxRepository;
 
+    private SkuAdmissionControl skuAdmissionControl;
     private ObjectMapper objectMapper;
     private InventoryService inventoryService;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper().findAndRegisterModules();
+        skuAdmissionControl = new SkuAdmissionControl(50, new SimpleMeterRegistry());
         inventoryService = new InventoryService(
                 inventoryRepository,
                 springDataInventoryRepository,
                 reservationRepository,
                 outboxRepository,
+                skuAdmissionControl,
                 objectMapper
         );
     }
@@ -85,7 +91,7 @@ class InventoryServiceTest {
     }
 
     @Test
-    @DisplayName("Should roll back partial reservations and emit failure outbox without rolling back transaction when stock is insufficient")
+    @DisplayName("Should roll back partial reservations and emit failure outbox when stock is insufficient")
     void shouldRollbackPartialAndEmitFailureOutboxWhenStockInsufficient() {
         Long orderId = 3002L;
         List<OrderItemEvent> items = List.of(
@@ -129,5 +135,27 @@ class InventoryServiceTest {
         inventoryService.fulfillReservation(orderId);
 
         verify(springDataInventoryRepository).atomicFulfillStock(101L, 1);
+    }
+
+    @Test
+    @DisplayName("Single reservation should reject fast with SkuContentionException when admission control is saturated")
+    void shouldRejectWhenAdmissionControlIsSaturated() {
+        Long productId = 999L;
+        SkuAdmissionControl tightAdmission = new SkuAdmissionControl(1, new SimpleMeterRegistry());
+        InventoryService tightService = new InventoryService(
+                inventoryRepository,
+                springDataInventoryRepository,
+                reservationRepository,
+                outboxRepository,
+                tightAdmission,
+                objectMapper
+        );
+
+        // Saturate the single permit
+        tightAdmission.tryAcquire(productId, java.time.Duration.ofMillis(100));
+
+        assertThatThrownBy(() -> tightService.reserveStock(4001L, productId, 1))
+                .isInstanceOf(SkuContentionException.class)
+                .hasMessageContaining("High concurrency contention for product #999");
     }
 }

@@ -7,7 +7,9 @@ import com.khandualoom.microservice.payment.application.dto.*;
 import com.khandualoom.microservice.payment.domain.model.Payment;
 import com.khandualoom.microservice.payment.domain.model.PaymentStatus;
 import com.khandualoom.microservice.payment.domain.repository.PaymentRepository;
+import com.khandualoom.microservice.payment.infrastructure.persistence.entity.PaymentOperationLedgerJpaEntity;
 import com.khandualoom.microservice.payment.infrastructure.persistence.entity.PaymentOutboxJpaEntity;
+import com.khandualoom.microservice.payment.infrastructure.persistence.repository.PaymentOperationLedgerRepository;
 import com.khandualoom.microservice.payment.infrastructure.persistence.repository.PaymentOutboxRepository;
 import com.khandualoom.microservice.payment.infrastructure.razorpay.RazorpayClientService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,12 +29,13 @@ public class PaymentApplicationService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentOutboxRepository outboxRepository;
+    private final PaymentOperationLedgerRepository ledgerRepository;
     private final RazorpayClientService razorpayClientService;
     private final ObjectMapper objectMapper;
 
     @Transactional
     public PaymentResponse createPaymentOrder(PaymentRequest request) {
-        // Idempotency check via idempotency key
+        // 1. Idempotency check via idempotency key
         if (request.getIdempotencyKey() != null && !request.getIdempotencyKey().isBlank()) {
             Optional<Payment> existing = paymentRepository.findByIdempotencyKey(request.getIdempotencyKey());
             if (existing.isPresent()) {
@@ -43,13 +47,33 @@ public class PaymentApplicationService {
 
         String receipt = "rcpt_" + UUID.randomUUID().toString().substring(0, 8);
         BigDecimal amountInPaise = request.getAmount().multiply(new BigDecimal("100"));
+        UUID operationId = UUID.randomUUID();
+        Long orderId = request.getOrderId() != null ? request.getOrderId() : 0L;
+
+        // 2. Pre-record ledger entry before external network call
+        PaymentOperationLedgerJpaEntity ledgerEntry = PaymentOperationLedgerJpaEntity.builder()
+                .operationId(operationId)
+                .orderId(orderId)
+                .idempotencyKey(request.getIdempotencyKey())
+                .operationType("CREATE_ORDER")
+                .status("INITIATED")
+                .retryCount(0)
+                .createdAt(LocalDateTime.now())
+                .build();
+        ledgerRepository.save(ledgerEntry);
 
         try {
             String razorpayOrderId = razorpayClientService.createRazorpayOrder(amountInPaise, request.getCurrency(), receipt);
 
+            // Update ledger entry to SUCCESS
+            ledgerEntry.setRazorpayOrderId(razorpayOrderId);
+            ledgerEntry.setGatewayReference(razorpayOrderId);
+            ledgerEntry.setStatus("SUCCESS");
+            ledgerRepository.save(ledgerEntry);
+
             Payment payment = Payment.builder()
                     .id(UUID.randomUUID())
-                    .orderId(request.getOrderId() != null ? request.getOrderId() : 0L)
+                    .orderId(orderId)
                     .amount(request.getAmount())
                     .currency(request.getCurrency() != null ? request.getCurrency() : "INR")
                     .status(PaymentStatus.CREATED)
@@ -71,7 +95,10 @@ public class PaymentApplicationService {
                     .message("Razorpay payment order created")
                     .build();
         } catch (Exception e) {
-            log.error("Failed to create Razorpay order: {}", e.getMessage(), e);
+            log.error("Failed to create Razorpay order for order #{}: {}", orderId, e.getMessage(), e);
+            ledgerEntry.setStatus("FAILED");
+            ledgerEntry.setGatewayResponse(e.getMessage());
+            ledgerRepository.save(ledgerEntry);
             throw new RuntimeException("Failed to create payment order: " + e.getMessage(), e);
         }
     }
@@ -146,11 +173,25 @@ public class PaymentApplicationService {
             signatureValid = true;
         }
 
+        // Record operation ledger entry
+        PaymentOperationLedgerJpaEntity ledgerEntry = PaymentOperationLedgerJpaEntity.builder()
+                .operationId(UUID.randomUUID())
+                .orderId(payment.getOrderId())
+                .razorpayOrderId(payment.getRazorpayOrderId())
+                .razorpayPaymentId(command.getRazorpayPaymentId())
+                .operationType("CAPTURE")
+                .createdAt(LocalDateTime.now())
+                .build();
+
         if (!signatureValid) {
             log.error("Signature verification failed for payment [{}] from source [{}]",
                     payment.getId(), command.getSource());
             payment.markFailed("Signature verification failed");
             paymentRepository.save(payment);
+
+            ledgerEntry.setStatus("FAILED");
+            ledgerEntry.setGatewayResponse("Signature verification failed");
+            ledgerRepository.save(ledgerEntry);
 
             publishOutboxEvent("payments.payment-failed", String.valueOf(payment.getOrderId()),
                     PaymentFailedEvent.of(payment.getOrderId(), command.getRazorpayPaymentId(), payment.getAmount(), "Signature verification failed"));
@@ -169,6 +210,10 @@ public class PaymentApplicationService {
                         payment.getOrderId(), payment.getAmount(), command.getAmount());
                 payment.markFailed("Amount mismatch");
                 paymentRepository.save(payment);
+
+                ledgerEntry.setStatus("FAILED");
+                ledgerEntry.setGatewayResponse("Amount mismatch: expected " + payment.getAmount() + ", got " + command.getAmount());
+                ledgerRepository.save(ledgerEntry);
 
                 publishOutboxEvent("payments.payment-failed", String.valueOf(payment.getOrderId()),
                         PaymentFailedEvent.of(payment.getOrderId(), command.getRazorpayPaymentId(), command.getAmount(), "Amount mismatch"));
@@ -189,6 +234,10 @@ public class PaymentApplicationService {
             }
             paymentRepository.save(payment);
 
+            ledgerEntry.setStatus("SUCCESS");
+            ledgerEntry.setGatewayReference(command.getRazorpayPaymentId());
+            ledgerRepository.save(ledgerEntry);
+
             PaymentCompletedEvent event = PaymentCompletedEvent.create(
                     payment.getOrderId(),
                     payment.getRazorpayPaymentId(),
@@ -207,10 +256,95 @@ public class PaymentApplicationService {
             payment.markFailed(command.getFailureReason() != null ? command.getFailureReason() : "Payment failed at gateway");
             paymentRepository.save(payment);
 
+            ledgerEntry.setStatus("FAILED");
+            ledgerEntry.setGatewayResponse(command.getFailureReason());
+            ledgerRepository.save(ledgerEntry);
+
             publishOutboxEvent("payments.payment-failed", String.valueOf(payment.getOrderId()),
                     PaymentFailedEvent.of(payment.getOrderId(), command.getRazorpayPaymentId(), payment.getAmount(), payment.getFailureReason()));
 
             return toResponse(payment, "Payment marked as failed");
+        }
+    }
+
+    /**
+     * Authoritative processing for Razorpay refund webhooks (refund.processed, refund.failed).
+     */
+    @Transactional
+    public PaymentResponse processRefundWebhook(
+            String refundId,
+            String paymentId,
+            String status,
+            String eventId,
+            String rawPayload,
+            String signature) {
+        log.info("Processing authoritative refund webhook: refundId={}, paymentId={}, status={}, eventId={}",
+                refundId, paymentId, status, eventId);
+
+        // 1. Verify webhook signature
+        if (signature != null && !razorpayClientService.verifyWebhookSignature(rawPayload, signature, null)) {
+            log.error("Refund webhook signature verification failed for refundId={}", refundId);
+            return PaymentResponse.builder().status("failed").message("Webhook signature mismatch").build();
+        }
+
+        // 2. Find payment by paymentId
+        Optional<Payment> paymentOpt = paymentRepository.findByRazorpayPaymentId(paymentId);
+        if (paymentOpt.isEmpty()) {
+            log.warn("Payment not found for refund webhook: paymentId={}", paymentId);
+            return PaymentResponse.builder().status("not_found").message("Payment not found").build();
+        }
+
+        Payment payment = paymentOpt.get();
+
+        // 3. Record in operation ledger
+        PaymentOperationLedgerJpaEntity ledgerEntry = PaymentOperationLedgerJpaEntity.builder()
+                .operationId(UUID.randomUUID())
+                .orderId(payment.getOrderId())
+                .razorpayOrderId(payment.getRazorpayOrderId())
+                .razorpayPaymentId(paymentId)
+                .operationType("REFUND_WEBHOOK")
+                .gatewayReference(refundId)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        if ("processed".equalsIgnoreCase(status) || "refund.processed".equalsIgnoreCase(status)) {
+            payment.markRefunded(refundId);
+            paymentRepository.save(payment);
+
+            ledgerEntry.setStatus("SUCCESS");
+            ledgerEntry.setGatewayResponse("Refund successfully processed authoritatively");
+            ledgerRepository.save(ledgerEntry);
+
+            publishOutboxEvent("payments.refund-processed", String.valueOf(payment.getOrderId()),
+                    new PaymentReconciliationService.PaymentRefundEvent(
+                            payment.getOrderId(),
+                            paymentId,
+                            refundId,
+                            payment.getAmount(),
+                            "AUTHORITATIVE_GATEWAY_CONFIRMATION"
+                    ));
+
+            log.info("Payment #{} authoritatively marked REFUNDED via webhook", payment.getId());
+            return toResponse(payment, "Refund processed successfully");
+        } else {
+            payment.markRefundFailed("Razorpay refund failed at gateway");
+            paymentRepository.save(payment);
+
+            ledgerEntry.setStatus("FAILED");
+            ledgerEntry.setGatewayResponse("Refund failed at gateway");
+            ledgerRepository.save(ledgerEntry);
+
+            publishOutboxEvent("payments.refund-failed", String.valueOf(payment.getOrderId()),
+                    new PaymentReconciliationService.PaymentRefundEvent(
+                            payment.getOrderId(),
+                            paymentId,
+                            refundId,
+                            payment.getAmount(),
+                            "GATEWAY_REFUND_FAILURE"
+                    ));
+
+            log.error("Payment #{} refund failed authoritatively via webhook", payment.getId());
+            return toResponse(payment, "Refund failed at gateway");
         }
     }
 

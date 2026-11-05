@@ -39,6 +39,12 @@ public class OrderSagaOrchestrator {
 
         idempotentConsumerTemplate.execute(eventId, CONSUMER_GROUP, "InventoryReservedEvent", () -> {
             orderRepository.findById(event.orderId()).ifPresent(order -> {
+                if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+                    log.warn("Inventory reserved event arrived for already CANCELLED order #{}. Triggering compensation release.", order.getId());
+                    saveOutboxEvent("inventory.release-reservation", String.valueOf(order.getId()), event);
+                    return;
+                }
+
                 SagaInstance saga = sagaInstanceRepository.findByOrderId(order.getId())
                         .orElseGet(() -> SagaInstance.start(order.getId(), 900));
 
@@ -97,6 +103,12 @@ public class OrderSagaOrchestrator {
 
         idempotentConsumerTemplate.execute(eventId, CONSUMER_GROUP, "PaymentCompletedEvent", () -> {
             orderRepository.findById(event.orderId()).ifPresent(order -> {
+                if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+                    log.warn("Late payment completed received for already CANCELLED order #{}. Routing to reconciliation outbox.", order.getId());
+                    saveOutboxEvent("orders.late-payment-reconciliation", String.valueOf(order.getId()), event);
+                    return;
+                }
+
                 order.setPaymentStatus(PaymentStatus.COMPLETED);
                 order.setOrderStatus(OrderStatus.CONFIRMED);
                 order.setRazorpayPaymentId(event.paymentId());
@@ -122,6 +134,11 @@ public class OrderSagaOrchestrator {
 
         idempotentConsumerTemplate.execute(eventId, CONSUMER_GROUP, "PaymentFailedEvent", () -> {
             orderRepository.findById(event.orderId()).ifPresent(order -> {
+                if (order.getOrderStatus() == OrderStatus.CONFIRMED) {
+                    log.warn("Ignoring payment failure event for already CONFIRMED order #{}", order.getId());
+                    return;
+                }
+
                 order.setPaymentStatus(PaymentStatus.FAILED);
                 order.setOrderStatus(OrderStatus.CANCELLED);
                 orderRepository.save(order);

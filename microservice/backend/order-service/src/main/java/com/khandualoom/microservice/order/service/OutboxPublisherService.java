@@ -5,11 +5,13 @@ import com.khandualoom.microservice.order.model.OutboxEvent;
 import com.khandualoom.microservice.order.repository.OutboxEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Random;
@@ -42,7 +44,17 @@ public class OutboxPublisherService {
         for (OutboxEvent event : pending) {
             try {
                 String topic = resolveTopic(event.getEventType());
-                kafkaTemplate.send(topic, event.getAggregateId(), event.getPayload()).get();
+                ProducerRecord<String, Object> record = new ProducerRecord<>(topic, event.getAggregateId(), event.getPayload());
+                if (event.getTraceparent() != null) {
+                    record.headers().add("traceparent", event.getTraceparent().getBytes(StandardCharsets.UTF_8));
+                }
+                if (event.getCorrelationId() != null) {
+                    record.headers().add("X-Correlation-ID", event.getCorrelationId().getBytes(StandardCharsets.UTF_8));
+                }
+                if (event.getCausationId() != null) {
+                    record.headers().add("X-Causation-ID", event.getCausationId().getBytes(StandardCharsets.UTF_8));
+                }
+                kafkaTemplate.send(record).get();
 
                 event.setStatus(OutboxStatus.PUBLISHED);
                 event.setPublishedAt(Instant.now());

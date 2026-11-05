@@ -1,6 +1,8 @@
 package com.khandualoom.microservice.common.config;
 
+import com.khandualoom.microservice.common.security.InternalAssertionTokenService;
 import com.khandualoom.microservice.common.security.JwtUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -18,5 +20,13 @@ public class CommonSecurityAutoConfiguration {
             properties.getJwt().getExpirationMs(),
             properties.getJwt().getRefreshExpirationMs()
         );
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public InternalAssertionTokenService internalAssertionTokenService(
+            @Value("${khandualoom.security.internal-secret:khandualoom-internal-zero-trust-cluster-secret-key-32b-min!}") String clusterSecret,
+            @Value("${khandualoom.security.internal-max-skew-ms:60000}") long maxSkewMs) {
+        return new InternalAssertionTokenService(clusterSecret, maxSkewMs);
     }
 }

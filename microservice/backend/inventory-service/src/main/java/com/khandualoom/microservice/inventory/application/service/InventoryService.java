@@ -9,11 +9,13 @@ import com.khandualoom.microservice.inventory.application.dto.StockAdjustmentReq
 import com.khandualoom.microservice.inventory.application.dto.StockCheckResponse;
 import com.khandualoom.microservice.inventory.application.dto.StockReservationDto;
 import com.khandualoom.microservice.inventory.domain.exception.InsufficientStockException;
+import com.khandualoom.microservice.inventory.domain.exception.SkuContentionException;
 import com.khandualoom.microservice.inventory.domain.model.InventoryItem;
 import com.khandualoom.microservice.inventory.domain.model.ReservationStatus;
 import com.khandualoom.microservice.inventory.domain.model.StockReservation;
 import com.khandualoom.microservice.inventory.domain.repository.InventoryRepository;
 import com.khandualoom.microservice.inventory.domain.repository.ReservationRepository;
+import com.khandualoom.microservice.inventory.infrastructure.concurrency.SkuAdmissionControl;
 import com.khandualoom.microservice.inventory.infrastructure.persistence.entity.InventoryOutboxJpaEntity;
 import com.khandualoom.microservice.inventory.infrastructure.persistence.repository.InventoryOutboxRepository;
 import com.khandualoom.microservice.inventory.infrastructure.persistence.repository.SpringDataInventoryRepository;
@@ -37,6 +39,7 @@ public class InventoryService {
     private final SpringDataInventoryRepository springDataInventoryRepository;
     private final ReservationRepository reservationRepository;
     private final InventoryOutboxRepository outboxRepository;
+    private final SkuAdmissionControl skuAdmissionControl;
     private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
@@ -75,40 +78,64 @@ public class InventoryService {
         }
 
         List<StockReservation> successfullyReserved = new ArrayList<>();
+        List<Long> acquiredPermitSkus = new ArrayList<>();
         boolean allReserved = true;
 
-        for (OrderItemEvent item : items) {
-            int updated = springDataInventoryRepository.atomicReserveStock(item.productId(), item.quantity());
-            if (updated > 0) {
-                StockReservation res = StockReservation.create(orderId, item.productId(), item.quantity(), 900);
-                successfullyReserved.add(reservationRepository.save(res));
-            } else {
-                log.warn("Insufficient stock for product #{} during reservation for order #{}", item.productId(), orderId);
-                allReserved = false;
-                break;
-            }
-        }
-
-        if (!allReserved) {
-            // Revert partial reservations within this order
-            for (StockReservation res : successfullyReserved) {
-                springDataInventoryRepository.atomicReleaseStock(res.getProductId(), res.getQuantity());
-                reservationRepository.atomicTransitionStatus(res.getId(), ReservationStatus.RESERVED, ReservationStatus.RELEASED);
+        try {
+            // SkuAdmissionControl: Acquire permits across all ordered SKUs to prevent connection starvation
+            for (OrderItemEvent item : items) {
+                if (!skuAdmissionControl.tryAcquire(item.productId(), java.time.Duration.ofMillis(300))) {
+                    log.warn("SKU admission rejected product #{} under high concurrency contention for order #{}",
+                            item.productId(), orderId);
+                    allReserved = false;
+                    break;
+                }
+                acquiredPermitSkus.add(item.productId());
             }
 
-            // Save failure outbox event cleanly so it COMMITS and publishes
-            saveOutboxEvent("inventory.reservation-failed", String.valueOf(orderId),
-                    InventoryReservationFailedEvent.of(orderId, "Insufficient stock available for requested items"));
-            log.info("Committed inventory.reservation-failed outbox event for order #{}", orderId);
-            return false;
-        }
+            if (!allReserved) {
+                saveOutboxEvent("inventory.reservation-failed", String.valueOf(orderId),
+                        InventoryReservationFailedEvent.of(orderId, "High flash-sale contention for requested items"));
+                return false;
+            }
 
-        // All succeeded: emit inventory.reserved
-        StockReservation firstRes = successfullyReserved.get(0);
-        saveOutboxEvent("inventory.reserved", String.valueOf(orderId),
-                InventoryReservedEvent.of(orderId, firstRes.getId()));
-        log.info("All {} items successfully reserved for order #{}. Emitted inventory.reserved.", items.size(), orderId);
-        return true;
+            for (OrderItemEvent item : items) {
+                int updated = springDataInventoryRepository.atomicReserveStock(item.productId(), item.quantity());
+                if (updated > 0) {
+                    StockReservation res = StockReservation.create(orderId, item.productId(), item.quantity(), 900);
+                    successfullyReserved.add(reservationRepository.save(res));
+                } else {
+                    log.warn("Insufficient stock for product #{} during reservation for order #{}", item.productId(), orderId);
+                    allReserved = false;
+                    break;
+                }
+            }
+
+            if (!allReserved) {
+                // Revert partial reservations within this order
+                for (StockReservation res : successfullyReserved) {
+                    springDataInventoryRepository.atomicReleaseStock(res.getProductId(), res.getQuantity());
+                    reservationRepository.atomicTransitionStatus(res.getId(), ReservationStatus.RESERVED, ReservationStatus.RELEASED);
+                }
+
+                // Save failure outbox event cleanly so it COMMITS and publishes
+                saveOutboxEvent("inventory.reservation-failed", String.valueOf(orderId),
+                        InventoryReservationFailedEvent.of(orderId, "Insufficient stock available for requested items"));
+                log.info("Committed inventory.reservation-failed outbox event for order #{}", orderId);
+                return false;
+            }
+
+            // All succeeded: emit inventory.reserved
+            StockReservation firstRes = successfullyReserved.get(0);
+            saveOutboxEvent("inventory.reserved", String.valueOf(orderId),
+                    InventoryReservedEvent.of(orderId, firstRes.getId()));
+            log.info("All {} items successfully reserved for order #{}. Emitted inventory.reserved.", items.size(), orderId);
+            return true;
+        } finally {
+            for (Long sku : acquiredPermitSkus) {
+                skuAdmissionControl.release(sku);
+            }
+        }
     }
 
     /**
@@ -118,31 +145,39 @@ public class InventoryService {
     public StockReservationDto reserveStock(Long orderId, Long productId, int quantity) {
         log.info("Attempting single atomic reservation: orderId={}, productId={}, quantity={}", orderId, productId, quantity);
 
-        Optional<StockReservation> existing = reservationRepository.findByOrderIdAndProductId(orderId, productId);
-        if (existing.isPresent()) {
-            StockReservation res = existing.get();
-            if (res.getStatus() == ReservationStatus.RESERVED) {
-                log.info("Idempotent replay: reservation already exists for order #{} and product #{}", orderId, productId);
-                return toDto(res);
+        if (!skuAdmissionControl.tryAcquire(productId, java.time.Duration.ofMillis(200))) {
+            throw new SkuContentionException("High concurrency contention for product #" + productId + ". Please retry shortly.");
+        }
+
+        try {
+            Optional<StockReservation> existing = reservationRepository.findByOrderIdAndProductId(orderId, productId);
+            if (existing.isPresent()) {
+                StockReservation res = existing.get();
+                if (res.getStatus() == ReservationStatus.RESERVED) {
+                    log.info("Idempotent replay: reservation already exists for order #{} and product #{}", orderId, productId);
+                    return toDto(res);
+                }
             }
+
+            int updatedRows = springDataInventoryRepository.atomicReserveStock(productId, quantity);
+
+            if (updatedRows == 0) {
+                log.warn("Atomic reservation failed: Insufficient stock for product #{}", productId);
+                saveOutboxEvent("inventory.reservation-failed", String.valueOf(orderId),
+                        InventoryReservationFailedEvent.of(orderId, "Insufficient stock available for product: " + productId));
+                throw new InsufficientStockException("Insufficient stock available for product: " + productId);
+            }
+
+            StockReservation reservation = StockReservation.create(orderId, productId, quantity, 900);
+            StockReservation savedReservation = reservationRepository.save(reservation);
+
+            saveOutboxEvent("inventory.reserved", String.valueOf(orderId),
+                    InventoryReservedEvent.of(orderId, savedReservation.getId()));
+
+            return toDto(savedReservation);
+        } finally {
+            skuAdmissionControl.release(productId);
         }
-
-        int updatedRows = springDataInventoryRepository.atomicReserveStock(productId, quantity);
-
-        if (updatedRows == 0) {
-            log.warn("Atomic reservation failed: Insufficient stock for product #{}", productId);
-            saveOutboxEvent("inventory.reservation-failed", String.valueOf(orderId),
-                    InventoryReservationFailedEvent.of(orderId, "Insufficient stock available for product: " + productId));
-            throw new InsufficientStockException("Insufficient stock available for product: " + productId);
-        }
-
-        StockReservation reservation = StockReservation.create(orderId, productId, quantity, 900);
-        StockReservation savedReservation = reservationRepository.save(reservation);
-
-        saveOutboxEvent("inventory.reserved", String.valueOf(orderId),
-                InventoryReservedEvent.of(orderId, savedReservation.getId()));
-
-        return toDto(savedReservation);
     }
 
     /**

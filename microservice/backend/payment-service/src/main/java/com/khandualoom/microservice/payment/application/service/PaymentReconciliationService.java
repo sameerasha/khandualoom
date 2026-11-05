@@ -5,7 +5,9 @@ import com.khandualoom.microservice.common.event.PaymentCompletedEvent;
 import com.khandualoom.microservice.payment.domain.model.Payment;
 import com.khandualoom.microservice.payment.domain.model.PaymentStatus;
 import com.khandualoom.microservice.payment.domain.repository.PaymentRepository;
+import com.khandualoom.microservice.payment.infrastructure.persistence.entity.PaymentOperationLedgerJpaEntity;
 import com.khandualoom.microservice.payment.infrastructure.persistence.entity.PaymentOutboxJpaEntity;
+import com.khandualoom.microservice.payment.infrastructure.persistence.repository.PaymentOperationLedgerRepository;
 import com.khandualoom.microservice.payment.infrastructure.persistence.repository.PaymentOutboxRepository;
 import com.khandualoom.microservice.payment.infrastructure.razorpay.RazorpayClientService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -23,6 +27,7 @@ public class PaymentReconciliationService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentOutboxRepository outboxRepository;
+    private final PaymentOperationLedgerRepository ledgerRepository;
     private final RazorpayClientService razorpayClientService;
     private final ObjectMapper objectMapper;
 
@@ -62,15 +67,36 @@ public class PaymentReconciliationService {
                     "RECOVERED_SUCCESS"
             );
             saveOutboxEvent("payment-completed", String.valueOf(orderId), recoveryEvent);
+
+            recordLedgerEntry(orderId, payment.getRazorpayOrderId(), payment.getRazorpayPaymentId(),
+                    "RECONCILE_RECOVER", "SUCCESS", null);
+
             return "ORDER_RECOVERED";
         } else {
             log.warn("Inventory reservation expired and stock unavailable for order #{}. Initiating automated refund.", orderId);
+
+            UUID operationId = UUID.randomUUID();
+            PaymentOperationLedgerJpaEntity ledgerEntry = PaymentOperationLedgerJpaEntity.builder()
+                    .operationId(operationId)
+                    .orderId(orderId)
+                    .razorpayOrderId(payment.getRazorpayOrderId())
+                    .razorpayPaymentId(payment.getRazorpayPaymentId())
+                    .operationType("REFUND_INITIATE")
+                    .status("INITIATED")
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            ledgerRepository.save(ledgerEntry);
+
             try {
                 BigDecimal amountInPaise = payment.getAmount().multiply(new BigDecimal("100"));
                 String refundId = razorpayClientService.refundPayment(payment.getRazorpayPaymentId(), amountInPaise);
 
-                payment.markRefunded(refundId);
+                payment.initiateRefund(refundId);
                 paymentRepository.save(payment);
+
+                ledgerEntry.setStatus("SUCCESS");
+                ledgerEntry.setGatewayReference(refundId);
+                ledgerRepository.save(ledgerEntry);
 
                 // Publish refund event to outbox for Notification and Audit consumers
                 PaymentRefundEvent refundEvent = new PaymentRefundEvent(
@@ -88,9 +114,28 @@ public class PaymentReconciliationService {
                 log.error("Failed to execute refund for order #{}: {}", orderId, e.getMessage(), e);
                 payment.transitionTo(PaymentStatus.REFUND_PENDING, "Refund API failed: " + e.getMessage());
                 paymentRepository.save(payment);
+
+                ledgerEntry.setStatus("FAILED");
+                ledgerEntry.setGatewayResponse(e.getMessage());
+                ledgerRepository.save(ledgerEntry);
+
                 return "REFUND_FAILED";
             }
         }
+    }
+
+    private void recordLedgerEntry(Long orderId, String rzpOrderId, String rzpPaymentId, String type, String status, String response) {
+        PaymentOperationLedgerJpaEntity entry = PaymentOperationLedgerJpaEntity.builder()
+                .operationId(UUID.randomUUID())
+                .orderId(orderId)
+                .razorpayOrderId(rzpOrderId)
+                .razorpayPaymentId(rzpPaymentId)
+                .operationType(type)
+                .status(status)
+                .gatewayResponse(response)
+                .createdAt(LocalDateTime.now())
+                .build();
+        ledgerRepository.save(entry);
     }
 
     private void saveOutboxEvent(String eventType, String aggregateId, Object payload) {
