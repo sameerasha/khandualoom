@@ -104,7 +104,7 @@ services:
     image: khandualoom-auth-service:latest
     container_name: auth-service
     ports:
-      - "8081:8081"
+      - "127.0.0.1:8081:8081"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -128,7 +128,7 @@ services:
     image: khandualoom-product-service:latest
     container_name: product-service
     ports:
-      - "8082:8082"
+      - "127.0.0.1:8082:8082"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -156,7 +156,7 @@ services:
     image: khandualoom-order-service:latest
     container_name: order-service
     ports:
-      - "8083:8083"
+      - "127.0.0.1:8083:8083"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -183,7 +183,7 @@ services:
     image: khandualoom-notification-service:latest
     container_name: notification-service
     ports:
-      - "8084:8084"
+      - "127.0.0.1:8084:8084"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -210,7 +210,7 @@ services:
     image: khandualoom-user-service:latest
     container_name: user-service
     ports:
-      - "8086:8086"
+      - "127.0.0.1:8086:8086"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -234,7 +234,7 @@ services:
     image: khandualoom-inventory-service:latest
     container_name: inventory-service
     ports:
-      - "8087:8087"
+      - "127.0.0.1:8087:8087"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -261,7 +261,7 @@ services:
     image: khandualoom-payment-service:latest
     container_name: payment-service
     ports:
-      - "8088:8088"
+      - "127.0.0.1:8088:8088"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
@@ -290,7 +290,7 @@ services:
     image: khandualoom-audit-service:latest
     container_name: audit-service
     ports:
-      - "8089:8089"
+      - "127.0.0.1:8089:8089"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:

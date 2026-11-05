@@ -1,5 +1,6 @@
 package com.khandualoom.microservice.inventory.domain.repository;
 
+import com.khandualoom.microservice.inventory.domain.model.ReservationStatus;
 import com.khandualoom.microservice.inventory.domain.model.StockReservation;
 
 import java.time.Instant;
@@ -13,4 +14,5 @@ public interface ReservationRepository {
     Optional<StockReservation> findByOrderIdAndProductId(Long orderId, Long productId);
     List<StockReservation> findByOrderId(Long orderId);
     List<StockReservation> findExpiredReservations(Instant now);
+    int atomicTransitionStatus(UUID id, ReservationStatus expectedStatus, ReservationStatus newStatus);
 }

@@ -16,6 +16,6 @@ public interface SagaInstanceRepository extends JpaRepository<SagaInstance, UUID
 
     Optional<SagaInstance> findByOrderId(Long orderId);
 
-    @Query("SELECT s FROM SagaInstance s WHERE s.sagaStatus IN (com.khandualoom.microservice.order.model.SagaStatus.STARTED, com.khandualoom.microservice.order.model.SagaStatus.IN_PROGRESS) AND s.deadlineAt < :now")
+    @Query(value = "SELECT * FROM saga_instances WHERE saga_status IN ('STARTED', 'IN_PROGRESS') AND deadline_at < :now ORDER BY deadline_at ASC LIMIT 50 FOR UPDATE SKIP LOCKED", nativeQuery = true)
     List<SagaInstance> findOverdueSagas(@Param("now") Instant now);
 }

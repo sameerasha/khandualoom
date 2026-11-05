@@ -46,11 +46,23 @@ public class ProductMetricsService {
                 .register(registry);
     }
 
+    private static final java.util.Set<String> KNOWN_CATEGORIES = java.util.Set.of(
+            "saree", "sarees", "silk", "handloom", "cotton", "sambalpuri",
+            "khandua", "bomkai", "berhampuri", "pasapalli", "kotpad",
+            "habaspuri", "dongria", "all"
+    );
+
     public void recordProductSearch(String category) {
+        String safeCategory = "all";
+        if (category != null && !category.isBlank()) {
+            String normalized = category.trim().toLowerCase();
+            safeCategory = KNOWN_CATEGORIES.contains(normalized) ? normalized : "other";
+        }
+
         Counter.builder("products.searched.total")
                 .description("Total product search queries by category")
                 .tag("service", "product-service")
-                .tag("category", category != null && !category.isBlank() ? category : "all")
+                .tag("category", safeCategory)
                 .register(registry)
                 .increment();
     }

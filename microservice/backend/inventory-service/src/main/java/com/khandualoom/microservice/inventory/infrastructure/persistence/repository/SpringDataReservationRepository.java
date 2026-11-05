@@ -3,6 +3,7 @@ package com.khandualoom.microservice.inventory.infrastructure.persistence.reposi
 import com.khandualoom.microservice.inventory.domain.model.ReservationStatus;
 import com.khandualoom.microservice.inventory.infrastructure.persistence.entity.StockReservationJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,8 @@ public interface SpringDataReservationRepository extends JpaRepository<StockRese
 
     @Query("SELECT r FROM StockReservationJpaEntity r WHERE r.status = :status AND r.expiresAt < :now")
     List<StockReservationJpaEntity> findExpiredReservations(@Param("status") ReservationStatus status, @Param("now") Instant now);
+
+    @Modifying
+    @Query("UPDATE StockReservationJpaEntity r SET r.status = :newStatus WHERE r.id = :id AND r.status = :expectedStatus")
+    int atomicTransitionStatus(@Param("id") UUID id, @Param("expectedStatus") ReservationStatus expectedStatus, @Param("newStatus") ReservationStatus newStatus);
 }

@@ -1,6 +1,7 @@
 package com.khandualoom.microservice.inventory.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.khandualoom.microservice.common.event.OrderItemEvent;
 import com.khandualoom.microservice.common.exception.ResourceNotFoundException;
 import com.khandualoom.microservice.contract.event.InventoryReservationFailedEvent;
 import com.khandualoom.microservice.contract.event.InventoryReservedEvent;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,14 +54,70 @@ public class InventoryService {
     }
 
     /**
-     * Atomically reserves stock using conditional SQL updates to prevent overselling under high concurrency.
-     * Persists integration events to the Transactional Outbox within the same database transaction.
+     * Atomically reserves all items for an incoming order.
+     * If any item is out of stock, partially reserved items are rolled back and an
+     * inventory.reservation-failed outbox event is saved and committed cleanly.
+     */
+    @Transactional
+    public boolean processOrderReservation(Long orderId, List<OrderItemEvent> items) {
+        log.info("Processing order inventory reservation: orderId={}, itemsCount={}",
+                orderId, items != null ? items.size() : 0);
+
+        if (items == null || items.isEmpty()) {
+            return true;
+        }
+
+        // Idempotency check: if all items already active
+        List<StockReservation> existingList = reservationRepository.findByOrderId(orderId);
+        if (!existingList.isEmpty() && existingList.stream().allMatch(r -> r.getStatus() == ReservationStatus.RESERVED)) {
+            log.info("Idempotent replay: all reservations already active for order #{}", orderId);
+            return true;
+        }
+
+        List<StockReservation> successfullyReserved = new ArrayList<>();
+        boolean allReserved = true;
+
+        for (OrderItemEvent item : items) {
+            int updated = springDataInventoryRepository.atomicReserveStock(item.productId(), item.quantity());
+            if (updated > 0) {
+                StockReservation res = StockReservation.create(orderId, item.productId(), item.quantity(), 900);
+                successfullyReserved.add(reservationRepository.save(res));
+            } else {
+                log.warn("Insufficient stock for product #{} during reservation for order #{}", item.productId(), orderId);
+                allReserved = false;
+                break;
+            }
+        }
+
+        if (!allReserved) {
+            // Revert partial reservations within this order
+            for (StockReservation res : successfullyReserved) {
+                springDataInventoryRepository.atomicReleaseStock(res.getProductId(), res.getQuantity());
+                reservationRepository.atomicTransitionStatus(res.getId(), ReservationStatus.RESERVED, ReservationStatus.RELEASED);
+            }
+
+            // Save failure outbox event cleanly so it COMMITS and publishes
+            saveOutboxEvent("inventory.reservation-failed", String.valueOf(orderId),
+                    InventoryReservationFailedEvent.of(orderId, "Insufficient stock available for requested items"));
+            log.info("Committed inventory.reservation-failed outbox event for order #{}", orderId);
+            return false;
+        }
+
+        // All succeeded: emit inventory.reserved
+        StockReservation firstRes = successfullyReserved.get(0);
+        saveOutboxEvent("inventory.reserved", String.valueOf(orderId),
+                InventoryReservedEvent.of(orderId, firstRes.getId()));
+        log.info("All {} items successfully reserved for order #{}. Emitted inventory.reserved.", items.size(), orderId);
+        return true;
+    }
+
+    /**
+     * Atomically reserves stock for a single item.
      */
     @Transactional
     public StockReservationDto reserveStock(Long orderId, Long productId, int quantity) {
-        log.info("Attempting atomic reservation: orderId={}, productId={}, quantity={}", orderId, productId, quantity);
+        log.info("Attempting single atomic reservation: orderId={}, productId={}, quantity={}", orderId, productId, quantity);
 
-        // 1. Idempotency Check: Prevent duplicate reservation for the same order and product
         Optional<StockReservation> existing = reservationRepository.findByOrderIdAndProductId(orderId, productId);
         if (existing.isPresent()) {
             StockReservation res = existing.get();
@@ -69,7 +127,6 @@ public class InventoryService {
             }
         }
 
-        // 2. Atomic Conditional Database Update
         int updatedRows = springDataInventoryRepository.atomicReserveStock(productId, quantity);
 
         if (updatedRows == 0) {
@@ -79,55 +136,52 @@ public class InventoryService {
             throw new InsufficientStockException("Insufficient stock available for product: " + productId);
         }
 
-        // 3. Persist Reservation Record
-        StockReservation reservation = StockReservation.create(orderId, productId, quantity, 900); // 15-min TTL
+        StockReservation reservation = StockReservation.create(orderId, productId, quantity, 900);
         StockReservation savedReservation = reservationRepository.save(reservation);
 
-        // 4. Record Event in Transactional Outbox (Same DB transaction)
         saveOutboxEvent("inventory.reserved", String.valueOf(orderId),
                 InventoryReservedEvent.of(orderId, savedReservation.getId()));
 
-        log.info("Stock atomically reserved: reservationId={}, orderId={}, productId={}",
-                savedReservation.getId(), orderId, productId);
         return toDto(savedReservation);
     }
 
     /**
      * Safe stock compensation: Releases stock back into available pool when a checkout fails or is cancelled.
+     * Uses atomic status transition to guarantee mutual exclusion.
      */
     @Transactional
     public void releaseReservation(Long orderId) {
         log.info("Executing inventory compensation for cancelled order: {}", orderId);
         List<StockReservation> reservations = reservationRepository.findByOrderId(orderId);
         for (StockReservation res : reservations) {
-            if (res.getStatus() == ReservationStatus.RESERVED) {
+            int updated = reservationRepository.atomicTransitionStatus(res.getId(), ReservationStatus.RESERVED, ReservationStatus.RELEASED);
+            if (updated > 0) {
                 springDataInventoryRepository.atomicReleaseStock(res.getProductId(), res.getQuantity());
-                res.markReleased();
-                reservationRepository.save(res);
-                log.info("Released {} units of product #{} for order #{}", res.getQuantity(), res.getProductId(), orderId);
+                log.info("Exclusively released {} units of product #{} for order #{}", res.getQuantity(), res.getProductId(), orderId);
             }
         }
     }
 
     /**
      * Fulfills reservation when payment succeeds and order is confirmed.
+     * Uses atomic status transition to guarantee mutual exclusion.
      */
     @Transactional
     public void fulfillReservation(Long orderId) {
         log.info("Fulfilling reservation for confirmed order: {}", orderId);
         List<StockReservation> reservations = reservationRepository.findByOrderId(orderId);
         for (StockReservation res : reservations) {
-            if (res.getStatus() == ReservationStatus.RESERVED) {
+            int updated = reservationRepository.atomicTransitionStatus(res.getId(), ReservationStatus.RESERVED, ReservationStatus.CONSUMED);
+            if (updated > 0) {
                 springDataInventoryRepository.atomicFulfillStock(res.getProductId(), res.getQuantity());
-                res.markConsumed();
-                reservationRepository.save(res);
-                log.info("Fulfilled {} units of product #{} for confirmed order #{}", res.getQuantity(), res.getProductId(), orderId);
+                log.info("Exclusively fulfilled {} units of product #{} for confirmed order #{}", res.getQuantity(), res.getProductId(), orderId);
             }
         }
     }
 
     /**
      * Periodic watchdog sweep: Automatically releases expired 15-minute stock reservations.
+     * Uses atomic status transition to prevent double release against concurrent fulfillment.
      */
     @Scheduled(fixedDelay = 60000)
     @Transactional
@@ -137,11 +191,12 @@ public class InventoryService {
         if (!expired.isEmpty()) {
             log.info("Found {} expired stock reservations to release", expired.size());
             for (StockReservation res : expired) {
-                springDataInventoryRepository.atomicReleaseStock(res.getProductId(), res.getQuantity());
-                res.markExpired();
-                reservationRepository.save(res);
-                log.warn("Expired reservation #{} for product #{} auto-released back to available stock",
-                        res.getId(), res.getProductId());
+                int updated = reservationRepository.atomicTransitionStatus(res.getId(), ReservationStatus.RESERVED, ReservationStatus.EXPIRED);
+                if (updated > 0) {
+                    springDataInventoryRepository.atomicReleaseStock(res.getProductId(), res.getQuantity());
+                    log.warn("Exclusively expired reservation #{} for product #{} auto-released to available stock",
+                            res.getId(), res.getProductId());
+                }
             }
         }
     }

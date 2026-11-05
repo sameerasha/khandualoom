@@ -46,6 +46,11 @@ public class ReservationPersistenceAdapter implements ReservationRepository {
         return repository.findExpiredReservations(ReservationStatus.RESERVED, now).stream().map(this::toDomain).toList();
     }
 
+    @Override
+    public int atomicTransitionStatus(UUID id, ReservationStatus expectedStatus, ReservationStatus newStatus) {
+        return repository.atomicTransitionStatus(id, expectedStatus, newStatus);
+    }
+
     private StockReservation toDomain(StockReservationJpaEntity entity) {
         return StockReservation.builder()
                 .id(entity.getId())
@@ -64,7 +69,7 @@ public class ReservationPersistenceAdapter implements ReservationRepository {
                 .orderId(domain.getOrderId())
                 .productId(domain.getProductId())
                 .quantity(domain.getQuantity())
-                .status(domain.getStatus() != null ? domain.getStatus() : ReservationStatus.RESERVED)
+                .status(domain.getStatus())
                 .expiresAt(domain.getExpiresAt())
                 .createdAt(domain.getCreatedAt())
                 .build();

@@ -1,7 +1,6 @@
 package com.khandualoom.microservice.inventory.infrastructure.messaging;
 
 import com.khandualoom.microservice.common.event.OrderCreatedEvent;
-import com.khandualoom.microservice.common.event.OrderItemEvent;
 import com.khandualoom.microservice.common.messaging.idempotency.IdempotentConsumerTemplate;
 import com.khandualoom.microservice.inventory.application.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +29,7 @@ public class OrderCreatedConsumer {
                 : UUID.nameUUIDFromBytes(("OrderCreated-" + event.orderId()).getBytes());
 
         idempotentConsumerTemplate.execute(eventId, CONSUMER_GROUP, "OrderCreatedEvent", () -> {
-            if (event.items() != null) {
-                for (OrderItemEvent item : event.items()) {
-                    inventoryService.reserveStock(event.orderId(), item.productId(), item.quantity());
-                }
-            }
+            inventoryService.processOrderReservation(event.orderId(), event.items());
         });
     }
 
@@ -43,7 +38,8 @@ public class OrderCreatedConsumer {
         try {
             Long orderId = Long.valueOf(record.key());
             log.info("Inventory consumer executing compensation for cancelled order ID: {}", orderId);
-            UUID eventId = UUID.nameUUIDFromBytes(("ReleaseReservation-" + orderId + "-" + record.offset()).getBytes());
+            // Deterministic event ID surviving DLQ retries & replay without relying on transient record.offset()
+            UUID eventId = UUID.nameUUIDFromBytes(("ReleaseReservation-Order-" + orderId).getBytes());
 
             idempotentConsumerTemplate.execute(eventId, CONSUMER_GROUP, "ReleaseReservationEvent", () -> {
                 inventoryService.releaseReservation(orderId);

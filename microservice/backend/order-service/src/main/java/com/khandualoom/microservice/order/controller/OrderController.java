@@ -27,6 +27,7 @@ public class OrderController {
             Principal principal,
             @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,
             @RequestHeader(value = "X-User-Email", required = false) String headerUserEmail,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
             @RequestBody OrderRequest request
     ) {
         Long userId = headerUserId != null ? headerUserId : (principal != null ? 1L : null);
@@ -35,7 +36,7 @@ public class OrderController {
         } else if (principal != null && (request.getCustomerEmail() == null || request.getCustomerEmail().isBlank())) {
             request.setCustomerEmail(principal.getName());
         }
-        return ResponseEntity.ok(orderService.createOrder(userId, request));
+        return ResponseEntity.ok(orderService.createOrder(userId, request, idempotencyKey));
     }
 
     /**
@@ -47,10 +48,18 @@ public class OrderController {
             @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,
             @RequestHeader(value = "X-User-Role", required = false) String headerUserRole,
             @RequestHeader(value = "X-User-Email", required = false) String headerUserEmail,
+            @RequestHeader(value = "X-Gateway-Identity", required = false) String gatewayToken,
             Principal principal
     ) {
         String role = headerUserRole != null ? headerUserRole : "";
         boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(role) || "ROLE_SUPER_ADMIN".equalsIgnoreCase(role);
+
+        // Security Defense-in-Depth: Reject spoofed admin headers that did not pass through API Gateway
+        if (isAdmin && (gatewayToken == null || !gatewayToken.equals("khandualoom-gateway-verified")) && principal == null) {
+            log.warn("Blocked unverified direct admin access attempt to /api/orders without gateway token");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("status", 403, "error", "Forbidden", "message", "Direct internal microservice admin access denied."));
+        }
 
         // Admins can see all orders if not scoped to a user
         if (isAdmin && headerUserId == null) {

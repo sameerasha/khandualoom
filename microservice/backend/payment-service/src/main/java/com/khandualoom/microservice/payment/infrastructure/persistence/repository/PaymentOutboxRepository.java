@@ -13,8 +13,12 @@ import java.util.UUID;
 @Repository
 public interface PaymentOutboxRepository extends JpaRepository<PaymentOutboxJpaEntity, UUID> {
 
-    @Query(value = "SELECT * FROM outbox_events WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT :batchSize FOR UPDATE SKIP LOCKED", nativeQuery = true)
-    List<PaymentOutboxJpaEntity> claimPendingBatch(@Param("batchSize") int batchSize);
+    @Query(value = "SELECT * FROM outbox_events WHERE status = 'PENDING' OR (status = 'FAILED' AND (next_retry_at IS NULL OR next_retry_at <= CURRENT_TIMESTAMP) AND retry_count < :maxRetries) ORDER BY created_at ASC LIMIT :batchSize FOR UPDATE SKIP LOCKED", nativeQuery = true)
+    List<PaymentOutboxJpaEntity> claimPendingBatch(@Param("batchSize") int batchSize, @Param("maxRetries") int maxRetries);
+
+    default List<PaymentOutboxJpaEntity> claimPendingBatch(int batchSize) {
+        return claimPendingBatch(batchSize, 5);
+    }
 
     List<PaymentOutboxJpaEntity> findTop50ByStatusOrderByCreatedAtAsc(OutboxStatus status);
 }

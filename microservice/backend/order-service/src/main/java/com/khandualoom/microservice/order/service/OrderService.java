@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,9 +35,26 @@ public class OrderService {
 
     @Transactional
     public OrderResponse createOrder(Long userId, OrderRequest request) {
+        return createOrder(userId, request, null);
+    }
+
+    @Transactional
+    public OrderResponse createOrder(Long userId, OrderRequest request, String idempotencyKey) {
         long startTime = System.currentTimeMillis();
+
+        // Client Idempotency Check: Prevent duplicate orders on network retry or double-click
+        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+            Optional<Order> existingOrder = orderRepository.findByIdempotencyKey(idempotencyKey.trim());
+            if (existingOrder.isPresent()) {
+                log.info("Idempotent replay detected for key: {}. Returning existing Order #{}",
+                        idempotencyKey, existingOrder.get().getId());
+                return mapToResponse(existingOrder.get());
+            }
+        }
+
         Order order = Order.builder()
                 .userId(userId)
+                .idempotencyKey(idempotencyKey != null && !idempotencyKey.isBlank() ? idempotencyKey.trim() : null)
                 .customerName(request.getCustomerName() != null ? request.getCustomerName() : "Customer")
                 .customerEmail(request.getCustomerEmail() != null ? request.getCustomerEmail() : "guest@khandualoom.com")
                 .customerPhone(request.getCustomerPhone() != null ? request.getCustomerPhone() : "")

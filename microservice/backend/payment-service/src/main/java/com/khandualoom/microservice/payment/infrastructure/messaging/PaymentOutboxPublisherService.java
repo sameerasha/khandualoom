@@ -44,9 +44,14 @@ public class PaymentOutboxPublisherService {
         for (PaymentOutboxJpaEntity event : events) {
             try {
                 // Topic mapping based on event type
-                String topic = "payment-completed".equalsIgnoreCase(event.getEventType())
-                        ? "payment-completed"
-                        : "payments.payment-failed";
+                String topic;
+                if ("payment-completed".equalsIgnoreCase(event.getEventType())) {
+                    topic = "payment-completed";
+                } else if ("payments.refund-processed".equalsIgnoreCase(event.getEventType())) {
+                    topic = "payments.refund-processed";
+                } else {
+                    topic = "payments.payment-failed";
+                }
 
                 kafkaTemplate.send(topic, event.getAggregateId(), event.getPayload()).get();
 

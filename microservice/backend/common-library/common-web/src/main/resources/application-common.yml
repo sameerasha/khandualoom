@@ -20,8 +20,8 @@ spring:
     driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
     hikari:
       pool-name: KhanduaLoomsHikariPool
-      maximum-pool-size: 15
-      minimum-idle: 5
+      maximum-pool-size: 25
+      minimum-idle: 10
       idle-timeout: 300000
       connection-timeout: 20000
       max-lifetime: 1200000
@@ -59,6 +59,11 @@ spring:
   # Default Kafka Broker Coordinates
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+    listener:
+      ack-mode: RECORD
 
 # ===================================================================
 # Actuator & Observability Standards (Pillar 1: Metrics, Pillar 2: Traces)

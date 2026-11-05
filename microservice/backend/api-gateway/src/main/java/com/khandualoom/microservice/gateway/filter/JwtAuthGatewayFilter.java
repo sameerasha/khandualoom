@@ -224,6 +224,7 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
                     if (userId != null) {
                         headers.set("X-User-Id", String.valueOf(userId));
                     }
+                    headers.set("X-Gateway-Identity", "khandualoom-gateway-verified");
                 })
                 .build();
     }
