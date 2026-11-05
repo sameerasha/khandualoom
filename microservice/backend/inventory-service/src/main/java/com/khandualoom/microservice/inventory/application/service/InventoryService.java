@@ -1,7 +1,7 @@
 package com.khandualoom.microservice.inventory.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khandualoom.microservice.common.event.OrderItemEvent;
+import com.khandualoom.microservice.contract.event.OrderItemEvent;
 import com.khandualoom.microservice.common.exception.ResourceNotFoundException;
 import com.khandualoom.microservice.contract.event.InventoryReservationFailedEvent;
 import com.khandualoom.microservice.contract.event.InventoryReservedEvent;

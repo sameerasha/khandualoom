@@ -1,8 +1,8 @@
 package com.khandualoom.microservice.order.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khandualoom.microservice.common.event.OrderCreatedEvent;
-import com.khandualoom.microservice.common.event.OrderItemEvent;
+import com.khandualoom.microservice.contract.event.OrderCreatedEvent;
+import com.khandualoom.microservice.contract.event.OrderItemEvent;
 import com.khandualoom.microservice.common.exception.ResourceNotFoundException;
 import com.khandualoom.microservice.order.dto.*;
 import com.khandualoom.microservice.order.model.*;

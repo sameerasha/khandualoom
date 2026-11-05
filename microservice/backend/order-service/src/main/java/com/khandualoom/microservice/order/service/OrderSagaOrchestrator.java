@@ -1,7 +1,7 @@
 package com.khandualoom.microservice.order.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khandualoom.microservice.common.event.PaymentCompletedEvent;
+import com.khandualoom.microservice.contract.event.PaymentCompletedEvent;
 import com.khandualoom.microservice.common.messaging.idempotency.IdempotentConsumerTemplate;
 import com.khandualoom.microservice.contract.event.InventoryReservationFailedEvent;
 import com.khandualoom.microservice.contract.event.InventoryReservedEvent;

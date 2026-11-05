@@ -1,6 +1,6 @@
 package com.khandualoom.microservice.notification.consumer;
 
-import com.khandualoom.microservice.common.event.OrderCreatedEvent;
+import com.khandualoom.microservice.contract.event.OrderCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;

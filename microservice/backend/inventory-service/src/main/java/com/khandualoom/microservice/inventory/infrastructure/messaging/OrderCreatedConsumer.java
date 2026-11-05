@@ -1,6 +1,6 @@
 package com.khandualoom.microservice.inventory.infrastructure.messaging;
 
-import com.khandualoom.microservice.common.event.OrderCreatedEvent;
+import com.khandualoom.microservice.contract.event.OrderCreatedEvent;
 import com.khandualoom.microservice.common.messaging.idempotency.IdempotentConsumerTemplate;
 import com.khandualoom.microservice.inventory.application.service.InventoryService;
 import lombok.RequiredArgsConstructor;

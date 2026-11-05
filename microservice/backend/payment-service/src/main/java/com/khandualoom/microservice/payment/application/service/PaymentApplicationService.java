@@ -1,7 +1,7 @@
 package com.khandualoom.microservice.payment.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khandualoom.microservice.common.event.PaymentCompletedEvent;
+import com.khandualoom.microservice.contract.event.PaymentCompletedEvent;
 import com.khandualoom.microservice.contract.event.PaymentFailedEvent;
 import com.khandualoom.microservice.payment.application.dto.*;
 import com.khandualoom.microservice.payment.domain.model.Payment;

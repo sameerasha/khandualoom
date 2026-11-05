@@ -1,7 +1,7 @@
 package com.khandualoom.microservice.inventory.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khandualoom.microservice.common.event.OrderItemEvent;
+import com.khandualoom.microservice.contract.event.OrderItemEvent;
 import com.khandualoom.microservice.inventory.domain.exception.SkuContentionException;
 import com.khandualoom.microservice.inventory.domain.model.ReservationStatus;
 import com.khandualoom.microservice.inventory.domain.model.StockReservation;
