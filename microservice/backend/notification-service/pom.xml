@@ -19,7 +19,19 @@
     <dependencies>
         <dependency>
             <groupId>com.khandualoom.microservice</groupId>
-            <artifactId>common-library</artifactId>
+            <artifactId>common-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.khandualoom.microservice</groupId>
+            <artifactId>common-observability</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.khandualoom.microservice</groupId>
+            <artifactId>common-messaging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.khandualoom.microservice</groupId>
+            <artifactId>event-contracts</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

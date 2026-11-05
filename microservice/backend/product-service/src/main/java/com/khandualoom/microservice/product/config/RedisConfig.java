@@ -26,8 +26,9 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(connectionFactory)
             .cacheDefaults(defaultConfig)
-            .withCacheConfiguration("products", defaultConfig.entryTtl(Duration.ofHours(1)))
-            .withCacheConfiguration("categories", defaultConfig.entryTtl(Duration.ofHours(2)))
+            .withCacheConfiguration("products_all", defaultConfig.entryTtl(Duration.ofMinutes(45)))
+            .withCacheConfiguration("products_categories", defaultConfig.entryTtl(Duration.ofHours(2)))
+            .withCacheConfiguration("product_by_id", defaultConfig.entryTtl(Duration.ofHours(1)))
             .build();
     }
 }

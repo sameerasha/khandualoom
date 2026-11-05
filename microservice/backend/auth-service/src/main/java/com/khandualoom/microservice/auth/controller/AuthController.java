@@ -414,7 +414,9 @@ public class AuthController {
                 
                 com.khandualoom.microservice.auth.model.ActiveSession session = activeSessionService.findByRefreshToken(requestRefreshToken);
                 if (session == null) {
-                    return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Refresh token not found in database. Please log in again.");
+                    log.warn("Potential refresh token reuse detected for {}. Revoking all sessions.", email);
+                    activeSessionService.revokeAllUserSessions(email);
+                    return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body("Refresh token expired or revoked. Please log in again.");
                 }
 
                 User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));

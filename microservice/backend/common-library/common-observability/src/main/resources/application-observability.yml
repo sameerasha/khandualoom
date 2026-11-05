@@ -1,0 +1,35 @@
+# ===================================================================
+# Khandua Looms Microservices - Common Observability & Telemetry Standards
+# ===================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: ${spring.application.name:unknown-service}
+      environment: ${ENVIRONMENT:development}
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+  dynatrace:
+    metrics:
+      export:
+        enabled: ${DYNATRACE_METRICS_ENABLED:false}
+        uri: ${DYNATRACE_URI:https://your-environment-id.live.dynatrace.com/api/v2/metrics/ingest}
+        api-token: ${DYNATRACE_API_TOKEN:}
+        device-id: ${spring.application.name:unknown-service}

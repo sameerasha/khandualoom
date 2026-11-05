@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.khandualoom.microservice.auth.service.OtpService;
+import java.util.List;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,19 @@ public class UserController {
             return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
                     .body(Map.of("status", 403, "error", "Forbidden", "message", "Access Denied: Insufficient permissions to list all users."));
         }
-        return ResponseEntity.ok(userRepository.findAll());
+        List<UserProfileResponse> responses = userRepository.findAll().stream()
+                .map(u -> UserProfileResponse.builder()
+                        .id(u.getId())
+                        .firstName(u.getFirstName())
+                        .lastName(u.getLastName())
+                        .email(u.getEmail())
+                        .phone(u.getPhone())
+                        .emailVerified(u.isEmailVerified())
+                        .phoneVerified(u.isPhoneVerified())
+                        .addresses(u.getAddresses())
+                        .build())
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 
     /**

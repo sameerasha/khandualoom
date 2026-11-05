@@ -62,7 +62,8 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
     // Public POST endpoints
     private static final List<String> PUBLIC_POST_PATTERNS = List.of(
             "/api/contact/**",
-            "/api/contact"
+            "/api/contact",
+            "/api/payment/webhook"
     );
 
     // Super Admin endpoints (ROLE_SUPER_ADMIN only)

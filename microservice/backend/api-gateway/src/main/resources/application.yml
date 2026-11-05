@@ -3,7 +3,7 @@ server:
 
 spring:
   config:
-    import: "optional:classpath:application-common.yml"
+    import: "optional:classpath:application-observability.yml"
   application:
     name: api-gateway
   cloud:
@@ -25,11 +25,17 @@ spring:
             allowCredentials: true
             maxAge: 3600
       routes:
-        # Auth & Users Route
+        # Auth (Identity & Credentials) Route
         - id: auth-service
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/auth/**, /api/users/**, /api/admin/users/**, /api/super-admin/**
+            - Path=/api/auth/**, /api/super-admin/**
+
+        # User Service (Profiles, Addresses & Preferences) Route
+        - id: user-service
+          uri: ${USER_SERVICE_URL:http://localhost:8086}
+          predicates:
+            - Path=/api/users/**, /api/admin/users/**
 
         # Products & AI RAG Route
         - id: product-service
@@ -37,14 +43,32 @@ spring:
           predicates:
             - Path=/api/products/**, /api/ai/**, /api/admin/products/**, /images/**
 
-        # Orders & Payments Route
+        # Inventory Service (Stock Management & Reservations) Route
+        - id: inventory-service
+          uri: ${INVENTORY_SERVICE_URL:http://localhost:8087}
+          predicates:
+            - Path=/api/inventory/**
+
+        # Payment Service (Razorpay & Webhooks) Route
+        - id: payment-service
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8088}
+          predicates:
+            - Path=/api/payment/**
+
+        # Orders Route
         - id: order-service
           uri: ${ORDER_SERVICE_URL:http://localhost:8083}
           predicates:
-            - Path=/api/orders/**, /api/checkout/**, /api/payment/**, /api/admin/orders/**
+            - Path=/api/orders/**, /api/checkout/**, /api/admin/orders/**
 
         # Notifications & Contacts Route
         - id: notification-service
           uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
           predicates:
             - Path=/api/contact/**, /api/social-media/**, /api/admin/social-media/**
+
+        # Audit Service (Immutable Ledger & Event History) Route
+        - id: audit-service
+          uri: ${AUDIT_SERVICE_URL:http://localhost:8089}
+          predicates:
+            - Path=/api/audit/**

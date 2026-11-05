@@ -6,6 +6,16 @@ spring:
     import: "optional:classpath:application-common.yml"
   application:
     name: product-service
+  jpa:
+    properties:
+      hibernate:
+        default_schema: product_schema
+  flyway:
+    enabled: true
+    schemas: product_schema
+    default-schema: product_schema
+    create-schemas: true
+    locations: classpath:db/migration
   data:
     redis:
       host: ${REDIS_HOST:localhost}

@@ -20,7 +20,7 @@ public class OrderNotificationConsumer {
         attempts = "3",
         backoff = @Backoff(delay = 1000, multiplier = 2.0)
     )
-    @KafkaListener(topics = "orders.order-created.v1", groupId = "notification-service-group")
+    @KafkaListener(topics = {"orders.order-created.v1", "orders.order-created", "order-created", "orders.order-confirmed"}, groupId = "notification-service-group")
     public void handleOrderCreated(OrderCreatedEvent event) {
         String eventKey = event.eventId().toString();
 

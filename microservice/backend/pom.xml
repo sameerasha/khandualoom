@@ -20,11 +20,16 @@
 
     <modules>
         <module>common-library</module>
+        <module>contracts</module>
         <module>api-gateway</module>
         <module>auth-service</module>
+        <module>user-service</module>
         <module>product-service</module>
+        <module>inventory-service</module>
         <module>order-service</module>
+        <module>payment-service</module>
         <module>notification-service</module>
+        <module>audit-service</module>
     </modules>
 
     <properties>
@@ -68,10 +73,47 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- Internal Common Library -->
+            <!-- Internal Common Technical Starters -->
             <dependency>
                 <groupId>com.khandualoom.microservice</groupId>
-                <artifactId>common-library</artifactId>
+                <artifactId>common-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.khandualoom.microservice</groupId>
+                <artifactId>common-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.khandualoom.microservice</groupId>
+                <artifactId>common-observability</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.khandualoom.microservice</groupId>
+                <artifactId>common-messaging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.khandualoom.microservice</groupId>
+                <artifactId>common-test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Internal Versioned Contracts -->
+            <dependency>
+                <groupId>com.khandualoom.microservice</groupId>
+                <artifactId>event-contracts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.khandualoom.microservice</groupId>
+                <artifactId>api-contracts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.khandualoom.microservice</groupId>
+                <artifactId>schema-registry</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

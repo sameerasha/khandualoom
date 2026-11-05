@@ -17,6 +17,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-khandualoom_db}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init-schemas.sql:/docker-entrypoint-initdb.d/01-init-schemas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d khandualoom_db"]
       interval: 5s
@@ -200,7 +201,114 @@ services:
       - khandualoom-net
 
   # ==========================================
-  # 9. Spring Cloud API Gateway (:8080)
+  # 9. User Profile Microservice (:8086)
+  # ==========================================
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    image: khandualoom-user-service:latest
+    container_name: user-service
+    ports:
+      - "8086:8086"
+    env_file:
+      - ${ENV_FILE:-.env.dev}
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - khandualoom-net
+
+  # ==========================================
+  # 10. Inventory Microservice (:8087)
+  # ==========================================
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    image: khandualoom-inventory-service:latest
+    container_name: inventory-service
+    ports:
+      - "8087:8087"
+    env_file:
+      - ${ENV_FILE:-.env.dev}
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - khandualoom-net
+
+  # ==========================================
+  # 11. Payment Microservice (:8088)
+  # ==========================================
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    image: khandualoom-payment-service:latest
+    container_name: payment-service
+    ports:
+      - "8088:8088"
+    env_file:
+      - ${ENV_FILE:-.env.dev}
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-rzp_test_TFkaBSlLomlL7q}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-wTrxhC2xJiIFyeKWIioUhYaO}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - khandualoom-net
+
+  # ==========================================
+  # 12. Audit Microservice (:8089)
+  # ==========================================
+  audit-service:
+    build:
+      context: ./audit-service
+      dockerfile: Dockerfile
+    image: khandualoom-audit-service:latest
+    container_name: audit-service
+    ports:
+      - "8089:8089"
+    env_file:
+      - ${ENV_FILE:-.env.dev}
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - khandualoom-net
+
+  # ==========================================
+  # 13. Spring Cloud API Gateway (:8080)
   # ==========================================
   api-gateway:
     build:
@@ -217,17 +325,25 @@ services:
       - PRODUCT_SERVICE_URL=${PRODUCT_SERVICE_URL:-http://product-service:8082}
       - ORDER_SERVICE_URL=${ORDER_SERVICE_URL:-http://order-service:8083}
       - NOTIFICATION_SERVICE_URL=${NOTIFICATION_SERVICE_URL:-http://notification-service:8084}
+      - USER_SERVICE_URL=${USER_SERVICE_URL:-http://user-service:8086}
+      - INVENTORY_SERVICE_URL=${INVENTORY_SERVICE_URL:-http://inventory-service:8087}
+      - PAYMENT_SERVICE_URL=${PAYMENT_SERVICE_URL:-http://payment-service:8088}
+      - AUDIT_SERVICE_URL=${AUDIT_SERVICE_URL:-http://audit-service:8089}
       - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
     depends_on:
       - auth-service
       - product-service
       - order-service
       - notification-service
+      - user-service
+      - inventory-service
+      - payment-service
+      - audit-service
     networks:
       - khandualoom-net
 
   # ==========================================
-  # 10. React TypeScript Luxury Storefront (:3000 / :5174)
+  # 14. React TypeScript Luxury Storefront (:3000 / :5174)
   # ==========================================
   frontend:
     build:
@@ -246,7 +362,7 @@ services:
       - khandualoom-net
 
   # ==========================================
-  # 11. Prometheus Observability Metrics (:9090)
+  # 15. Prometheus Observability Metrics (:9090)
   # ==========================================
   prometheus:
     image: prom/prometheus:v2.51.0
@@ -265,7 +381,7 @@ services:
       - khandualoom-net
 
   # ==========================================
-  # 12. Grafana Tempo Distributed Tracing (:3200, :4318)
+  # 16. Grafana Tempo Distributed Tracing (:3200, :4318)
   # ==========================================
   tempo:
     image: grafana/tempo:2.4.1
@@ -282,7 +398,7 @@ services:
       - khandualoom-net
 
   # ==========================================
-  # 13. Grafana Observability Dashboards (:3001)
+  # 17. Grafana Observability Dashboards (:3001)
   # ==========================================
   grafana:
     image: grafana/grafana:10.4.1

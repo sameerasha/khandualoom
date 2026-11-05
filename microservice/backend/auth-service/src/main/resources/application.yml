@@ -6,6 +6,16 @@ spring:
     import: "optional:classpath:application-common.yml"
   application:
     name: auth-service
+  jpa:
+    properties:
+      hibernate:
+        default_schema: auth_schema
+  flyway:
+    enabled: true
+    schemas: auth_schema
+    default-schema: auth_schema
+    create-schemas: true
+    locations: classpath:db/migration
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}

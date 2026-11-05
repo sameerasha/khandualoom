@@ -8,6 +8,7 @@ import com.khandualoom.microservice.order.dto.*;
 import com.khandualoom.microservice.order.model.*;
 import com.khandualoom.microservice.order.repository.OrderRepository;
 import com.khandualoom.microservice.order.repository.OutboxEventRepository;
+import com.khandualoom.microservice.order.repository.SagaInstanceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OutboxEventRepository outboxEventRepository;
+    private final SagaInstanceRepository sagaInstanceRepository;
     private final ObjectMapper objectMapper;
     private final OrderMetricsService orderMetricsService;
 
@@ -83,6 +85,10 @@ public class OrderService {
         order.setTotalAmount(total);
         Order savedOrder = orderRepository.save(order);
 
+        // Persistent Saga State Machine Initialization (15-min timeout)
+        SagaInstance saga = SagaInstance.start(savedOrder.getId(), 900);
+        sagaInstanceRepository.save(saga);
+
         // Transactional Outbox Pattern: Save OrderCreatedEvent within same ACID transaction
         try {
             OrderCreatedEvent event = OrderCreatedEvent.create(
@@ -98,18 +104,15 @@ public class OrderService {
                     eventItems
             );
 
-            OutboxEvent outboxEvent = OutboxEvent.builder()
-                    .id(event.eventId())
-                    .aggregateType("Order")
-                    .aggregateId(savedOrder.getId().toString())
-                    .eventType("OrderCreatedEvent")
-                    .payload(objectMapper.writeValueAsString(event))
-                    .createdAt(Instant.now())
-                    .processed(false)
-                    .build();
+            OutboxEvent outboxEvent = new OutboxEvent(
+                    "Order",
+                    savedOrder.getId().toString(),
+                    "OrderCreatedEvent",
+                    objectMapper.writeValueAsString(event)
+            );
 
             outboxEventRepository.save(outboxEvent);
-            log.info("Persisted OutboxEvent for Order #{}", savedOrder.getId());
+            log.info("Persisted OutboxEvent and initialized Saga for Order #{}", savedOrder.getId());
         } catch (Exception e) {
             log.error("Failed to serialize Outbox event: {}", e.getMessage(), e);
         }

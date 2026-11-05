@@ -1,31 +1,29 @@
 package com.khandualoom.microservice.product.controller;
 
 import com.khandualoom.microservice.product.model.Product;
-import com.khandualoom.microservice.product.repository.ProductRepository;
+import com.khandualoom.microservice.product.service.ProductCatalogService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/products")
 @RequiredArgsConstructor
 public class AdminProductController {
 
-    private final ProductRepository productRepository;
-
+    private final ProductCatalogService catalogService;
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@NonNull @RequestBody Product product) {
-        Product savedProduct = productRepository.save(product);
+        Product savedProduct = catalogService.saveProduct(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@NonNull @PathVariable("id") Long id, @NonNull @RequestBody Product productDetails) {
-        return productRepository.findById(id)
+        return catalogService.getProductById(id)
                 .map(product -> {
                     product.setName(productDetails.getName());
                     product.setCategory(productDetails.getCategory());
@@ -44,7 +42,7 @@ public class AdminProductController {
                     if (productDetails.getImages() != null) {
                         product.setImages(productDetails.getImages());
                     }
-                    Product updated = productRepository.save(product);
+                    Product updated = catalogService.saveProduct(product);
                     return ResponseEntity.ok(updated);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -52,12 +50,11 @@ public class AdminProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@NonNull @PathVariable("id") Long id) {
-        return productRepository.findById(id)
-                .map((@NonNull Product product) -> {
-                    productRepository.delete(product);
+        return catalogService.getProductById(id)
+                .map(product -> {
+                    catalogService.deleteProduct(id);
                     return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 }
-
