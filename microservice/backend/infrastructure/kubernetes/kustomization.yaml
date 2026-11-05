@@ -9,6 +9,7 @@ resources:
   - configmap-and-secrets.yaml
   - deployments.yaml
   - pod-disruption-budget.yaml
+  - pgbouncer.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: kustomize

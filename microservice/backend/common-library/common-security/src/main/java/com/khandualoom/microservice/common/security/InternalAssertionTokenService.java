@@ -1,7 +1,9 @@
 package com.khandualoom.microservice.common.security;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -9,6 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Formatter;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +26,7 @@ public class InternalAssertionTokenService {
     private final String primarySecret;
     private final String secondarySecret;
     private final long maxSkewMs;
+    private final StringRedisTemplate redisTemplate;
 
     // Atomic Nonce Replay Cache (nonce -> timestamp)
     private final ConcurrentHashMap<String, Long> usedNonces = new ConcurrentHashMap<>();
@@ -31,14 +35,23 @@ public class InternalAssertionTokenService {
     public InternalAssertionTokenService(
             @Value("${khandualoom.security.internal-secret:khandualoom-internal-zero-trust-cluster-secret-key-32b-min!}") String primarySecret,
             @Value("${khandualoom.security.internal-secondary-secret:}") String secondarySecret,
-            @Value("${khandualoom.security.internal-max-skew-ms:60000}") long maxSkewMs) {
+            @Value("${khandualoom.security.internal-max-skew-ms:60000}") long maxSkewMs,
+            @Autowired(required = false) StringRedisTemplate redisTemplate) {
         this.primarySecret = primarySecret;
         this.secondarySecret = secondarySecret != null && !secondarySecret.isBlank() ? secondarySecret : null;
         this.maxSkewMs = maxSkewMs;
+        this.redisTemplate = redisTemplate;
+    }
+
+    public InternalAssertionTokenService(
+            String primarySecret,
+            String secondarySecret,
+            long maxSkewMs) {
+        this(primarySecret, secondarySecret, maxSkewMs, null);
     }
 
     public InternalAssertionTokenService(String primarySecret, long maxSkewMs) {
-        this(primarySecret, null, maxSkewMs);
+        this(primarySecret, null, maxSkewMs, null);
     }
 
     /**
@@ -182,6 +195,19 @@ public class InternalAssertionTokenService {
     }
 
     private boolean recordNonceIfAbsent(String nonce, long now) {
+        if (redisTemplate != null) {
+            try {
+                Boolean wasSet = redisTemplate.opsForValue()
+                        .setIfAbsent("khandualoom:nonce:" + nonce, String.valueOf(now), Duration.ofMillis(maxSkewMs));
+                if (Boolean.FALSE.equals(wasSet)) {
+                    log.warn("Cluster Security Alert: Replay attack detected via distributed Redis! Nonce [{}] already consumed", nonce);
+                    return false;
+                }
+            } catch (Exception e) {
+                log.warn("Distributed Redis nonce check unavailable: {}. Falling back to container memory nonce cache", e.getMessage());
+            }
+        }
+
         Long existing = usedNonces.putIfAbsent(nonce, now);
         if (existing != null) {
             log.warn("Security Alert: Replay attack detected! Nonce [{}] has already been consumed within active freshness window", nonce);

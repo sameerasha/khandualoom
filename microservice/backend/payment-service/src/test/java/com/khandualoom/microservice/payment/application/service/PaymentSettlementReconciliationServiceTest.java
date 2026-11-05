@@ -41,7 +41,8 @@ class PaymentSettlementReconciliationServiceTest {
         reconciliationService = new PaymentSettlementReconciliationService(
                 settlementRepository,
                 paymentRepository,
-                meterRegistry
+                meterRegistry,
+                Optional.empty()
         );
     }
 

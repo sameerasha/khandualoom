@@ -97,4 +97,28 @@ class InternalAssertionTokenServiceTest {
         assertThat(tokenService.validateToken("")).isFalse();
         assertThat(tokenService.validateToken(null)).isFalse();
     }
+
+    @Test
+    @DisplayName("Should reject replay attack detected via distributed Redis")
+    void shouldRejectReplayViaRedisCluster() {
+        org.springframework.data.redis.core.StringRedisTemplate mockRedis = org.mockito.Mockito.mock(org.springframework.data.redis.core.StringRedisTemplate.class);
+        org.springframework.data.redis.core.ValueOperations<String, String> mockOps = org.mockito.Mockito.mock(org.springframework.data.redis.core.ValueOperations.class);
+        org.mockito.Mockito.when(mockRedis.opsForValue()).thenReturn(mockOps);
+
+        InternalAssertionTokenService redisTokenService = new InternalAssertionTokenService(
+                primaryKey, secondaryKey, 60000L, mockRedis
+        );
+
+        String token = redisTokenService.generateToken();
+
+        // 1. First validation: Redis returns true (nonce set successfully)
+        org.mockito.Mockito.when(mockOps.setIfAbsent(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(Boolean.TRUE);
+        assertThat(redisTokenService.validateToken(token)).isTrue();
+
+        // 2. Second validation: Redis returns false (nonce already exists in cluster)
+        org.mockito.Mockito.when(mockOps.setIfAbsent(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(Boolean.FALSE);
+        assertThat(redisTokenService.validateToken(token)).isFalse();
+    }
 }

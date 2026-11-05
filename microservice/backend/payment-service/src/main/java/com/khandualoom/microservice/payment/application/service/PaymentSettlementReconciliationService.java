@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +30,7 @@ public class PaymentSettlementReconciliationService {
     private final PaymentSettlementLedgerRepository settlementRepository;
     private final PaymentRepository paymentRepository;
     private final MeterRegistry meterRegistry;
+    private final Optional<DoubleEntryLedgerService> doubleEntryLedgerService;
 
     @Getter
     @Setter
@@ -126,6 +128,20 @@ public class PaymentSettlementReconciliationService {
 
         if ("SETTLED".equals(status)) {
             meterRegistry.counter("khandualoom.reconciliation.settled").increment();
+            // Automatically post double-entry balancing journal entry
+            doubleEntryLedgerService.ifPresent(ledger -> {
+                try {
+                    ledger.postSettlementJournalEntry(
+                            request.getRazorpaySettlementId(),
+                            request.getGrossAmount(),
+                            request.getFee(),
+                            request.getTax(),
+                            request.getNetAmount()
+                    );
+                } catch (Exception e) {
+                    log.error("Failed to post settlement journal entry: {}", e.getMessage());
+                }
+            });
         }
 
         // Persist settlement audit ledger
@@ -154,5 +170,19 @@ public class PaymentSettlementReconciliationService {
                 discrepancyReason != null ? discrepancyReason : "Settlement successfully reconciled",
                 "DISCREPANCY".equals(status) || "UNMATCHED".equals(status)
         );
+    }
+
+    /**
+     * Reconciles an entire batch of settlement items (e.g. from Razorpay daily settlement file or webhook).
+     */
+    @Transactional
+    public List<SettlementReconciliationResult> reconcileSettlementBatch(List<SettlementItemRequest> batch) {
+        log.info("Starting batch reconciliation for {} settlement items", batch != null ? batch.size() : 0);
+        if (batch == null || batch.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        return batch.stream()
+                .map(this::reconcileSettlementItem)
+                .toList();
     }
 }

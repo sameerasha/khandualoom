@@ -1,0 +1,13 @@
+package com.khandualoom.microservice.payment.infrastructure.persistence.repository;
+
+import com.khandualoom.microservice.payment.infrastructure.persistence.entity.JournalEntryJpaEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface JournalEntryRepository extends JpaRepository<JournalEntryJpaEntity, UUID> {
+    List<JournalEntryJpaEntity> findByTransactionReference(String transactionReference);
+}
