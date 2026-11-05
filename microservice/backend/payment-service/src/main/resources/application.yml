@@ -34,6 +34,8 @@ razorpay:
   key:
     id: ${RAZORPAY_KEY_ID:rzp_test_5g2g6g4g3g2g1}
     secret: ${RAZORPAY_KEY_SECRET:secret_test_xyz123}
+  webhook:
+    secret: ${RAZORPAY_WEBHOOK_SECRET:dummy_webhook_secret}
 
 management:
   endpoints:

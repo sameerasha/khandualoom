@@ -279,6 +279,7 @@ services:
       - REDIS_PORT=${REDIS_PORT:-6379}
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-rzp_test_TFkaBSlLomlL7q}
       - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-wTrxhC2xJiIFyeKWIioUhYaO}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET:-dummy_webhook_secret}
       - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
     depends_on:
       postgres:
