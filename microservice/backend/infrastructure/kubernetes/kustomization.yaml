@@ -10,7 +10,10 @@ resources:
   - deployments.yaml
   - pod-disruption-budget.yaml
   - pgbouncer.yaml
+  - hpa.yaml
+  - ingress.yaml
 
-commonLabels:
-  app.kubernetes.io/managed-by: kustomize
-  app.kubernetes.io/part-of: khandualoom
+labels:
+  - pairs:
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/part-of: khandualoom

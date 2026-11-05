@@ -1,0 +1,50 @@
+# ===================================================================
+# Khandua Looms – Production Ingress Manifest (networking.k8s.io/v1)
+# Routes external HTTPS traffic to API Gateway and Frontend with TLS Termination
+# ===================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: khandualoom-ingress
+  namespace: khandualoom
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "25m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "15"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://khandualoom.com, https://admin.khandualoom.com"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+spec:
+  tls:
+    - hosts:
+        - khandualoom.com
+        - api.khandualoom.com
+      secretName: khandualoom-tls-cert
+  rules:
+    # API Gateway Subdomain
+    - host: api.khandualoom.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080
+    # Main Domain
+    - host: khandualoom.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080

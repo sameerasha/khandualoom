@@ -1,15 +1,32 @@
 # ===================================================================
-# 1. API Gateway Deployment & Service
+# Khandua Looms – Production Kubernetes Deployments & Services (All 9 Microservices)
+# Standards:
+#  - Zero-downtime RollingUpdate (maxSurge: 1, maxUnavailable: 0)
+#  - Graceful termination: terminationGracePeriodSeconds: 60
+#  - Non-root container security context (UID 10001)
+#  - Independent Liveness (/actuator/health/liveness) & Readiness (/actuator/health/readiness)
+#  - Explicit CPU & Memory requests and limits
 # ===================================================================
+
+# -------------------------------------------------------------------
+# 1. API Gateway Deployment & Service (:8080)
+# -------------------------------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
   namespace: khandualoom
   labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: khandualoom
     app: api-gateway
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: api-gateway
@@ -18,12 +35,21 @@ spec:
       labels:
         app: api-gateway
     spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
       containers:
         - name: api-gateway
           image: khandualoom/api-gateway:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - configMapRef:
                 name: khandualoom-config
@@ -42,52 +68,78 @@ spec:
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
             initialDelaySeconds: 20
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: api-gateway
   namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: khandualoom
+    app: api-gateway
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
-    - port: 80
+    - name: http
+      port: 8080
       targetPort: 8080
   selector:
     app: api-gateway
 ---
-# ===================================================================
-# 2. Order Service Deployment & Service
-# ===================================================================
+
+# -------------------------------------------------------------------
+# 2. Auth Microservice (:8081)
+# -------------------------------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: auth-service
   namespace: khandualoom
   labels:
-    app: order-service
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/part-of: khandualoom
+    app: auth-service
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
-      app: order-service
+      app: auth-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: auth-service
     spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
       containers:
-        - name: order-service
-          image: khandualoom/order-service:latest
+        - name: auth-service
+          image: khandualoom/auth-service:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8083
+            - containerPort: 8081
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - configMapRef:
                 name: khandualoom-config
@@ -95,7 +147,7 @@ spec:
                 name: khandualoom-secrets
           resources:
             requests:
-              cpu: 300m
+              cpu: 250m
               memory: 512Mi
             limits:
               cpu: 1000m
@@ -103,169 +155,58 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8083
+              port: 8081
             initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 8083
+              port: 8081
             initialDelaySeconds: 20
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: order-service
-  namespace: khandualoom
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8083
-      targetPort: 8083
-  selector:
-    app: order-service
----
-# ===================================================================
-# 3. Inventory Service Deployment & Service
-# ===================================================================
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: inventory-service
+  name: auth-service
   namespace: khandualoom
   labels:
-    app: inventory-service
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: inventory-service
-  template:
-    metadata:
-      labels:
-        app: inventory-service
-    spec:
-      containers:
-        - name: inventory-service
-          image: khandualoom/inventory-service:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8087
-          envFrom:
-            - configMapRef:
-                name: khandualoom-config
-            - secretRef:
-                name: khandualoom-secrets
-          resources:
-            requests:
-              cpu: 300m
-              memory: 512Mi
-            limits:
-              cpu: 1000m
-              memory: 1024Mi
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8087
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8087
-            initialDelaySeconds: 20
-            periodSeconds: 5
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: inventory-service
-  namespace: khandualoom
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/part-of: khandualoom
+    app: auth-service
 spec:
   type: ClusterIP
   ports:
-    - port: 8087
-      targetPort: 8087
+    - name: http
+      port: 8081
+      targetPort: 8081
   selector:
-    app: inventory-service
+    app: auth-service
 ---
-# ===================================================================
-# 4. Payment Service Deployment & Service
-# ===================================================================
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: payment-service
-  namespace: khandualoom
-  labels:
-    app: payment-service
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: payment-service
-  template:
-    metadata:
-      labels:
-        app: payment-service
-    spec:
-      containers:
-        - name: payment-service
-          image: khandualoom/payment-service:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8088
-          envFrom:
-            - configMapRef:
-                name: khandualoom-config
-            - secretRef:
-                name: khandualoom-secrets
-          resources:
-            requests:
-              cpu: 300m
-              memory: 512Mi
-            limits:
-              cpu: 1000m
-              memory: 1024Mi
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8088
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8088
-            initialDelaySeconds: 20
-            periodSeconds: 5
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: payment-service
-  namespace: khandualoom
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8088
-      targetPort: 8088
-  selector:
-    app: payment-service
----
-# ===================================================================
-# 5. Product Service Deployment & Service
-# ===================================================================
+
+# -------------------------------------------------------------------
+# 3. Product Microservice (:8082)
+# -------------------------------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: product-service
   namespace: khandualoom
   labels:
+    app.kubernetes.io/name: product-service
+    app.kubernetes.io/part-of: khandualoom
     app: product-service
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: product-service
@@ -274,12 +215,21 @@ spec:
       labels:
         app: product-service
     spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
       containers:
         - name: product-service
           image: khandualoom/product-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8082
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - configMapRef:
                 name: khandualoom-config
@@ -298,22 +248,571 @@ spec:
               port: 8082
             initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8082
             initialDelaySeconds: 20
             periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: product-service
   namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: product-service
+    app.kubernetes.io/part-of: khandualoom
+    app: product-service
 spec:
   type: ClusterIP
   ports:
-    - port: 8082
+    - name: http
+      port: 8082
       targetPort: 8082
   selector:
     app: product-service
+---
+
+# -------------------------------------------------------------------
+# 4. Order Microservice (:8083)
+# -------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: order-service
+    app.kubernetes.io/part-of: khandualoom
+    app: order-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: order-service
+          image: khandualoom/order-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: khandualoom-config
+            - secretRef:
+                name: khandualoom-secrets
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8083
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8083
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: order-service
+    app.kubernetes.io/part-of: khandualoom
+    app: order-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8083
+  selector:
+    app: order-service
+---
+
+# -------------------------------------------------------------------
+# 5. Notification Microservice (:8084)
+# -------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: khandualoom
+    app: notification-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: notification-service
+          image: khandualoom/notification-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: khandualoom-config
+            - secretRef:
+                name: khandualoom-secrets
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: notification-service
+    app.kubernetes.io/part-of: khandualoom
+    app: notification-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8084
+      targetPort: 8084
+  selector:
+    app: notification-service
+---
+
+# -------------------------------------------------------------------
+# 6. User Profile Microservice (:8086)
+# -------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: user-service
+    app.kubernetes.io/part-of: khandualoom
+    app: user-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: user-service
+          image: khandualoom/user-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8086
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: khandualoom-config
+            - secretRef:
+                name: khandualoom-secrets
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8086
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8086
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: user-service
+    app.kubernetes.io/part-of: khandualoom
+    app: user-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8086
+      targetPort: 8086
+  selector:
+    app: user-service
+---
+
+# -------------------------------------------------------------------
+# 7. Inventory Microservice (:8087)
+# -------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/part-of: khandualoom
+    app: inventory-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: inventory-service
+  template:
+    metadata:
+      labels:
+        app: inventory-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: inventory-service
+          image: khandualoom/inventory-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8087
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: khandualoom-config
+            - secretRef:
+                name: khandualoom-secrets
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8087
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8087
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: inventory-service
+    app.kubernetes.io/part-of: khandualoom
+    app: inventory-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8087
+      targetPort: 8087
+  selector:
+    app: inventory-service
+---
+
+# -------------------------------------------------------------------
+# 8. Payment Microservice (:8088)
+# -------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: payment-service
+    app.kubernetes.io/part-of: khandualoom
+    app: payment-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: payment-service
+          image: khandualoom/payment-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8088
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: khandualoom-config
+            - secretRef:
+                name: khandualoom-secrets
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8088
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8088
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: payment-service
+    app.kubernetes.io/part-of: khandualoom
+    app: payment-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8088
+      targetPort: 8088
+  selector:
+    app: payment-service
+---
+
+# -------------------------------------------------------------------
+# 9. Audit Microservice (:8089)
+# -------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audit-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: audit-service
+    app.kubernetes.io/part-of: khandualoom
+    app: audit-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: audit-service
+  template:
+    metadata:
+      labels:
+        app: audit-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: audit-service
+          image: khandualoom/audit-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8089
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: khandualoom-config
+            - secretRef:
+                name: khandualoom-secrets
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8089
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8089
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: audit-service
+  namespace: khandualoom
+  labels:
+    app.kubernetes.io/name: audit-service
+    app.kubernetes.io/part-of: khandualoom
+    app: audit-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8089
+      targetPort: 8089
+  selector:
+    app: audit-service
