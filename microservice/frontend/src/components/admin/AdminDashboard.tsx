@@ -20,6 +20,7 @@ import { OrderManagerView } from './OrderManagerView';
 import { UserManagerView, UserItem } from './UserManagerView';
 import { StoreSettingsView, SocialItem } from './StoreSettingsView';
 import { AdminManagerView, AdminUserItem } from './AdminManagerView';
+import { ArtisanManagerView } from './ArtisanManagerView';
 import { ProductEditorModal } from './ProductEditorModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 
@@ -30,7 +31,9 @@ interface AdminDashboardProps {
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore }) => {
   const dispatch = useAppDispatch();
   const { isAuthenticated, role } = useAppSelector((state) => state.auth);
-  const isAdminUser = isAuthenticated && (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN');
+  const isAdminUser =
+    isAuthenticated &&
+    (role === 'ROLE_ADMIN' || role === 'ROLE_SUPER_ADMIN' || role === 'ROLE_ARTISAN');
 
   const [loginMutation, { isLoading: isLoggingIn }] = useLoginMutation();
   const [adminEmail, setAdminEmail] = useState('superadmin@khandualoom.com');
@@ -39,7 +42,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>(
+    role === 'ROLE_ARTISAN' ? 'artisans' : 'dashboard'
+  );
 
   // Orders API
   const { data: apiOrders = [], refetch: refetchOrders } = useGetAllOrdersQuery();
@@ -466,6 +471,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
           />
         )
       )}
+
+      {activeTab === 'artisans' && <ArtisanManagerView />}
 
       {activeTab === 'orders' && (
         <OrderManagerView orders={apiOrders} onStatusChange={handleOrderStatusChange} />

@@ -22,6 +22,7 @@ import {
 import { Product } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { addToCart, setCartOpen } from '@/features/cart/cartSlice';
+import { toggleWishlist, selectIsInWishlist } from '@/features/wishlist/wishlistSlice';
 import { useGetProductsQuery } from '@/features/products/productsApi';
 import { fallbackProducts } from '@/data/fallbackProducts';
 import { scrollToTopImmediate } from '@/components/common/SmoothScrollProvider';
@@ -48,7 +49,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState(product.image || '/images/saree_crimson_red.png');
   const [copiedLink, setCopiedLink] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const isWishlisted = useAppSelector(selectIsInWishlist(product.id));
 
   // Zoom state for inspecting silk weave (desktop only)
   const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({
@@ -260,13 +261,13 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
 
             {/* Wishlist Tool */}
             <button
-              onClick={() => setIsWishlisted(!isWishlisted)}
+              onClick={() => dispatch(toggleWishlist(product))}
               className={`p-2 rounded-xl border transition-all shadow-sm cursor-pointer ${
                 isWishlisted
                   ? 'border-brand-crimson bg-brand-crimson/25 text-brand-crimson shadow-brand-crimson/20'
                   : 'border-brand-gold/30 bg-white/[0.04] hover:bg-brand-gold/15 text-brand-gold hover:text-white'
               }`}
-              title="Add to Wishlist"
+              title={isWishlisted ? 'Saved in Wishlist' : 'Add to Wishlist'}
             >
               <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-current' : ''}`} />
             </button>
@@ -528,6 +529,20 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({
                     <span>Add to Bag</span>
                   </button>
                 )}
+
+                {/* Wishlist Button in Actions Row */}
+                <button
+                  onClick={() => dispatch(toggleWishlist(product))}
+                  className={`p-3 rounded-xl border transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center shrink-0 ${
+                    isWishlisted
+                      ? 'border-brand-crimson bg-brand-crimson/25 text-brand-crimson shadow-brand-crimson/30'
+                      : 'border-brand-gold/40 bg-black/40 text-brand-gold hover:text-white hover:border-brand-gold'
+                  }`}
+                  aria-label={isWishlisted ? 'Saved in Wishlist' : 'Add to Wishlist'}
+                  title={isWishlisted ? 'Saved in Wishlist' : 'Add to Wishlist'}
+                >
+                  <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                </button>
               </div>
 
               {/* Instant Checkout Button */}

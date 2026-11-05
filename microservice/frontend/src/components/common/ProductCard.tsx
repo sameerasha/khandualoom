@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Star, ShoppingBag, Check, Eye } from 'lucide-react';
+import { Star, ShoppingBag, Check, Eye, Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { addToCart, setCartOpen } from '@/features/cart/cartSlice';
+import { toggleWishlist, selectIsInWishlist } from '@/features/wishlist/wishlistSlice';
 
 interface ProductCardProps {
   product: Product;
@@ -12,6 +13,7 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) => {
   const dispatch = useAppDispatch();
   const { items } = useAppSelector((state) => state.cart);
+  const isWishlisted = useAppSelector(selectIsInWishlist(product.id));
   const [added, setAdded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -29,6 +31,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
   const handleGoToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     dispatch(setCartOpen(true));
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(toggleWishlist(product));
   };
 
   const imageSrc =
@@ -70,33 +77,51 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
           )}
         </div>
 
-        {/* Top Right Add to Cart Icon Button on Mobile / In-Cart Badge on Desktop */}
-        <button
-          onClick={isInCart ? handleGoToCart : handleAddToCart}
-          className={`sm:hidden absolute top-2 right-2 z-30 w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-md border ${
-            isInCart
-              ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400/50'
-              : 'bg-black/60 backdrop-blur-md text-brand-gold hover:text-white border-brand-gold/40'
-          }`}
-          aria-label={isInCart ? 'Go to Cart' : 'Add to Cart'}
-          title={isInCart ? 'In Cart • Go to Cart' : 'Add to Cart'}
-        >
-          {isInCart ? (
-            <Check className="w-3.5 h-3.5 stroke-[3] text-white" />
-          ) : (
-            <ShoppingBag className="w-3.5 h-3.5" />
-          )}
-        </button>
-
-        {isInCart && (
-          <div
-            onClick={handleGoToCart}
-            className="hidden sm:flex absolute top-2.5 right-2.5 z-10 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full p-1 shadow-md border border-emerald-400/40 items-center justify-center transition-transform hover:scale-110 cursor-pointer"
-            title="Item in Cart • Click to View Bag"
+        {/* Top Right Controls: Wishlist Heart & In-Cart Status */}
+        <div className="absolute top-2.5 right-2.5 z-30 flex items-center gap-1.5">
+          {/* Wishlist Heart Toggle */}
+          <button
+            onClick={handleToggleWishlist}
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all active:scale-90 shadow-md border cursor-pointer ${
+              isWishlisted
+                ? 'bg-brand-crimson/90 border-brand-crimson text-white shadow-[0_2px_10px_rgba(225,29,72,0.4)]'
+                : 'bg-black/60 backdrop-blur-md text-brand-ivory/80 hover:text-brand-gold border-brand-gold/30 hover:border-brand-gold'
+            }`}
+            aria-label={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+            title={isWishlisted ? 'Saved in Wishlist' : 'Add to Wishlist'}
           >
-            <Check className="w-3 h-3 stroke-[3]" />
-          </div>
-        )}
+            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isWishlisted ? 'fill-white stroke-white scale-110' : ''}`} />
+          </button>
+
+          {/* Mobile Quick Add to Cart */}
+          <button
+            onClick={isInCart ? handleGoToCart : handleAddToCart}
+            className={`sm:hidden w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-md border ${
+              isInCart
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400/50'
+                : 'bg-black/60 backdrop-blur-md text-brand-gold hover:text-white border-brand-gold/40'
+            }`}
+            aria-label={isInCart ? 'Go to Cart' : 'Add to Cart'}
+            title={isInCart ? 'In Cart • Go to Cart' : 'Add to Cart'}
+          >
+            {isInCart ? (
+              <Check className="w-3.5 h-3.5 stroke-[3] text-white" />
+            ) : (
+              <ShoppingBag className="w-3.5 h-3.5" />
+            )}
+          </button>
+
+          {/* Desktop In-Cart Badge */}
+          {isInCart && (
+            <div
+              onClick={handleGoToCart}
+              className="hidden sm:flex bg-emerald-600 hover:bg-emerald-500 text-white rounded-full p-1.5 shadow-md border border-emerald-400/40 items-center justify-center transition-transform hover:scale-110 cursor-pointer"
+              title="Item in Cart • Click to View Bag"
+            >
+              <Check className="w-3 h-3 stroke-[3]" />
+            </div>
+          )}
+        </div>
 
         {/* ======================================================== */}
         {/* MIDDLE OF PRODUCT (DESKTOP ONLY HOVER OVERLAY)           */}

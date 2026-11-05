@@ -11,6 +11,9 @@ export const baseApi = createApi({
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
+      if (!headers.has('X-Correlation-Id')) {
+        headers.set('X-Correlation-Id', crypto.randomUUID());
+      }
       return headers;
     },
   }),

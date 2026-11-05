@@ -15,6 +15,7 @@ interface AdminLayoutProps {
 const ROUTE_LABELS: Record<string, { title: string; subtitle: string }> = {
   dashboard: { title: 'Dashboard', subtitle: 'Atelier Overview' },
   products: { title: 'Products', subtitle: 'Masterpiece Catalog' },
+  artisans: { title: 'Artisan Studio', subtitle: 'Loom Masters & GI Registry' },
   users: { title: 'Customers', subtitle: 'Patron Registry' },
   orders: { title: 'Orders', subtitle: 'Imperial Dispatches' },
   settings: { title: 'Social Media', subtitle: 'Atelier Broadcast' },
@@ -132,6 +133,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
           <line x1="7" y1="7" x2="7.01" y2="7" />
+        </svg>
+      ),
+    },
+    {
+      id: 'artisans',
+      label: 'Artisans',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <circle cx="12" cy="7" r="4" />
+          <path d="M5.5 21v-2a6.5 6.5 0 0 1 13 0v2" />
+          <path d="M12 11v6" />
+          <path d="M9 14h6" />
         </svg>
       ),
     },

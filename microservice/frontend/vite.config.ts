@@ -23,4 +23,17 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
+          'vendor-motion': ['gsap', 'lenis', 'motion'],
+          'vendor-state': ['@reduxjs/toolkit', 'react-redux'],
+          'vendor-icons': ['lucide-react'],
+        },
+      },
+    },
+  },
 });

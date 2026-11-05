@@ -11,6 +11,7 @@ import { Testimonials } from '@/components/common/Testimonials';
 import { NewsletterSection } from '@/components/common/NewsletterSection';
 import { RecentViews } from '@/components/common/RecentViews';
 import { CartSidebar } from '@/components/common/CartSidebar';
+import { WishlistDrawer } from '@/components/common/WishlistDrawer';
 import { Footer } from '@/components/common/Footer';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { ProductDetails } from '@/components/product/ProductDetails';
@@ -210,6 +211,7 @@ export const App: React.FC = () => {
 
         {/* Global Modals & Drawers */}
         <CartSidebar onProceedToCheckout={() => setCurrentView('checkout')} />
+        <WishlistDrawer onSelectProduct={handleSelectProduct} />
 
         <AuthModal
           isOpen={authModalOpen}
