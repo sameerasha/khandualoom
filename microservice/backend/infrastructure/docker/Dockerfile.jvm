@@ -13,7 +13,6 @@ WORKDIR /workspace
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
 COPY common-library ./common-library
-COPY contracts ./contracts
 COPY api-gateway ./api-gateway
 COPY auth-service ./auth-service
 COPY user-service ./user-service

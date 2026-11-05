@@ -20,7 +20,6 @@
 
     <modules>
         <module>common-library</module>
-        <module>contracts</module>
         <module>api-gateway</module>
         <module>auth-service</module>
         <module>user-service</module>

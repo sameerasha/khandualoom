@@ -22,5 +22,6 @@
         <module>common-observability</module>
         <module>common-messaging</module>
         <module>common-test</module>
+        <module>contracts</module>
     </modules>
 </project>
