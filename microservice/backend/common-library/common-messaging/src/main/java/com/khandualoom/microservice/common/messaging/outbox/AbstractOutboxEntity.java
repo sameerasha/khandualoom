@@ -50,6 +50,12 @@ public abstract class AbstractOutboxEntity {
     @Column(name = "last_error", columnDefinition = "TEXT")
     private String lastError;
 
+    @Column(name = "locked_by", length = 128)
+    private String lockedBy;
+
+    @Column(name = "locked_until")
+    private Instant lockedUntil;
+
     @Column(name = "traceparent", length = 128)
     private String traceparent;
 

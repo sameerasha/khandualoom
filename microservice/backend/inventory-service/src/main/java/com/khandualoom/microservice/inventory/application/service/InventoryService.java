@@ -21,6 +21,7 @@ import com.khandualoom.microservice.inventory.infrastructure.persistence.reposit
 import com.khandualoom.microservice.inventory.infrastructure.persistence.repository.SpringDataInventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,13 +78,18 @@ public class InventoryService {
             return true;
         }
 
+        // Canonical SKU Sorting: Strictly orders items by productId ascending to mathematically eliminate circular deadlock (40P01)
+        List<OrderItemEvent> sortedItems = items.stream()
+                .sorted(java.util.Comparator.comparing(OrderItemEvent::productId))
+                .toList();
+
         List<StockReservation> successfullyReserved = new ArrayList<>();
         List<Long> acquiredPermitSkus = new ArrayList<>();
         boolean allReserved = true;
 
         try {
-            // SkuAdmissionControl: Acquire permits across all ordered SKUs to prevent connection starvation
-            for (OrderItemEvent item : items) {
+            // SkuAdmissionControl: Acquire permits across all ordered SKUs in canonical order
+            for (OrderItemEvent item : sortedItems) {
                 if (!skuAdmissionControl.tryAcquire(item.productId(), java.time.Duration.ofMillis(300))) {
                     log.warn("SKU admission rejected product #{} under high concurrency contention for order #{}",
                             item.productId(), orderId);
@@ -99,15 +105,44 @@ public class InventoryService {
                 return false;
             }
 
-            for (OrderItemEvent item : items) {
-                int updated = springDataInventoryRepository.atomicReserveStock(item.productId(), item.quantity());
-                if (updated > 0) {
-                    StockReservation res = StockReservation.create(orderId, item.productId(), item.quantity(), 900);
-                    successfullyReserved.add(reservationRepository.save(res));
-                } else {
-                    log.warn("Insufficient stock for product #{} during reservation for order #{}", item.productId(), orderId);
-                    allReserved = false;
-                    break;
+            int maxLockRetries = 3;
+            for (int attempt = 1; attempt <= maxLockRetries; attempt++) {
+                try {
+                    for (OrderItemEvent item : sortedItems) {
+                        int updated = springDataInventoryRepository.atomicReserveStock(item.productId(), item.quantity());
+                        if (updated > 0) {
+                            StockReservation res = StockReservation.create(orderId, item.productId(), item.quantity(), 900);
+                            successfullyReserved.add(reservationRepository.save(res));
+                        } else {
+                            log.warn("Insufficient stock for product #{} during reservation for order #{}", item.productId(), orderId);
+                            allReserved = false;
+                            break;
+                        }
+                    }
+                    break; // Successfully processed all items without deadlock
+                } catch (PessimisticLockingFailureException lockEx) {
+                    log.warn("Transient lock contention / deadlock on order #{}, attempt {}/{}: {}",
+                            orderId, attempt, maxLockRetries, lockEx.getMessage());
+                    // Revert any partial reservations from this attempt
+                    for (StockReservation res : successfullyReserved) {
+                        springDataInventoryRepository.atomicReleaseStock(res.getProductId(), res.getQuantity());
+                        reservationRepository.atomicTransitionStatus(res.getId(), ReservationStatus.RESERVED, ReservationStatus.RELEASED);
+                    }
+                    successfullyReserved.clear();
+
+                    if (attempt == maxLockRetries) {
+                        allReserved = false;
+                        break;
+                    }
+
+                    try {
+                        long backoff = attempt * 30L + java.util.concurrent.ThreadLocalRandom.current().nextInt(20);
+                        Thread.sleep(backoff);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        allReserved = false;
+                        break;
+                    }
                 }
             }
 
@@ -120,7 +155,7 @@ public class InventoryService {
 
                 // Save failure outbox event cleanly so it COMMITS and publishes
                 saveOutboxEvent("inventory.reservation-failed", String.valueOf(orderId),
-                        InventoryReservationFailedEvent.of(orderId, "Insufficient stock available for requested items"));
+                        InventoryReservationFailedEvent.of(orderId, "Insufficient stock or lock contention for requested items"));
                 log.info("Committed inventory.reservation-failed outbox event for order #{}", orderId);
                 return false;
             }
@@ -129,7 +164,7 @@ public class InventoryService {
             StockReservation firstRes = successfullyReserved.get(0);
             saveOutboxEvent("inventory.reserved", String.valueOf(orderId),
                     InventoryReservedEvent.of(orderId, firstRes.getId()));
-            log.info("All {} items successfully reserved for order #{}. Emitted inventory.reserved.", items.size(), orderId);
+            log.info("All {} items successfully reserved for order #{}. Emitted inventory.reserved.", sortedItems.size(), orderId);
             return true;
         } finally {
             for (Long sku : acquiredPermitSkus) {

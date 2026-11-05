@@ -5,6 +5,7 @@ import com.khandualoom.microservice.order.model.*;
 import com.khandualoom.microservice.order.repository.OrderRepository;
 import com.khandualoom.microservice.order.repository.OutboxEventRepository;
 import com.khandualoom.microservice.order.repository.SagaInstanceRepository;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -20,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -37,6 +40,7 @@ class SagaWatchdogServiceTest {
 
     private SagaWatchdogService watchdogService;
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+    private final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     @BeforeEach
     void setUp() {
@@ -44,7 +48,8 @@ class SagaWatchdogServiceTest {
                 sagaInstanceRepository,
                 orderRepository,
                 outboxEventRepository,
-                objectMapper
+                objectMapper,
+                Optional.of(meterRegistry)
         );
     }
 
@@ -94,5 +99,39 @@ class SagaWatchdogServiceTest {
         OutboxEvent outbox = outboxCaptor.getValue();
         assertThat(outbox.getEventType()).isEqualTo("inventory.release-reservation");
         assertThat(outbox.getAggregateId()).isEqualTo(orderId.toString());
+
+        // 4. Verify metric incremented
+        assertThat(meterRegistry.counter("khandualoom_saga_watchdog_recoveries").count()).isEqualTo(1.0);
+    }
+
+    @Test
+    @DisplayName("Should safely handle OptimisticLockingFailureException when concurrent payment modifies Order")
+    void shouldCatchOptimisticLockingFailureAndContinue() {
+        Long orderId = 3002L;
+        Instant past = Instant.now().minusSeconds(1200);
+
+        SagaInstance overdueSaga = SagaInstance.builder()
+                .sagaId(UUID.randomUUID())
+                .orderId(orderId)
+                .currentStep(SagaStep.PAYMENT_PROCESSING)
+                .sagaStatus(SagaStatus.IN_PROGRESS)
+                .stepStartedAt(past)
+                .deadlineAt(past.plusSeconds(900))
+                .version(1L)
+                .build();
+
+        Order order = Order.builder()
+                .id(orderId)
+                .orderStatus(OrderStatus.PAYMENT_PENDING)
+                .paymentStatus(PaymentStatus.PENDING)
+                .totalAmount(new BigDecimal("5000.00"))
+                .build();
+
+        when(sagaInstanceRepository.findOverdueSagas(any(Instant.class))).thenReturn(List.of(overdueSaga));
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(orderRepository.save(any(Order.class))).thenThrow(new OptimisticLockingFailureException("Row updated concurrently by payment webhook"));
+
+        assertDoesNotThrow(() -> watchdogService.recoverOverdueSagas());
+        verify(outboxEventRepository, never()).save(any());
     }
 }

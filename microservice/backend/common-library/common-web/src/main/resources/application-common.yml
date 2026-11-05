@@ -6,11 +6,32 @@
 #       import: "optional:classpath:application-common.yml"
 # ===================================================================
 
+server:
+  shutdown: graceful
+
 spring:
+  # Operational Resilience: Graceful Shutdown Window
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
   # Concurrency: Enable High-Throughput Virtual Threads (Java 21)
   threads:
     virtual:
       enabled: true
+
+  # Distributed Cache / Admission Datastore (Redis 7) with Fast-Fail Timeouts
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 100ms
+      connect-timeout: 100ms
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 20
+          min-idle: 5
+          max-wait: 50ms
 
   # Default Relational Datastore Configuration (PostgreSQL + HikariCP)
   datasource:

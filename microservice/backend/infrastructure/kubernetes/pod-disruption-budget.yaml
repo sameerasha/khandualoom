@@ -1,0 +1,69 @@
+# ===================================================================
+# Khandua Looms - Kubernetes Pod Disruption Budgets (PDB)
+# Guarantees High Availability (minAvailable: 1) during node upgrades & rollouts
+# ===================================================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-gateway-pdb
+  namespace: khandualoom
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: order-service-pdb
+  namespace: khandualoom
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: order-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: inventory-service-pdb
+  namespace: khandualoom
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: inventory-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: payment-service-pdb
+  namespace: khandualoom
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: payment-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: product-service-pdb
+  namespace: khandualoom
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: product-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: auth-service-pdb
+  namespace: khandualoom
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: auth-service

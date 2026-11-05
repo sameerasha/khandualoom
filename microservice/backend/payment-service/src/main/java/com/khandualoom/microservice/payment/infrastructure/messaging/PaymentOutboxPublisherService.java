@@ -3,6 +3,8 @@ package com.khandualoom.microservice.payment.infrastructure.messaging;
 import com.khandualoom.microservice.common.messaging.outbox.OutboxStatus;
 import com.khandualoom.microservice.payment.infrastructure.persistence.entity.PaymentOutboxJpaEntity;
 import com.khandualoom.microservice.payment.infrastructure.persistence.repository.PaymentOutboxRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,9 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -23,13 +29,18 @@ public class PaymentOutboxPublisherService {
 
     private final PaymentOutboxRepository outboxRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final Optional<MeterRegistry> meterRegistry;
     private final Random random = new Random();
+    private final String publisherId = UUID.randomUUID().toString().substring(0, 8);
 
     private static final int MAX_RETRIES = 5;
+    private static final int LEASE_SECONDS = 30;
 
     @Scheduled(fixedDelay = 1000)
     @Transactional
     public void publishPendingEvents() {
+        recordBacklogMetrics();
+
         List<PaymentOutboxJpaEntity> events;
         try {
             events = outboxRepository.claimPendingBatch(50);
@@ -44,6 +55,10 @@ public class PaymentOutboxPublisherService {
         log.debug("Processing {} payment outbox events", events.size());
 
         for (PaymentOutboxJpaEntity event : events) {
+            // Acquire publisher lease
+            event.setLockedBy(publisherId);
+            event.setLockedUntil(Instant.now().plusSeconds(LEASE_SECONDS));
+
             try {
                 // Topic mapping based on event type
                 String topic;
@@ -72,6 +87,8 @@ public class PaymentOutboxPublisherService {
 
                 event.setStatus(OutboxStatus.PUBLISHED);
                 event.setPublishedAt(Instant.now());
+                event.setLockedBy(null);
+                event.setLockedUntil(null);
                 outboxRepository.save(event);
                 log.info("Successfully published payment outbox event [{}] to topic [{}]", event.getId(), topic);
             } catch (Exception e) {
@@ -79,6 +96,8 @@ public class PaymentOutboxPublisherService {
                 int retries = event.getRetryCount() + 1;
                 event.setRetryCount(retries);
                 event.setLastError(e.getMessage());
+                event.setLockedBy(null);
+                event.setLockedUntil(null);
 
                 if (retries >= MAX_RETRIES) {
                     event.setStatus(OutboxStatus.DEAD_LETTER);
@@ -92,5 +111,37 @@ public class PaymentOutboxPublisherService {
                 outboxRepository.save(event);
             }
         }
+    }
+
+    /**
+     * Purges successfully published outbox events older than 7 days to eliminate MVCC bloat.
+     */
+    @Scheduled(fixedDelay = 86400000, initialDelay = 60000)
+    @Transactional
+    public void purgeOldPublishedEvents() {
+        try {
+            Instant cutoff = Instant.now().minus(7, ChronoUnit.DAYS);
+            int purged = outboxRepository.purgePublishedEvents(cutoff);
+            if (purged > 0) {
+                log.info("Purged {} published payment outbox events older than 7 days", purged);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to purge old published payment outbox events: {}", e.getMessage());
+        }
+    }
+
+    private void recordBacklogMetrics() {
+        meterRegistry.ifPresent(registry -> {
+            try {
+                long backlog = outboxRepository.countPendingBacklog();
+                registry.gauge("khandualoom_outbox_backlog_count", Tags.of("service", "payment-service"), backlog);
+
+                Instant oldest = outboxRepository.findOldestUnpublishedCreatedAt();
+                double ageSeconds = oldest != null ? Duration.between(oldest, Instant.now()).getSeconds() : 0.0;
+                registry.gauge("khandualoom_outbox_oldest_event_age_seconds", Tags.of("service", "payment-service"), ageSeconds);
+            } catch (Exception ignored) {
+                // Skip metric recording if database query fails or in partial test environments
+            }
+        });
     }
 }

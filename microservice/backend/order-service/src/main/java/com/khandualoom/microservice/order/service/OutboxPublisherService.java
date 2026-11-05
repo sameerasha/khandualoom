@@ -3,6 +3,8 @@ package com.khandualoom.microservice.order.service;
 import com.khandualoom.microservice.common.messaging.outbox.OutboxStatus;
 import com.khandualoom.microservice.order.model.OutboxEvent;
 import com.khandualoom.microservice.order.repository.OutboxEventRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,9 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -23,13 +29,18 @@ public class OutboxPublisherService {
 
     private final OutboxEventRepository outboxEventRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final Optional<MeterRegistry> meterRegistry;
     private final Random random = new Random();
+    private final String publisherId = UUID.randomUUID().toString().substring(0, 8);
 
     private static final int MAX_RETRIES = 5;
+    private static final int LEASE_SECONDS = 30;
 
     @Scheduled(fixedDelay = 1000)
     @Transactional
     public void publishPendingOutboxEvents() {
+        recordBacklogMetrics();
+
         List<OutboxEvent> pending;
         try {
             pending = outboxEventRepository.claimPendingBatch(50);
@@ -42,6 +53,10 @@ public class OutboxPublisherService {
         log.debug("Found {} pending order outbox events to publish", pending.size());
 
         for (OutboxEvent event : pending) {
+            // Acquire publisher lease
+            event.setLockedBy(publisherId);
+            event.setLockedUntil(Instant.now().plusSeconds(LEASE_SECONDS));
+
             try {
                 String topic = resolveTopic(event.getEventType());
                 ProducerRecord<String, Object> record = new ProducerRecord<>(topic, event.getAggregateId(), event.getPayload());
@@ -58,6 +73,8 @@ public class OutboxPublisherService {
 
                 event.setStatus(OutboxStatus.PUBLISHED);
                 event.setPublishedAt(Instant.now());
+                event.setLockedBy(null);
+                event.setLockedUntil(null);
                 outboxEventRepository.save(event);
                 log.info("Published order outbox event [{}] to topic [{}]", event.getId(), topic);
             } catch (Exception e) {
@@ -65,6 +82,8 @@ public class OutboxPublisherService {
                 int retries = event.getRetryCount() + 1;
                 event.setRetryCount(retries);
                 event.setLastError(e.getMessage());
+                event.setLockedBy(null);
+                event.setLockedUntil(null);
 
                 if (retries >= MAX_RETRIES) {
                     event.setStatus(OutboxStatus.DEAD_LETTER);
@@ -77,6 +96,38 @@ public class OutboxPublisherService {
                 outboxEventRepository.save(event);
             }
         }
+    }
+
+    /**
+     * Purges successfully published outbox events older than 7 days to eliminate MVCC bloat.
+     */
+    @Scheduled(fixedDelay = 86400000, initialDelay = 60000)
+    @Transactional
+    public void purgeOldPublishedEvents() {
+        try {
+            Instant cutoff = Instant.now().minus(7, ChronoUnit.DAYS);
+            int purged = outboxEventRepository.purgePublishedEvents(cutoff);
+            if (purged > 0) {
+                log.info("Purged {} published order outbox events older than 7 days", purged);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to purge old published order outbox events: {}", e.getMessage());
+        }
+    }
+
+    private void recordBacklogMetrics() {
+        meterRegistry.ifPresent(registry -> {
+            try {
+                long backlog = outboxEventRepository.countPendingBacklog();
+                registry.gauge("khandualoom_outbox_backlog_count", Tags.of("service", "order-service"), backlog);
+
+                Instant oldest = outboxEventRepository.findOldestUnpublishedCreatedAt();
+                double ageSeconds = oldest != null ? Duration.between(oldest, Instant.now()).getSeconds() : 0.0;
+                registry.gauge("khandualoom_outbox_oldest_event_age_seconds", Tags.of("service", "order-service"), ageSeconds);
+            } catch (Exception ignored) {
+                // Skip metric recording if database query fails or in partial test environments
+            }
+        });
     }
 
     private String resolveTopic(String eventType) {

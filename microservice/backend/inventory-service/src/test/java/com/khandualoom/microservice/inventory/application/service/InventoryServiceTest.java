@@ -138,6 +138,37 @@ class InventoryServiceTest {
     }
 
     @Test
+    @DisplayName("Should enforce canonical lock ordering by sorting SKU IDs ascending prior to DB lock")
+    void shouldProcessMultiSkuInCanonicalSortedOrder() {
+        Long orderId = 3004L;
+        // Items passed in reverse order: 205 then 102
+        List<OrderItemEvent> reverseOrderItems = List.of(
+                new OrderItemEvent(205L, "Khandua Silk", 1, BigDecimal.valueOf(14999), "img.png"),
+                new OrderItemEvent(102L, "Sambalpuri Cotton", 1, BigDecimal.valueOf(7999), "img2.png")
+        );
+
+        when(springDataInventoryRepository.atomicReserveStock(anyLong(), anyInt())).thenReturn(1);
+        when(reservationRepository.save(any(StockReservation.class))).thenAnswer(i -> {
+            StockReservation r = i.getArgument(0);
+            return StockReservation.builder()
+                    .id(UUID.randomUUID())
+                    .orderId(r.getOrderId())
+                    .productId(r.getProductId())
+                    .quantity(r.getQuantity())
+                    .status(ReservationStatus.RESERVED)
+                    .build();
+        });
+
+        boolean result = inventoryService.processOrderReservation(orderId, reverseOrderItems);
+        assertThat(result).isTrue();
+
+        // Verify invocation order: 102 MUST be locked before 205
+        org.mockito.InOrder inOrder = inOrder(springDataInventoryRepository);
+        inOrder.verify(springDataInventoryRepository).atomicReserveStock(eq(102L), eq(1));
+        inOrder.verify(springDataInventoryRepository).atomicReserveStock(eq(205L), eq(1));
+    }
+
+    @Test
     @DisplayName("Single reservation should reject fast with SkuContentionException when admission control is saturated")
     void shouldRejectWhenAdmissionControlIsSaturated() {
         Long productId = 999L;

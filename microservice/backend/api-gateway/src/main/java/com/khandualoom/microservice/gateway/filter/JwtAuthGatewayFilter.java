@@ -225,7 +225,12 @@ public class JwtAuthGatewayFilter implements GlobalFilter, Ordered {
         String email = jwtUtils.extractUsername(token);
         String role = jwtUtils.extractRole(token);
         Long userId = jwtUtils.extractUserId(token);
-        String assertionToken = internalAssertionTokenService.generateToken();
+        String assertionToken = internalAssertionTokenService.generateV2Token(
+                request.getMethod() != null ? request.getMethod().name() : "GET",
+                request.getURI().getPath(),
+                "api-gateway",
+                "*"
+        );
 
         return request.mutate()
                 .headers(headers -> {

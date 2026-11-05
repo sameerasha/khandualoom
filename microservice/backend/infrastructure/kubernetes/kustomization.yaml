@@ -8,6 +8,7 @@ resources:
   - network-policy.yaml
   - configmap-and-secrets.yaml
   - deployments.yaml
+  - pod-disruption-budget.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: kustomize
