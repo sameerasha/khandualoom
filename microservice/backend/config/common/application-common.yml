@@ -1,0 +1,30 @@
+# ===================================================================
+# Khandua Looms – Core Shared Application Configuration
+# Common platform ergonomics, graceful shutdown, virtual threads, and serialization
+# ===================================================================
+server:
+  shutdown: graceful
+
+spring:
+  config:
+    import:
+      - "optional:classpath:application-database.yml"
+      - "optional:classpath:application-security.yml"
+      - "optional:classpath:application-observability.yml"
+      - "optional:classpath:application-kafka.yml"
+      - "optional:classpath:application-redis.yml"
+
+  # Operational Resilience: Graceful Shutdown Window
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+  # Concurrency: Enable High-Throughput Virtual Threads (Java 21)
+  threads:
+    virtual:
+      enabled: true
+
+  # Default Jackson Serialization Standards
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null

@@ -1,0 +1,39 @@
+# ===================================================================
+# Khandua Looms – Shared Database & Persistence Configuration
+# PostgreSQL 16 (pgvector), HikariCP Enterprise Connection Pool, JPA & Flyway
+# ===================================================================
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/khandualoom_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    hikari:
+      pool-name: KhanduaLoomsHikariPool
+      maximum-pool-size: 25
+      minimum-idle: 10
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: false
+    out-of-order: true
+    clean-disabled: true
+    locations: classpath:db/migration

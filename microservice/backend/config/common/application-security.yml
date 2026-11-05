@@ -1,0 +1,11 @@
+# ===================================================================
+# Khandua Looms – Shared Security & Identity Configuration
+# JWT Tokens, HMAC Microservice Assertions, and Platform CORS Standards
+# ===================================================================
+khandualoom:
+  jwt:
+    secret: ${JWT_SECRET:9a4f2c8d3b7a1e6f5c8d0b2a4f6e8d1c3b5a7f9e2d4c6b8a0f1e3d5c7b9a2f4}
+    expiration-ms: 86400000 # 24 hours
+    refresh-expiration-ms: 604800000 # 7 days
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:5174}

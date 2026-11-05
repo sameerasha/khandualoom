@@ -1,6 +1,6 @@
-# Khandua Looms — Infrastructure & Orchestration Guide
+# Khandua Looms — Infrastructure & Orchestration Architecture
 
-This directory contains the production-grade deployment manifests, container definitions, database initialization scripts, messaging topologies, and observability configurations for the **Khandua Looms** distributed microservices platform.
+This directory is the single canonical source of truth for production-grade deployment manifests, container definitions, database initialization scripts, messaging topologies, and observability configurations for the **Khandua Looms** distributed microservices platform.
 
 ---
 
@@ -20,14 +20,26 @@ infrastructure/
 ├── kafka/
 │   ├── init-topics.sh              # KRaft topic provisioning script with 6 partitions, 7d retention & DLTs (Linux/macOS)
 │   └── init-topics.ps1             # KRaft topic provisioning script with 6 partitions, 7d retention & DLTs (PowerShell)
-├── kubernetes/
-│   ├── kustomization.yaml          # Kustomize manifest aggregating all cluster resources
-│   ├── namespace.yaml              # Isolated 'khandualoom' namespace definition
-│   ├── configmap-and-secrets.yaml  # Cluster-wide environment configs & secret templates
-│   ├── deployments.yaml            # Pod specs, resource limits, readiness/liveness probes for all 9 microservices
-│   ├── network-policy.yaml         # Zero-trust ingress/egress network isolation between pods and backing services
-│   ├── pgbouncer.yaml              # PgBouncer transaction pooling multiplexer (10k client limit, 50 server pool)
-│   └── pod-disruption-budget.yaml  # High-availability PDBs ensuring minAvailable: 1 during node drains
+├── kubernetes/                     # Canonical Kustomize Multi-Environment Orchestration
+│   ├── base/                       # Shared Core Deployments & Services (All 9 Microservices + Frontend)
+│   │   ├── kustomization.yaml      # Base resource aggregator
+│   │   ├── namespace.yaml          # Isolated 'khandualoom' namespace
+│   │   ├── configmap-and-secrets.yaml # Cluster DNS service endpoints & secret templates
+│   │   ├── deployments.yaml        # Pod specs, health probes, non-root securityContext, graceful shutdown
+│   │   └── network-policy.yaml     # Zero-trust inter-pod network isolation
+│   ├── components/                 # Reusable Optional Infrastructure Capabilities
+│   │   ├── hpa/                    # Autoscaling (autoscaling/v2) scaling 2 to 10 replicas on CPU/RAM targets
+│   │   ├── in-cluster-infra/       # Optional in-cluster Postgres, Redis, Kafka KRaft, Kafka-UI (for dev/local k8s)
+│   │   ├── ingress/                # Ingress (networking.k8s.io/v1) with TLS termination & domain routing
+│   │   ├── pgbouncer/              # PgBouncer connection multiplexer (10k client connections, 50 server pool)
+│   │   └── pod-disruption-budget/  # High-availability PDBs (minAvailable: 1) covering all 9 microservices
+│   ├── overlays/                   # Environment Overlays
+│   │   ├── dev/                    # Development / Minikube: 1 replica per service, in-cluster infra enabled
+│   │   ├── staging/                # Staging: 2 replicas, staging Ingress hostnames, PDBs enabled
+│   │   └── production/             # Production: HA 3+ replicas, PgBouncer, HPA autoscaling, Ingress, PDBs
+│   ├── k8s-start.ps1               # Automated dynamic deployment launcher (PowerShell)
+│   ├── k8s-start.sh                # Automated dynamic deployment launcher (Bash)
+│   └── kustomization.yaml          # Root Kustomize definition (defaults to overlays/dev)
 ├── postgres/
 │   ├── init-schemas.sql            # Idempotent creation of microservice schemas: auth, user, product, inventory, order, payment, notification, audit
 │   └── service-roles.sql           # Principle of least privilege: dedicated DB users restricted to their own service schema
@@ -41,69 +53,98 @@ infrastructure/
 
 ---
 
-## Component Details
+## Centralized Configuration Architecture
 
-### 1. Docker (`docker/`)
-- **`Dockerfile.jvm`**: Multi-stage production container build using `eclipse-temurin:21-jre-alpine`.
-  - Drops root privileges via system user `khandualoom:khandualoom`.
-  - Extracts Spring Boot layers (`jarmode=layertools`) to maximize Docker layer cache hits.
-  - Applies high-throughput JVM ergonomics: `-XX:+UseG1GC`, `-XX:MaxRAMPercentage=75.0`, `-XX:+ExitOnOutOfMemoryError`.
-- **`docker-compose.infra.yml`**: Spins up all 7 backing infrastructure services without requiring local compilation of the microservice JARs.
-  - Ideal for rapid local development in IntelliJ / Eclipse / VS Code.
+The platform centralizes configuration across three distinct dimensions to eliminate duplication:
 
-### 2. Grafana & Observability (`grafana/`, `prometheus/`, `tempo/`)
-- **Prometheus** scrapes metrics from all microservice endpoints (`/actuator/prometheus`) every 5 seconds.
-- **Grafana Tempo** ingests OpenTelemetry traces via OTLP (W3C `traceparent` headers propagated across Kafka and HTTP REST calls).
-- **Datasource Exemplars**: Clicking on a latency spike in Grafana immediately pivots to the corresponding OpenTelemetry trace in Tempo.
+### 1. Centralized Maven Dependency Management (`pom.xml`)
+- Single root aggregator manages all dependency versions via `<dependencyManagement>` and plugin lifecycles via `<pluginManagement>`.
+- Version declarations are completely eliminated from child module POMs.
+- Centralized libraries include:
+  - **Spring Boot** `3.3.1` & **Spring Cloud** `2023.0.3`
+  - **Spring AI** `1.0.0-M1`
+  - **Testcontainers** `1.19.8`
+  - **Razorpay SDK** `1.4.3` (`com.razorpay:razorpay-java`)
+  - **JSON Tools** `20231013` (`org.json:json`)
+  - **Structured Logging** `7.4` (`net.logstash.logback:logstash-logback-encoder`)
+  - **Compiler**: Java 21 LTS with parameter metadata (`maven-compiler-plugin:3.13.0`)
 
-### 3. Kafka Provisioning (`kafka/`)
-- KRaft mode (no Zookeeper dependency) with automated topic provisioning.
-- Topics are pre-allocated with **6 partitions** to support horizontal scaling across consumer groups.
-- Enforces dedicated Dead Letter Topics (`.DLT`) for poison-pill recovery and non-blocking retry topics.
+### 2. Centralized Shared Spring Boot Properties (`config/common/`)
+Shared microservice properties are modularized and versioned in `config/common/` (and packaged in `common-library/common-web` for classpath resolution):
+- **`application-common.yml`**: Java 21 Virtual Threads (`threads.virtual.enabled: true`), graceful termination (`server.shutdown: graceful`), and Jackson non-null serialization.
+- **`application-database.yml`**: PostgreSQL connection pooling (HikariCP 25 max, 10 min idle), Hibernate batching (`batch_size: 25`), and Flyway auto-migration.
+- **`application-security.yml`**: JWT signing specifications and cross-origin resource sharing (CORS) standards.
+- **`application-observability.yml`**: Actuator health probe enablement (`/actuator/health/liveness`, `/actuator/health/readiness`), Prometheus metrics percentiles, and Tempo OTLP trace export.
+- **`application-kafka.yml`**: Kafka cluster connection coordinates, producer idempotency (`acks: all`), and consumer offset policies (`ack-mode: RECORD`).
+- **`application-redis.yml`**: Redis coordinates, fast-fail connection timeouts (`100ms`), and Lettuce connection pooling.
 
-### 4. Kubernetes (`kubernetes/`)
-- Production-ready cloud orchestration with zero-trust network policies.
-- Enforces Spring Boot Actuator health checks:
-  - Liveness probe: `/actuator/health/liveness`
-  - Readiness probe: `/actuator/health/readiness`
-- Integrated **PgBouncer** connection multiplexer preventing PostgreSQL connection starvation under high concurrent traffic.
+Services import all shared standards with a single line in their local `application.yml`:
+```yaml
+spring:
+  config:
+    import: "optional:classpath:application-common.yml"
+```
+Each service defines only its unique overrides (port, schema name, consumer group, gateway routes).
 
-### 5. PostgreSQL (`postgres/`)
-- Pre-creates isolated schema namespaces per microservice:
-  - `auth_schema`, `user_schema`, `product_schema`, `inventory_schema`, `order_schema`, `payment_schema`, `notification_schema`, `audit_schema`.
-- Includes `service-roles.sql` to enforce database-level boundaries so no service can query another service's tables.
-
-### 6. Redis (`redis/`)
-- Hardened for distributed inventory admission control and replay nonce defense:
-  - `maxmemory-policy noeviction`: Ensures admission tokens and replay nonces are never dropped prematurely.
-  - `appendonly yes` (AOF) + RDB snapshots for persistence across pod restarts.
+### 3. Canonical Kubernetes Kustomize Hierarchy (`infrastructure/kubernetes/`)
+- **`base/`**: Unifies all 9 Spring Boot microservices plus the React storefront into a single deployment topology. Every pod includes non-root security contexts (`UID 10001`), dual Actuator probes, resource limits, and internal ClusterIP services.
+- **`components/`**: Modular capabilities that can be mixed and matched across environments:
+  - `pgbouncer`: Connection pooler preventing Postgres thread starvation under high concurrent traffic.
+  - `hpa`: Dynamic scaling driven by CPU (>75%) and memory (>80%) consumption.
+  - `ingress`: NGINX ingress controller routing HTTPS traffic to `api.khandualoom.com` and `khandualoom.com`.
+  - `pod-disruption-budget`: High-availability guarantees preventing node maintenance from draining critical services.
+  - `in-cluster-infra`: Standalone databases and brokers for local development without external cloud dependencies.
+- **`overlays/`**: Environment-specific resource allocations:
+  - **`dev/`**: Single replica per pod, lower resource requests, in-cluster infrastructure enabled.
+  - **`staging/`**: Dual replicas, staging ingress hostnames, PDBs enabled.
+  - **`production/`**: HA 3+ replicas, PgBouncer, HPA autoscaling, production Ingress, PDBs enabled.
 
 ---
 
-## Quickstart Commands
+## Deployment Quickstart
 
-### Option A: Run Backing Infrastructure Only (Local IDE Development)
+### Option A: Local Backend Development (Backing Services Only)
 ```bash
-# From repository root:
+# Starts Postgres, Redis, Kafka, Tempo, Prometheus, and Grafana:
 docker compose -f infrastructure/docker/docker-compose.infra.yml up -d
 
-# Verify all services are healthy:
-docker compose -f infrastructure/docker/docker-compose.infra.yml ps
-
-# Provision Kafka topics:
-# On Linux/macOS:
-./infrastructure/kafka/init-topics.sh
-# On Windows PowerShell:
+# Initialize Kafka KRaft topics:
+# PowerShell:
 .\infrastructure\kafka\init-topics.ps1
+# Bash:
+./infrastructure\kafka\init-topics.sh
 ```
 
-### Option B: Run Full Platform via Docker Compose
+### Option B: Full Platform Stack via Docker Compose
 ```bash
-# Starts all 9 microservices + frontend + backing infrastructure:
 docker compose up -d --build
 ```
 
-### Option C: Deploy to Kubernetes Cluster
+### Option C: Kubernetes Orchestration
+```powershell
+# Deploy Development Overlay (Local Minikube / Kind):
+.\infrastructure\kubernetes\k8s-start.ps1 -env dev
+
+# Deploy Staging Overlay:
+.\infrastructure\kubernetes\k8s-start.ps1 -env staging
+
+# Deploy Production Overlay (EKS / GKE):
+.\infrastructure\kubernetes\k8s-start.ps1 -env prod
+
+# Check Live Status:
+.\infrastructure\kubernetes\k8s-start.ps1 status
+
+# Stop Deployments:
+.\infrastructure\kubernetes\k8s-start.ps1 stop
+```
+Or directly using `kubectl`:
 ```bash
-kubectl apply -k infrastructure/kubernetes/
+# Development:
+kubectl apply -k infrastructure/kubernetes/overlays/dev
+
+# Staging:
+kubectl apply -k infrastructure/kubernetes/overlays/staging
+
+# Production:
+kubectl apply -k infrastructure/kubernetes/overlays/production
 ```
