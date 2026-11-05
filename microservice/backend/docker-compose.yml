@@ -32,9 +32,11 @@ services:
   redis:
     image: redis:7-alpine
     container_name: redis
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     ports:
       - "6379:6379"
     volumes:
+      - ./infrastructure/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -370,7 +372,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./.local/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -388,7 +390,7 @@ services:
     container_name: tempo
     command: ["-config.file=/etc/tempo.yaml"]
     volumes:
-      - ./.local/observability/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - ./infrastructure/tempo/tempo.yml:/etc/tempo.yaml:ro
       - tempo-data:/var/tempo
     ports:
       - "3200:3200" # Tempo UI / API
@@ -410,9 +412,9 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
-      - ./.local/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./.local/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./.local/observability/grafana/dashboards:/etc/grafana/dashboards:ro
+      - ./infrastructure/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./infrastructure/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./infrastructure/grafana/dashboards:/etc/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus

@@ -1,0 +1,57 @@
+# ===================================================================
+# Khandua Looms – Multi-Stage Production Containerfile (Java 21 LTS)
+# Hardened non-root runtime with optimized JVM memory ergonomics
+# ===================================================================
+
+# -------------------------------------------------------------------
+# Stage 1: Build Layer
+# -------------------------------------------------------------------
+FROM eclipse-temurin:21-jdk-alpine AS builder
+WORKDIR /workspace
+
+# Copy Maven wrapper and POM aggregator
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+COPY common-library ./common-library
+COPY contracts ./contracts
+COPY api-gateway ./api-gateway
+COPY auth-service ./auth-service
+COPY user-service ./user-service
+COPY product-service ./product-service
+COPY inventory-service ./inventory-service
+COPY order-service ./order-service
+COPY payment-service ./payment-service
+COPY notification-service ./notification-service
+COPY audit-service ./audit-service
+
+ARG MODULE_NAME
+RUN ./mvnw clean package -pl ${MODULE_NAME} -am -DskipTests
+
+# Extract Spring Boot fat jar layers
+RUN java -Djarmode=layertools -jar ${MODULE_NAME}/target/*.jar extract --destination /workspace/extracted
+
+# -------------------------------------------------------------------
+# Stage 2: Hardened Non-Root Minimal Runtime
+# -------------------------------------------------------------------
+FROM eclipse-temurin:21-jre-alpine AS runtime
+
+# Create isolated non-root system user and group
+RUN addgroup -S khandua && adduser -S khandua -G khandua
+USER khandua:khandua
+WORKDIR /app
+
+# Copy layered spring boot dependencies for optimal docker caching
+COPY --from=builder --chown=khandua:khandua /workspace/extracted/dependencies/ ./
+COPY --from=builder --chown=khandua:khandua /workspace/extracted/spring-boot-loader/ ./
+COPY --from=builder --chown=khandua:khandua /workspace/extracted/snapshot-dependencies/ ./
+COPY --from=builder --chown=khandua:khandua /workspace/extracted/application/ ./
+
+# High-Performance Java 21 Container Flags
+ENV JAVA_OPTS="-XX:+UseG1GC \
+               -XX:MaxRAMPercentage=75.0 \
+               -XX:InitialRAMPercentage=50.0 \
+               -XX:+ExitOnOutOfMemoryError \
+               -Djava.security.egd=file:/dev/./urandom \
+               -Dspring.backgroundpreinitializer.ignore=true"
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
