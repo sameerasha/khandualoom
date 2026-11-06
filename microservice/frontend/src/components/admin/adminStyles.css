@@ -1666,3 +1666,253 @@
     color: #444444 !important;
   }
 }
+
+
+/* =========================================================
+   LIGHT THEME OVERRIDES FOR ADMIN PORTAL (Clean Modern SaaS Aesthetic)
+   ========================================================= */
+
+[data-theme="light"] .admin-layout,
+html.light .admin-layout,
+:root:not([data-theme="dark"]) .admin-layout {
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f1f5f9;
+  --color-bg-card: #ffffff;
+  --color-bg-glass: rgba(255, 255, 255, 0.95);
+  --color-surface: #ffffff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-gold: #b45309;
+  --color-accent: #881337;
+  --color-accent-hover: #9f1239;
+  --color-gold-100: #fffbeb;
+  --color-gold-200: #fef3c7;
+  --color-gold-300: #b45309;
+  --color-gold-400: #d97706;
+  --color-gold-500: #b45309;
+  --color-gold-600: #92400e;
+  --color-burgundy-500: #881337;
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --gradient-gold: linear-gradient(135deg, #b45309, #d97706, #b45309);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Light Theme Sidebar */
+[data-theme="light"] .admin-sidebar {
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .admin-sidebar__header {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .admin-sidebar__logo-main {
+  color: #881337;
+}
+
+[data-theme="light"] .admin-sidebar__logo-sub {
+  color: #64748b;
+}
+
+[data-theme="light"] .admin-sidebar__link {
+  color: #475569;
+}
+
+[data-theme="light"] .admin-sidebar__link:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+[data-theme="light"] .admin-sidebar__link--active {
+  background: #fff1f2;
+  color: #881337;
+  border: 1px solid #fecdd3;
+  font-weight: 600;
+}
+
+[data-theme="light"] .admin-sidebar__link--active svg {
+  color: #881337;
+}
+
+[data-theme="light"] .admin-sidebar__footer {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .admin-sidebar-toggle-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+[data-theme="light"] .admin-sidebar-toggle-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Light Theme Dashboard Cards */
+[data-theme="light"] .admin-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .admin-stat-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .admin-stat-card__value {
+  color: #0f172a;
+}
+
+[data-theme="light"] .admin-stat-card__label {
+  color: #64748b;
+}
+
+[data-theme="light"] .admin-stat-card__icon {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .admin-dashboard__section-title {
+  color: #0f172a;
+}
+
+/* Light Theme Data Tables */
+[data-theme="light"] .admin-table,
+[data-theme="light"] .product-manager__table,
+[data-theme="light"] .inventory-ledger__table,
+[data-theme="light"] .order-fulfillment__table {
+  background: #ffffff;
+}
+
+[data-theme="light"] .admin-table th,
+[data-theme="light"] .product-manager__table th,
+[data-theme="light"] .inventory-ledger__table th,
+[data-theme="light"] .order-fulfillment__table th {
+  background: #f8fafc;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .admin-table td,
+[data-theme="light"] .product-manager__table td,
+[data-theme="light"] .inventory-ledger__table td,
+[data-theme="light"] .order-fulfillment__table td {
+  color: #0f172a;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] .admin-table tbody tr:hover,
+[data-theme="light"] .product-manager__row:hover,
+[data-theme="light"] .inventory-ledger__row:hover {
+  background: #f8fafc;
+}
+
+[data-theme="light"] .product-manager__content,
+[data-theme="light"] .inventory-ledger__content,
+[data-theme="light"] .order-fulfillment__content,
+[data-theme="light"] .audit-log__content {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Light Theme Inputs & Form Controls */
+[data-theme="light"] .product-manager__select,
+[data-theme="light"] .product-manager__search-input,
+[data-theme="light"] .inventory-ledger__search-input,
+[data-theme="light"] .admin-input,
+[data-theme="light"] .admin-select,
+[data-theme="light"] .admin-textarea {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+}
+
+[data-theme="light"] .product-manager__select:focus,
+[data-theme="light"] .product-manager__search-input:focus,
+[data-theme="light"] .inventory-ledger__search-input:focus,
+[data-theme="light"] .admin-input:focus,
+[data-theme="light"] .admin-select:focus {
+  border-color: #881337 !important;
+  box-shadow: 0 0 0 3px rgba(136, 19, 55, 0.12) !important;
+}
+
+[data-theme="light"] .product-manager__select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+[data-theme="light"] .product-manager__select-arrow {
+  color: #64748b;
+}
+
+/* Light Theme Modals */
+[data-theme="light"] .product-editor-modal__content,
+[data-theme="light"] .delete-confirm-modal,
+[data-theme="light"] .admin-modal__content {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .product-editor-modal__header,
+[data-theme="light"] .product-editor-modal__footer,
+[data-theme="light"] .admin-modal__header,
+[data-theme="light"] .admin-modal__footer {
+  border-color: #e2e8f0 !important;
+  background: #f8fafc !important;
+}
+
+[data-theme="light"] .product-editor-modal__title,
+[data-theme="light"] .admin-modal__title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .product-editor-modal__label,
+[data-theme="light"] .admin-form__label {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .product-editor-modal__cancel-btn,
+[data-theme="light"] .admin-btn-secondary {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] .product-editor-modal__cancel-btn:hover,
+[data-theme="light"] .admin-btn-secondary:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Light Theme Pagination & Controls */
+[data-theme="light"] .product-manager__pagination,
+[data-theme="light"] .inventory-ledger__pagination,
+[data-theme="light"] .admin-pagination {
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+[data-theme="light"] .product-manager__page-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
+[data-theme="light"] .product-manager__page-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #0f172a;
+}

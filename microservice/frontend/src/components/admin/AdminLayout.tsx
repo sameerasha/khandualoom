@@ -86,7 +86,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   }, []);
 
   return (
-    <div className="admin-layout relative flex min-h-screen bg-[#0B0D17] text-brand-ivory" data-lenis-prevent="true">
+    <div className="admin-layout relative flex min-h-screen transition-colors duration-200" data-lenis-prevent="true">
       {/* Modern Collapsible Sidebar */}
       <AdminSidebar
         currentRoute={currentRoute}
