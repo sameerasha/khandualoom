@@ -110,7 +110,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=auth_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
@@ -134,7 +134,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=product_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - REDIS_HOST=${REDIS_HOST:-redis}
@@ -162,7 +162,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=order_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
@@ -189,7 +189,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=notification_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
@@ -216,7 +216,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=user_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318/v1/traces}
@@ -240,7 +240,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=inventory_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
@@ -271,7 +271,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=payment_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
@@ -305,7 +305,7 @@ services:
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-khandualoom_db}?currentSchema=audit_schema
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
@@ -329,6 +329,7 @@ services:
     container_name: api-gateway
     ports:
       - "${API_GATEWAY_HOST_PORT:-8090}:8080"
+      - "8080:8080"
     env_file:
       - ${ENV_FILE:-.env.dev}
     environment:

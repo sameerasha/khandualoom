@@ -71,6 +71,7 @@ public class SkuAdmissionControl {
 
     private final RedisScript<Long> tokenBucketScript = new DefaultRedisScript<>(REDIS_LUA_SCRIPT, Long.class);
 
+    @Autowired
     public SkuAdmissionControl(
             @Value("${khandualoom.inventory.max-concurrent-per-sku:50}") int maxConcurrentPerSku,
             MeterRegistry meterRegistry,

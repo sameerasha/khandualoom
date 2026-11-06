@@ -32,6 +32,7 @@ public class InternalAssertionTokenService {
     private final ConcurrentHashMap<String, Long> usedNonces = new ConcurrentHashMap<>();
     private long lastNonceCleanup = System.currentTimeMillis();
 
+    @Autowired
     public InternalAssertionTokenService(
             @Value("${khandualoom.security.internal-secret:khandualoom-internal-zero-trust-cluster-secret-key-32b-min!}") String primarySecret,
             @Value("${khandualoom.security.internal-secondary-secret:}") String secondarySecret,

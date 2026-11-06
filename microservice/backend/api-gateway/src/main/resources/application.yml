@@ -29,13 +29,13 @@ spring:
         - id: auth-service
           uri: ${AUTH_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/auth/**, /api/super-admin/**
+            - Path=/api/auth/**, /api/super-admin/**, /api/admin/users/**, /api/admin/users
 
         # User Service (Profiles, Addresses & Preferences) Route
         - id: user-service
           uri: ${USER_SERVICE_URL:http://localhost:8086}
           predicates:
-            - Path=/api/users/**, /api/admin/users/**
+            - Path=/api/users/**
 
         # Products & AI RAG Route
         - id: product-service

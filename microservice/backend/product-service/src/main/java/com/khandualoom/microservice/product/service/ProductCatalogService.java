@@ -32,7 +32,7 @@ public class ProductCatalogService {
     private final ProductMetricsService productMetricsService;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "products_all", sync = true, unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "products_all", sync = true)
     public List<Product> getAllProducts() {
         log.info("Fetching all products from DB/Cache");
         return productRepository.findAll();
