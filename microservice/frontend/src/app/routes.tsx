@@ -9,6 +9,7 @@ import { HomepageView } from '@/components/home/HomepageView';
 import { CatalogView } from '@/components/catalog/CatalogView';
 import { ProductDetailsView } from '@/components/product/ProductDetailsView';
 import { ShoppingBagView } from '@/components/cart/ShoppingBagView';
+import { MultiStepCheckoutView } from '@/components/checkout/MultiStepCheckoutView';
 
 // Placeholder / interim components until tasks 2-7 complete their views
 const HomePlaceholder: React.FC = () => (
@@ -61,7 +62,7 @@ export const routeDefinitions: RouteObject[] = [
     path: '/checkout',
     element: <CheckoutLayout />,
     children: [
-      { index: true, element: <CheckoutPlaceholder /> },
+      { index: true, element: <MultiStepCheckoutView /> },
       { path: 'success/:orderId', element: <div className="py-12 text-center text-brand-gold font-serif text-2xl">Order Placed Successfully</div> },
     ],
   },

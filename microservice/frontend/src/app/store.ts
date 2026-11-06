@@ -4,6 +4,7 @@ import cartReducer from '@/features/cart/cartSlice';
 import productsReducer from '@/features/products/productsSlice';
 import wishlistReducer from '@/features/wishlist/wishlistSlice';
 import i18nReducer from '@/features/i18n/i18nSlice';
+import checkoutReducer from '@/features/checkout/checkoutSlice';
 import { baseApi } from '@/services/baseApi';
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     products: productsReducer,
     wishlist: wishlistReducer,
     i18n: i18nReducer,
+    checkout: checkoutReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -27,8 +27,39 @@ export interface RazorpayOrderResponse {
   currency: string;
 }
 
+export interface OrderSubmissionRequest {
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  shippingAddress: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  paymentMethod?: string;
+  items: {
+    productId: number;
+    productName: string;
+    productImage?: string;
+    quantity: number;
+    price: number;
+  }[];
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  idempotencyKey?: string;
+}
+
 export const ordersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    createOrder: builder.mutation<Order, OrderSubmissionRequest>({
+      query: (body) => ({
+        url: '/api/orders',
+        method: 'POST',
+        headers: body.idempotencyKey ? { 'Idempotency-Key': body.idempotencyKey } : {},
+        body,
+      }),
+      invalidatesTags: ['Orders'],
+    }),
     createCheckoutOrder: builder.mutation<Order, CheckoutRequest>({
       query: (body) => ({
         url: '/api/orders/checkout',
@@ -84,6 +115,7 @@ export const ordersApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useCreateOrderMutation,
   useCreateCheckoutOrderMutation,
   useGetMyOrdersQuery,
   useGetAllOrdersQuery,
