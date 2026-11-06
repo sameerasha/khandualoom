@@ -5,7 +5,7 @@ const getBaseUrl = (): string => {
   try {
     return (new Function('return typeof import.meta !== "undefined" && import.meta.env ? import.meta.env.VITE_API_URL : ""'))() || '';
   } catch {
-    return (typeof process !== 'undefined' && process.env?.VITE_API_URL) || '';
+    return (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process?.env?.VITE_API_URL) || '';
   }
 };
 

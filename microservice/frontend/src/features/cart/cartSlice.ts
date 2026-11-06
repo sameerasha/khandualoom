@@ -9,7 +9,7 @@ export interface Coupon {
   description: string;
 }
 
-interface CartState {
+export interface CartState {
   items: CartItem[];
   isOpen: boolean;
   appliedCoupon: Coupon | null;

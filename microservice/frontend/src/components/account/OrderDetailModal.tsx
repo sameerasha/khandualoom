@@ -1,6 +1,6 @@
 import React from 'react';
 import { Order } from '@/types';
-import { X, ShieldCheck, Download, Truck } from 'lucide-react';
+import { X, Download, Truck } from 'lucide-react';
 
 interface OrderDetailModalProps {
   order: Order | null;

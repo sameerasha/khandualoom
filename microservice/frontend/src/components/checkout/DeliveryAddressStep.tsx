@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { setDeliveryAddress, DeliveryAddress } from '@/features/checkout/checkoutSlice';
 import { checkPincodeServiceability } from '@/features/pincode/pincodeService';
-import { MapPin, Plus, Check, ShieldCheck } from 'lucide-react';
+import { MapPin, Plus, ShieldCheck } from 'lucide-react';
 
 interface DeliveryAddressStepProps {
   onProceed: () => void;

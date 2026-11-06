@@ -87,6 +87,7 @@ export interface Order {
   orderStatus?: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | string;
   status?: string;
   createdDate?: string;
+  createdAt?: string;
   items?: OrderItem[];
   orderItems?: OrderItem[];
 }

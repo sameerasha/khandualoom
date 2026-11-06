@@ -6,7 +6,7 @@ import { AuthoritativePriceSummary } from './AuthoritativePriceSummary';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { clearCart, removeFromCart } from '@/features/cart/cartSlice';
 import { calculateCartTotals } from '@/features/cart/cartCalculations';
-import { ShoppingBag, ArrowRight, Sparkles } from 'lucide-react';
+import { ShoppingBag, ArrowRight } from 'lucide-react';
 
 export const ShoppingBagView: React.FC = () => {
   const dispatch = useAppDispatch();

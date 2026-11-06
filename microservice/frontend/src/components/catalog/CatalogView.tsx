@@ -16,7 +16,7 @@ import { SlidersHorizontal, Sparkles } from 'lucide-react';
 
 export const CatalogView: React.FC = () => {
   const { category } = useParams<{ category?: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [filters, setFilters] = useState<CatalogFilterState>({
     ...initialFilterState,

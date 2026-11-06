@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { CheckCircle, Download, ArrowRight, ShieldCheck, MessageCircle, PackageCheck } from 'lucide-react';
+import { CheckCircle, Download, ArrowRight, ShieldCheck, MessageCircle } from 'lucide-react';
 
 export const OrderSuccessView: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();

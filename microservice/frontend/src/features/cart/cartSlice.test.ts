@@ -3,6 +3,7 @@ import cartReducer, {
   removeFromCart,
   updateQuantity,
   clearCart,
+  CartState,
 } from './cartSlice';
 import { Product } from '@/types';
 
@@ -21,9 +22,11 @@ const mockProduct: Product = {
 };
 
 describe('Cart Redux Slice', () => {
-  const initialState = {
+  const initialState: CartState = {
     items: [],
     isOpen: false,
+    appliedCoupon: null,
+    donationAmount: 0,
   };
 
   it('should handle initial state', () => {

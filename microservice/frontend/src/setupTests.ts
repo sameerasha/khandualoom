@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom';
 
-global.ResizeObserver = class ResizeObserver {
+(globalThis as any).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-global.IntersectionObserver = class IntersectionObserver {
+(globalThis as any).IntersectionObserver = class IntersectionObserver {
   root = null;
   rootMargin = '';
   thresholds = [];
