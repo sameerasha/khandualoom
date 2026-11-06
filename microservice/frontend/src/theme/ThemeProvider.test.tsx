@@ -106,4 +106,31 @@ describe('ThemeProvider & Theme System', () => {
     expect(screen.getByRole('button', { name: /switch to light theme/i })).toBeInTheDocument();
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
+
+  test('does not override documentElement data-theme when on an /admin route', () => {
+    delete (window as any).location;
+    window.location = { pathname: '/admin/products' } as any;
+
+    document.documentElement.setAttribute('data-theme', 'admin-dark');
+    document.documentElement.className = 'dark';
+
+    render(
+      <ThemeProvider>
+        <TestConsumer />
+      </ThemeProvider>
+    );
+
+    // Document attribute must remain admin-dark despite customer theme state
+    expect(document.documentElement.getAttribute('data-theme')).toBe('admin-dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+
+    const toggleBtn = screen.getByTestId('toggle-btn');
+    act(() => {
+      fireEvent.click(toggleBtn);
+    });
+
+    expect(screen.getByTestId('current-theme').textContent).toBe('dark');
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('admin-dark');
+  });
 });

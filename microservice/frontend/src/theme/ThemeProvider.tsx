@@ -25,6 +25,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const applyThemeToDOM = useCallback((newTheme: ThemeMode) => {
     if (typeof document === 'undefined') return;
 
+    // If currently on an administrative route, do not override permanent admin-dark
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+      return;
+    }
+
     const root = document.documentElement;
     root.setAttribute('data-theme', newTheme);
 

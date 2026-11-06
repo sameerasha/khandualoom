@@ -4,10 +4,31 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: ['class', '[data-theme="dark"]'],
+  darkMode: ['class', '[data-theme="dark"], [data-theme="admin-dark"]'],
   theme: {
     extend: {
       colors: {
+        // Admin dedicated tokens
+        admin: {
+          background: 'var(--admin-background)',
+          sidebar: 'var(--admin-sidebar)',
+          header: 'var(--admin-header)',
+          surface: 'var(--admin-surface)',
+          'surface-elevated': 'var(--admin-surface-elevated)',
+          'input-background': 'var(--admin-input-background)',
+          'text-primary': 'var(--admin-text-primary)',
+          'text-secondary': 'var(--admin-text-secondary)',
+          'text-muted': 'var(--admin-text-muted)',
+          primary: {
+            DEFAULT: 'var(--admin-primary)',
+            hover: 'var(--admin-primary-hover)',
+          },
+          accent: 'var(--admin-accent)',
+          border: 'var(--admin-border)',
+          success: 'var(--admin-success)',
+          warning: 'var(--admin-warning)',
+          danger: 'var(--admin-danger)',
+        },
         // Semantic theme-token mappings
         background: 'var(--color-background)',
         'background-secondary': 'var(--color-background-secondary)',

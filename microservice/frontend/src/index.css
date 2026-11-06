@@ -1,4 +1,7 @@
 @import './styles/tokens.css';
+@import './styles/themes/customer-light.css';
+@import './styles/themes/customer-dark.css';
+@import './styles/themes/admin-dark.css';
 @import './styles/themes/light.css';
 @import './styles/themes/dark.css';
 

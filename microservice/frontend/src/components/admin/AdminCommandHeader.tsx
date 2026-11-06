@@ -2,8 +2,6 @@ import React from 'react';
 import { ExternalLink, Activity, LogOut, User as UserIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout } from '@/features/auth/authSlice';
-import { ThemeSwitcher } from '@/theme/ThemeSwitcher';
-import { useTheme } from '@/theme/useTheme';
 
 interface AdminCommandHeaderProps {
   currentRoute: string;
@@ -36,7 +34,6 @@ export const AdminCommandHeader: React.FC<AdminCommandHeaderProps> = ({
   latencyMs,
 }) => {
   const dispatch = useAppDispatch();
-  const { isDark } = useTheme();
   const { user, role } = useAppSelector((state) => state.auth);
 
   const routeInfo = ROUTE_TITLES[currentRoute] || {
@@ -45,49 +42,29 @@ export const AdminCommandHeader: React.FC<AdminCommandHeaderProps> = ({
   };
 
   return (
-    <header
-      className={`border-b px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30 transition-colors backdrop-blur-md ${
-        isDark
-          ? 'border-brand-gold/15 bg-[#170928]/90 text-brand-ivory'
-          : 'border-slate-200 bg-white/90 text-slate-800 shadow-xs'
-      }`}
-    >
+    <header className="border-b border-[#374151] px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30 transition-colors backdrop-blur-md bg-[#111827]/95 text-[#F9FAFB]">
       {/* Route Title & Breadcrumbs */}
       <div>
-        <div
-          className={`flex items-center gap-2 text-[11px] uppercase font-semibold tracking-wider ${
-            isDark ? 'text-brand-gold/60' : 'text-slate-500'
-          }`}
-        >
+        <div className="flex items-center gap-2 text-[11px] uppercase font-semibold tracking-wider text-[#9CA3AF]">
           <span>Admin</span>
           <span>/</span>
-          <span className={isDark ? 'text-brand-gold' : 'text-[#881337]'}>{routeInfo.title}</span>
+          <span className="text-[#DFBF7A]">{routeInfo.title}</span>
         </div>
-        <h1
-          className={`font-serif text-xl sm:text-2xl font-bold tracking-wide ${
-            isDark ? 'text-brand-gold' : 'text-slate-900'
-          }`}
-        >
+        <h1 className="font-sans text-xl sm:text-2xl font-bold tracking-wide text-[#F9FAFB]">
           {routeInfo.title}
         </h1>
-        <p className={`text-xs mt-0.5 ${isDark ? 'text-brand-ivory/60' : 'text-slate-500'}`}>
+        <p className="text-xs mt-0.5 text-[#9CA3AF]">
           {routeInfo.subtitle}
         </p>
       </div>
 
-      {/* Action Strip: Theme Switcher, Back to Store, Server Pulse, User Info */}
+      {/* Action Strip: Back to Store, Server Pulse, User Info (No Theme Switcher in Admin) */}
       <div className="flex items-center gap-3 self-end md:self-auto">
         {/* Gateway Health Indicator */}
-        <div
-          className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs ${
-            isDark
-              ? 'bg-[#140622] border-brand-gold/20 text-brand-ivory/70'
-              : 'bg-slate-50 border-slate-200 text-slate-600'
-          }`}
-        >
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs bg-[#1F2937] border-[#374151] text-[#D1D5DB]">
           <Activity
             className={`w-3.5 h-3.5 ${
-              serverStatus === 'online' ? 'text-emerald-500 animate-pulse' : 'text-amber-500'
+              serverStatus === 'online' ? 'text-emerald-400 animate-pulse' : 'text-amber-400'
             }`}
           />
           <span className="font-mono text-[11px]">
@@ -95,52 +72,27 @@ export const AdminCommandHeader: React.FC<AdminCommandHeaderProps> = ({
           </span>
         </div>
 
-        {/* Theme Switcher Toggle */}
-        <ThemeSwitcher />
-
         {/* Back to Live Store Button */}
         <button
           type="button"
           onClick={onBackToStore}
-          className={`px-3.5 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer ${
-            isDark
-              ? 'bg-brand-gold/15 border-brand-gold/30 text-brand-gold hover:bg-brand-gold/25'
-              : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
-          }`}
+          className="px-3.5 py-1.5 rounded-full border border-[rgba(223,191,122,0.3)] bg-[rgba(223,191,122,0.12)] text-[#DFBF7A] hover:bg-[rgba(223,191,122,0.22)] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
         >
           <span>Back to Store</span>
           <ExternalLink className="w-3.5 h-3.5" />
         </button>
 
         {/* Active Admin Profile */}
-        <div
-          className={`flex items-center gap-2.5 pl-2 border-l ${
-            isDark ? 'border-brand-gold/20' : 'border-slate-200'
-          }`}
-        >
-          <div
-            className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs ${
-              isDark
-                ? 'bg-brand-gold/20 border-brand-gold/40 text-brand-gold'
-                : 'bg-slate-100 border-slate-300 text-slate-700'
-            }`}
-          >
+        <div className="flex items-center gap-2.5 pl-2 border-l border-[#374151]">
+          <div className="w-8 h-8 rounded-full border border-[rgba(223,191,122,0.4)] bg-[rgba(223,191,122,0.15)] text-[#DFBF7A] flex items-center justify-center font-bold text-xs">
             <UserIcon className="w-4 h-4" />
           </div>
 
           <div className="hidden lg:block text-left">
-            <span
-              className={`text-xs font-bold block leading-tight ${
-                isDark ? 'text-brand-ivory' : 'text-slate-800'
-              }`}
-            >
+            <span className="text-xs font-bold block leading-tight text-[#F9FAFB]">
               {user?.username || 'Super Administrator'}
             </span>
-            <span
-              className={`text-[10px] uppercase tracking-wider font-semibold block ${
-                isDark ? 'text-brand-gold/70' : 'text-[#881337]'
-              }`}
-            >
+            <span className="text-[10px] uppercase tracking-wider font-semibold block text-[#DFBF7A]">
               {role || 'ROLE_SUPER_ADMIN'}
             </span>
           </div>
@@ -149,11 +101,7 @@ export const AdminCommandHeader: React.FC<AdminCommandHeaderProps> = ({
             type="button"
             onClick={() => dispatch(logout())}
             title="Sign out from administrative session"
-            className={`p-1.5 rounded-lg transition-colors ml-1 cursor-pointer ${
-              isDark
-                ? 'text-brand-ivory/50 hover:text-rose-400 hover:bg-rose-950/20'
-                : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'
-            }`}
+            className="p-1.5 rounded-lg transition-colors ml-1 cursor-pointer text-[#9CA3AF] hover:text-rose-400 hover:bg-rose-950/20"
           >
             <LogOut className="w-4 h-4" />
           </button>

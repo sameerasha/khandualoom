@@ -85,8 +85,42 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  // Enforce permanent Admin Dark Theme isolation
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const previousTheme = root.getAttribute('data-theme');
+    const hadDark = root.classList.contains('dark');
+    const hadLight = root.classList.contains('light');
+
+    root.setAttribute('data-theme', 'admin-dark');
+    root.classList.add('dark');
+    root.classList.remove('light');
+
+    return () => {
+      // Restore customer theme when leaving admin portal
+      try {
+        const saved = localStorage.getItem('khandualoom_theme_preference');
+        const custTheme = (saved === 'dark') ? 'dark' : 'light';
+        root.setAttribute('data-theme', custTheme);
+        root.classList.remove('light', 'dark');
+        root.classList.add(custTheme);
+      } catch {
+        if (previousTheme) {
+          root.setAttribute('data-theme', previousTheme);
+          if (hadDark) root.classList.add('dark');
+          if (hadLight) root.classList.add('light');
+        }
+      }
+    };
+  }, []);
+
   return (
-    <div className="admin-layout relative flex min-h-screen transition-colors duration-200" data-lenis-prevent="true">
+    <div
+      className="admin-layout admin-theme-scope dark relative flex min-h-screen bg-[var(--admin-background,#111827)] text-[var(--admin-text-primary,#F9FAFB)]"
+      data-theme="admin-dark"
+      data-lenis-prevent="true"
+    >
       {/* Modern Collapsible Sidebar */}
       <AdminSidebar
         currentRoute={currentRoute}

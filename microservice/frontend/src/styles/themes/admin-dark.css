@@ -1,0 +1,50 @@
+/**
+ * Khandua Looms Design System - Permanent Admin Dark Theme
+ * Isolated Enterprise Dark Dashboard Architecture
+ */
+[data-theme="admin-dark"],
+.admin-theme-scope,
+.admin-layout {
+  /* Official Admin Tokens */
+  --admin-background: #111827;
+  --admin-sidebar: #0B1220;
+  --admin-header: #111827;
+  --admin-surface: #1F2937;
+  --admin-surface-elevated: #273449;
+  --admin-input-background: #111827;
+  --admin-text-primary: #F9FAFB;
+  --admin-text-secondary: #D1D5DB;
+  --admin-text-muted: #9CA3AF;
+  --admin-primary: #9E1B32;
+  --admin-primary-hover: #BE123C;
+  --admin-accent: #DFBF7A;
+  --admin-border: #374151;
+  --admin-success: #34D399;
+  --admin-warning: #FBBF24;
+  --admin-danger: #F87171;
+
+  /* Backward Compatibility & Component Scope Mappings */
+  --color-bg-primary: var(--admin-background);
+  --color-bg-secondary: var(--admin-surface);
+  --color-bg-tertiary: var(--admin-sidebar);
+  --color-bg-card: var(--admin-surface);
+  --color-bg-glass: rgba(31, 41, 55, 0.85);
+  --color-surface: var(--admin-surface);
+  --color-text-primary: var(--admin-text-primary);
+  --color-text-secondary: var(--admin-text-secondary);
+  --color-text-muted: var(--admin-text-muted);
+  --color-text-gold: var(--admin-accent);
+  --color-accent: var(--admin-primary);
+  --color-accent-hover: var(--admin-primary-hover);
+  --color-border: var(--admin-border);
+  --color-border-subtle: rgba(55, 65, 81, 0.5);
+  --color-border-strong: var(--admin-border);
+  --color-primary: var(--admin-primary);
+  --color-primary-hover: var(--admin-primary-hover);
+  --color-success: var(--admin-success);
+  --color-warning: var(--admin-warning);
+  --color-error: var(--admin-danger);
+
+  background-color: var(--admin-background) !important;
+  color: var(--admin-text-primary) !important;
+}

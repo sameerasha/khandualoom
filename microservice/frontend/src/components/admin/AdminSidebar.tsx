@@ -99,12 +99,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           onClick={() => onNavigate('dashboard')}
           title="Khandua Looms Atelier"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-gold to-brand-gold-dark flex items-center justify-center text-brand-purple-dark font-serif font-bold text-sm shadow">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-gold to-brand-gold-dark flex items-center justify-center text-brand-purple-dark font-sans font-bold text-sm shadow">
             KL
           </div>
           {!isCollapsed && (
             <div className="admin-sidebar__logo-text">
-              <span className="admin-sidebar__logo-main font-serif font-bold text-brand-gold block text-sm leading-tight">
+              <span className="admin-sidebar__logo-main font-sans font-bold text-[#DFBF7A] block text-sm leading-tight">
                 Khandua Looms
               </span>
               <span className="admin-sidebar__logo-sub text-[10px] text-brand-ivory/50 uppercase tracking-widest block">
