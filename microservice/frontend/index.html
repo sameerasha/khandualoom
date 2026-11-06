@@ -18,8 +18,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+    <!-- Anti-Flash Theme Init Script (Strictly White/Light for first-time visitors) -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('khandualoom_theme_preference');
+          var theme = (saved === 'dark') ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.classList.remove('light', 'dark');
+          document.documentElement.classList.add(theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.classList.add('light');
+        }
+      })();
+    </script>
   </head>
-  <body class="bg-[#0A0210] text-neutral-900 font-sans antialiased selection:bg-brand-gold/30 selection:text-brand-purple">
+  <body class="bg-background text-text-primary font-sans antialiased selection:bg-brand-gold/30 selection:text-brand-purple">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
