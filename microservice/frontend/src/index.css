@@ -1,3 +1,7 @@
+@import './styles/tokens.css';
+@import './styles/themes/light.css';
+@import './styles/themes/dark.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,6 +9,13 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    transition: background-color 250ms ease, color 250ms ease;
   }
 }
 
@@ -19,10 +30,10 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Custom Gold Scrollbar for Data Tables & Modals */
+/* Custom Gold / Theme Scrollbar */
 .custom-gold-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(223, 191, 122, 0.45) rgba(223, 191, 122, 0.05);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 .custom-gold-scrollbar::-webkit-scrollbar {
@@ -31,15 +42,15 @@
 }
 
 .custom-gold-scrollbar::-webkit-scrollbar-track {
-  background: rgba(223, 191, 122, 0.05);
+  background: var(--scrollbar-track);
   border-radius: 4px;
 }
 
 .custom-gold-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(223, 191, 122, 0.4);
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 .custom-gold-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(223, 191, 122, 0.75);
+  background: var(--scrollbar-thumb-hover);
 }
