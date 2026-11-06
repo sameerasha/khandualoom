@@ -1,9 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CartItem, Product } from '@/types';
 
+export interface Coupon {
+  code: string;
+  discountType: 'PERCENT' | 'FLAT';
+  value: number;
+  minOrder?: number;
+  description: string;
+}
+
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
+  appliedCoupon: Coupon | null;
+  donationAmount: number;
 }
 
 const CART_STORAGE_KEY = 'khandua_cart';
@@ -28,6 +38,8 @@ const saveCartToStorage = (items: CartItem[]) => {
 const initialState: CartState = {
   items: loadCartFromStorage(),
   isOpen: false,
+  appliedCoupon: null,
+  donationAmount: 0,
 };
 
 export const cartSlice = createSlice({
@@ -77,6 +89,15 @@ export const cartSlice = createSlice({
     setCartOpen: (state, action: PayloadAction<boolean>) => {
       state.isOpen = action.payload;
     },
+    applyCoupon: (state, action: PayloadAction<Coupon>) => {
+      state.appliedCoupon = action.payload;
+    },
+    removeCoupon: (state) => {
+      state.appliedCoupon = null;
+    },
+    setDonationAmount: (state, action: PayloadAction<number>) => {
+      state.donationAmount = Math.max(0, action.payload);
+    },
   },
 });
 
@@ -87,6 +108,9 @@ export const {
   clearCart,
   toggleCart,
   setCartOpen,
+  applyCoupon,
+  removeCoupon,
+  setDonationAmount,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

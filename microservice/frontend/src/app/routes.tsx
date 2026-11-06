@@ -5,6 +5,7 @@ import { CheckoutLayout } from '@/components/layout/CheckoutLayout';
 import { ContactPage } from '@/components/common/ContactPage';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { ProfileDashboard } from '@/components/profile/ProfileDashboard';
+import { HomepageView } from '@/components/home/HomepageView';
 
 // Placeholder / interim components until tasks 2-7 complete their views
 const HomePlaceholder: React.FC = () => (
@@ -43,7 +44,7 @@ export const routeDefinitions: RouteObject[] = [
     path: '/',
     element: <StoreLayout />,
     children: [
-      { index: true, element: <HomePlaceholder /> },
+      { index: true, element: <HomepageView /> },
       { path: 'catalog', element: <CatalogPlaceholder /> },
       { path: 'collections/:category', element: <CatalogPlaceholder /> },
       { path: 'products/:id', element: <ProductDetailsPlaceholder /> },
