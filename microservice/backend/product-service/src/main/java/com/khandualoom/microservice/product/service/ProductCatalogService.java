@@ -32,9 +32,8 @@ public class ProductCatalogService {
     private final ProductMetricsService productMetricsService;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "products_all", sync = true)
     public List<Product> getAllProducts() {
-        log.info("Fetching all products from DB/Cache");
+        log.info("Fetching all products from DB");
         return productRepository.findAll();
     }
 

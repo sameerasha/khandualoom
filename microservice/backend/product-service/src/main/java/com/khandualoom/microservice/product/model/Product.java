@@ -54,6 +54,13 @@ public class Product {
     @Builder.Default
     private java.util.List<String> images = new java.util.ArrayList<>();
 
+    public java.util.List<String> getImages() {
+        if (images == null) {
+            return new java.util.ArrayList<>();
+        }
+        return (images.getClass() == java.util.ArrayList.class) ? images : new java.util.ArrayList<>(images);
+    }
+
     @Column(name = "created_date", updatable = false)
     private java.time.LocalDateTime createdDate;
 
