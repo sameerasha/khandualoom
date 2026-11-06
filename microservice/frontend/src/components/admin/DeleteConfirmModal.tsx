@@ -54,14 +54,14 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
               </div>
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-red-400">
-                  PERMANENT DECOMMISSION
+                  CONFIRM ACTION
                 </span>
                 <h3 className="font-serif text-xl font-bold text-white tracking-tight">{title}</h3>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-ivory/60 hover:text-white flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-ivory/60 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -73,7 +73,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
               {message}
             </p>
             <p className="mt-2 text-[11px] text-red-400/90 font-mono">
-              ⚠ This action cannot be reversed. The weave will be removed from all patron catalogs.
+              ⚠ This action cannot be undone. The item will be permanently removed.
             </p>
           </div>
 

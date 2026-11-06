@@ -45,36 +45,36 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: 'Catalog & Inventory',
+    title: 'Products & Stock',
     items: [
-      { id: 'products', label: 'Products Atelier', icon: <Package className="w-4 h-4" /> },
-      { id: 'categories', label: 'Categories & Tree', icon: <FolderTree className="w-4 h-4" /> },
-      { id: 'inventory', label: 'Stock Ledger', icon: <Boxes className="w-4 h-4" />, badge: 'Live' },
+      { id: 'products', label: 'Products', icon: <Package className="w-4 h-4" /> },
+      { id: 'categories', label: 'Categories', icon: <FolderTree className="w-4 h-4" /> },
+      { id: 'inventory', label: 'Manage Stock', icon: <Boxes className="w-4 h-4" />, badge: 'Live' },
     ],
   },
   {
-    title: 'Experience & Customization',
+    title: 'Website Content',
     items: [
-      { id: 'homepage', label: 'Homepage Builder', icon: <Sliders className="w-4 h-4" /> },
-      { id: 'banners', label: 'Banner Studio', icon: <ImageIcon className="w-4 h-4" /> },
-      { id: 'promotions', label: 'Coupons & Offers', icon: <Tag className="w-4 h-4" /> },
-      { id: 'features', label: 'Feature Toggles', icon: <ToggleLeft className="w-4 h-4" />, badge: 'Dynamic' },
+      { id: 'homepage', label: 'Website Content', icon: <Sliders className="w-4 h-4" /> },
+      { id: 'banners', label: 'Banners', icon: <ImageIcon className="w-4 h-4" /> },
+      { id: 'promotions', label: 'Offers', icon: <Tag className="w-4 h-4" /> },
+      { id: 'features', label: 'Feature Settings', icon: <ToggleLeft className="w-4 h-4" />, badge: 'Dynamic' },
     ],
   },
   {
-    title: 'Store Operations',
+    title: 'Orders & People',
     items: [
-      { id: 'orders', label: 'Orders & Dispatches', icon: <ShoppingBag className="w-4 h-4" /> },
-      { id: 'users', label: 'Patrons & Customers', icon: <Users className="w-4 h-4" /> },
-      { id: 'artisans', label: 'Artisan Masters', icon: <Sparkles className="w-4 h-4" /> },
+      { id: 'orders', label: 'Orders', icon: <ShoppingBag className="w-4 h-4" /> },
+      { id: 'users', label: 'Customers', icon: <Users className="w-4 h-4" /> },
+      { id: 'artisans', label: 'Sellers & Artisans', icon: <Sparkles className="w-4 h-4" /> },
     ],
   },
   {
-    title: 'Governance & Settings',
+    title: 'Settings & Security',
     items: [
-      { id: 'admins', label: 'RBAC Administrators', icon: <ShieldAlert className="w-4 h-4" />, superAdminOnly: true },
-      { id: 'audit', label: 'Audit Trail', icon: <History className="w-4 h-4" /> },
-      { id: 'settings', label: 'Store Settings', icon: <Settings className="w-4 h-4" /> },
+      { id: 'admins', label: 'User Permissions', icon: <ShieldAlert className="w-4 h-4" />, superAdminOnly: true },
+      { id: 'audit', label: 'Audit Log', icon: <History className="w-4 h-4" /> },
+      { id: 'settings', label: 'Website Settings', icon: <Settings className="w-4 h-4" /> },
     ],
   },
 ];

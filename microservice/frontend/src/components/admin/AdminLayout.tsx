@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '@/app/hooks';
-import { AdminBackground3D } from './AdminBackground3D';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminCommandHeader } from './AdminCommandHeader';
 import './adminStyles.css';
@@ -87,9 +86,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   }, []);
 
   return (
-    <div className="admin-layout relative flex min-h-screen bg-[#0B0314] text-brand-ivory" data-lenis-prevent="true">
-      <AdminBackground3D />
-
+    <div className="admin-layout relative flex min-h-screen bg-[#0B0D17] text-brand-ivory" data-lenis-prevent="true">
       {/* Modern Collapsible Sidebar */}
       <AdminSidebar
         currentRoute={currentRoute}
@@ -99,8 +96,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         onToggleCollapse={toggleSidebar}
       />
 
-      {/* Main Administrative View Area */}
-      <div className="flex-1 flex flex-col min-w-0 z-10">
+      {/* Main Administrative View Area properly offset so sidebar does not overlap content */}
+      <div className={`admin-main ${isCollapsed ? 'admin-main--collapsed' : ''} flex flex-col min-w-0 z-10 transition-all duration-300 w-full`}>
         <AdminCommandHeader
           currentRoute={currentRoute}
           onBackToStore={onBackToStore}

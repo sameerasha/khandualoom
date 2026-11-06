@@ -64,13 +64,13 @@ export const ShoppingBagView: React.FC = () => {
           Your Shopping Bag is Empty
         </h1>
         <p className="text-sm text-brand-ivory/60 max-w-md mx-auto mt-2 mb-8">
-          Explore our collection of authentic, handwoven Khandua Pata, Sambalpuri, and Bomkai sarees directly from Odisha artisans.
+          Shop our collection of handwoven sarees made by skilled weavers of Odisha.
         </p>
         <Link
           to="/catalog"
           className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-gold to-brand-gold-light text-brand-purple-dark font-bold text-xs uppercase tracking-widest shadow-xl hover:shadow-[0_0_20px_rgba(197,160,89,0.5)] transition-all"
         >
-          <span>Explore Sarees</span>
+          <span>Start Shopping</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

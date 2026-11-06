@@ -264,15 +264,15 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             </div>
             <div>
               <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold">
-                PHASE 01 • WEAVE NOMENCLATURE
+                BASIC DETAILS
               </span>
               <h3 className="font-serif text-base sm:text-lg font-bold text-white tracking-tight">
-                Identification & Tradition Lineage
+                Product Information
               </h3>
             </div>
           </div>
           <span className="text-[10px] font-mono px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold-light w-fit">
-            Master Registry
+            Product Details
           </span>
         </div>
 
@@ -281,7 +281,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           {/* Saree Title */}
           <div className="lg:col-span-7">
             <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
-              Saree Masterpiece Title *
+              Product Name *
             </label>
             <input
               type="text"
@@ -293,14 +293,14 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-colors shadow-inner"
             />
             <p className="text-[11px] text-brand-ivory/50 font-sans mt-1.5">
-              Enter the imperial curatorial title incorporating tradition and motif architecture.
+              Enter the full name of the saree or handloom product.
             </p>
           </div>
 
           {/* Category / Tradition Selector */}
           <div className="lg:col-span-5">
             <label className="block text-xs font-mono uppercase tracking-wider text-brand-ivory/80 mb-2">
-              Weave Tradition & Provenance *
+              Category *
             </label>
             <div className="relative">
               <select
@@ -560,10 +560,10 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
             </div>
             <div>
               <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold font-bold">
-                PHASE 03 • CURATORIAL LORE
+                DETAILS
               </span>
               <h3 className="font-serif text-base sm:text-lg font-bold text-white tracking-tight">
-                Provenance & Storytelling Narrative
+                Product Description
               </h3>
             </div>
           </div>
@@ -577,7 +577,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
           rows={4}
           value={formData.description || ''}
           onChange={handleChange}
-          placeholder="Narrate the ancestral loom lineage, mythological flora/fauna motifs, real electroplated gold zari purity, and architectural drape weight..."
+          placeholder="Enter a clear description of the saree, its weaving style, motifs, border, and fabric care..."
           className="w-full bg-[#0E0518] border border-brand-gold/30 focus:border-brand-gold rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-colors resize-none leading-relaxed shadow-inner"
         />
         <div className="flex flex-wrap items-center gap-2 text-[11px] text-brand-gold/80 font-mono">
@@ -908,7 +908,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                   onClick={onClose}
                   className="px-6 py-2.5 rounded-xl border border-white/15 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors cursor-pointer"
                 >
-                  Discard Draft
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -916,7 +916,7 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
                   className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark font-serif font-bold text-sm shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>{loading ? 'Saving...' : product ? 'Save Masterpiece Changes' : 'Publish Masterpiece'}</span>
+                  <span>{loading ? 'Saving...' : product ? 'Save Changes' : 'Add Product'}</span>
                 </button>
               </div>
             </div>
@@ -958,16 +958,16 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               </div>
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-brand-gold">
-                  ATELIER COMMISSION PROTOCOL
+                  PRODUCT EDITOR
                 </span>
                 <h3 className="font-serif text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  {product ? 'Edit Heirloom Saree Record' : 'Commission Masterpiece Saree'}
+                  {product ? 'Edit Product' : 'Add Product'}
                 </h3>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-ivory/60 hover:text-white flex items-center justify-center transition-all"
+              className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-brand-ivory/60 hover:text-white flex items-center justify-center transition-all cursor-pointer"
               title="Close"
             >
               <X className="w-5 h-5" />
@@ -983,16 +983,16 @@ export const ProductEditorModal: React.FC<ProductEditorModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-xl border border-white/15 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors"
+                className="px-6 py-2.5 rounded-xl border border-white/15 text-xs font-mono uppercase tracking-wider text-brand-ivory hover:bg-white/5 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold text-brand-purple-dark font-serif font-bold text-sm shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold text-brand-purple-dark font-serif font-bold text-sm shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer"
               >
-                {loading ? 'Publishing to Atelier...' : product ? 'Update Masterpiece Record' : 'Publish Saree to Catalog'}
+                {loading ? 'Saving...' : product ? 'Save Changes' : 'Add Product'}
               </button>
             </div>
           </form>

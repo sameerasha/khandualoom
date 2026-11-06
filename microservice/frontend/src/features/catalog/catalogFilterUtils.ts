@@ -36,12 +36,28 @@ export const filterAndSortProducts = (
 ): Product[] => {
   return products
     .filter((product) => {
-      // Category filter (if route scoped e.g. /collections/Khandua)
+      // Category / Collection filter (supports slugs like /collections/khandua-silk or /collections/Khandua%20Silk)
       if (filters.category && filters.category !== 'All') {
+        const normalizedTarget = decodeURIComponent(filters.category)
+          .toLowerCase()
+          .replace(/[-_]/g, ' ')
+          .trim();
+        const prodCat = (product.category || '').toLowerCase();
+        const prodWeave = (product.weave || '').toLowerCase();
+        const prodName = (product.name || '').toLowerCase();
+
+        const isKhanduaMatch =
+          (normalizedTarget.includes('khandua') || normalizedTarget.includes('khadua')) &&
+          (prodCat.includes('khandua') || prodCat.includes('khadua') || prodWeave.includes('khandua') || prodWeave.includes('khadua') || prodName.includes('khandua') || prodName.includes('khadua'));
+
         const matchesCategory =
-          product.category?.toLowerCase() === filters.category.toLowerCase() ||
-          product.weave?.toLowerCase().includes(filters.category.toLowerCase()) ||
-          product.name?.toLowerCase().includes(filters.category.toLowerCase());
+          isKhanduaMatch ||
+          prodCat === normalizedTarget ||
+          prodCat.includes(normalizedTarget) ||
+          normalizedTarget.includes(prodCat) ||
+          prodWeave.includes(normalizedTarget) ||
+          prodName.includes(normalizedTarget);
+
         if (!matchesCategory) return false;
       }
 

@@ -79,8 +79,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
 
   return (
     <div className="space-y-6">
-      <h2 className="font-serif text-xl font-bold text-brand-gold flex items-center gap-2">
-        <Lock className="w-5 h-5 text-brand-gold" />
+      <h2 className="text-base font-bold text-gray-900 tracking-wide flex items-center gap-2 uppercase">
+        <Lock className="w-4 h-4 text-teal-600" />
         <span>Select Payment Mode</span>
       </h2>
 
@@ -89,10 +89,10 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
         {/* UPI / QR Code */}
         <label
           onClick={() => setPaymentMethod('RAZORPAY_UPI')}
-          className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+          className={`p-4 rounded-lg border flex items-center justify-between cursor-pointer transition-all ${
             paymentMethod === 'RAZORPAY_UPI'
-              ? 'bg-[#1D0C30] border-brand-gold shadow-md'
-              : 'bg-[#150724] border-brand-gold/20 hover:border-brand-gold/40'
+              ? 'bg-teal-50/50 border-teal-600 shadow-xs'
+              : 'bg-white border-gray-200 hover:border-gray-300'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -101,15 +101,15 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
               name="paymentGroup"
               checked={paymentMethod === 'RAZORPAY_UPI'}
               onChange={() => setPaymentMethod('RAZORPAY_UPI')}
-              className="w-4 h-4 accent-brand-gold cursor-pointer"
+              className="w-4 h-4 accent-teal-600 cursor-pointer"
             />
-            <QrCode className="w-5 h-5 text-brand-gold" />
+            <QrCode className="w-5 h-5 text-teal-700" />
             <div>
-              <p className="font-bold text-sm text-brand-ivory">UPI / Instant QR Code</p>
-              <p className="text-xs text-brand-ivory/60">Google Pay, PhonePe, Paytm, BHIM</p>
+              <p className="font-bold text-sm text-gray-900">UPI / QR Code</p>
+              <p className="text-xs text-gray-500">Google Pay, PhonePe, Paytm, BHIM</p>
             </div>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-100/60 border border-teal-200 px-2 py-0.5 rounded">
             Fastest
           </span>
         </label>
@@ -117,10 +117,10 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
         {/* Credit & Debit Cards */}
         <label
           onClick={() => setPaymentMethod('RAZORPAY_CARD')}
-          className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+          className={`p-4 rounded-lg border flex items-center justify-between cursor-pointer transition-all ${
             paymentMethod === 'RAZORPAY_CARD'
-              ? 'bg-[#1D0C30] border-brand-gold shadow-md'
-              : 'bg-[#150724] border-brand-gold/20 hover:border-brand-gold/40'
+              ? 'bg-teal-50/50 border-teal-600 shadow-xs'
+              : 'bg-white border-gray-200 hover:border-gray-300'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -129,15 +129,15 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
               name="paymentGroup"
               checked={paymentMethod === 'RAZORPAY_CARD'}
               onChange={() => setPaymentMethod('RAZORPAY_CARD')}
-              className="w-4 h-4 accent-brand-gold cursor-pointer"
+              className="w-4 h-4 accent-teal-600 cursor-pointer"
             />
-            <CreditCard className="w-5 h-5 text-brand-gold" />
+            <CreditCard className="w-5 h-5 text-teal-700" />
             <div>
-              <p className="font-bold text-sm text-brand-ivory">Credit & Debit Cards</p>
-              <p className="text-xs text-brand-ivory/60">Visa, MasterCard, RuPay, American Express</p>
+              <p className="font-bold text-sm text-gray-900">Credit / Debit Card</p>
+              <p className="text-xs text-gray-500">Visa, MasterCard, RuPay, American Express</p>
             </div>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-brand-gold-light bg-brand-gold/10 border border-brand-gold/25 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-700 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded">
             All Banks
           </span>
         </label>
@@ -145,10 +145,10 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
         {/* Cash on Delivery (COD) */}
         <label
           onClick={() => setPaymentMethod('COD')}
-          className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+          className={`p-4 rounded-lg border flex items-center justify-between cursor-pointer transition-all ${
             paymentMethod === 'COD'
-              ? 'bg-[#1D0C30] border-brand-gold shadow-md'
-              : 'bg-[#150724] border-brand-gold/20 hover:border-brand-gold/40'
+              ? 'bg-teal-50/50 border-teal-600 shadow-xs'
+              : 'bg-white border-gray-200 hover:border-gray-300'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -157,19 +157,19 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
               name="paymentGroup"
               checked={paymentMethod === 'COD'}
               onChange={() => setPaymentMethod('COD')}
-              className="w-4 h-4 accent-brand-gold cursor-pointer"
+              className="w-4 h-4 accent-teal-600 cursor-pointer"
             />
-            <Banknote className="w-5 h-5 text-brand-gold" />
+            <Banknote className="w-5 h-5 text-teal-700" />
             <div>
-              <p className="font-bold text-sm text-brand-ivory">Cash on Delivery (COD)</p>
-              <p className="text-xs text-brand-ivory/60">Pay cash upon verified doorstep delivery</p>
+              <p className="font-bold text-sm text-gray-900">Cash on Delivery (COD)</p>
+              <p className="text-xs text-gray-500">Pay cash upon verified doorstep delivery</p>
             </div>
           </div>
         </label>
       </div>
 
       {errorMessage && (
-        <p className="text-xs text-rose-400 font-medium">{errorMessage}</p>
+        <p className="text-xs text-rose-600 font-medium">{errorMessage}</p>
       )}
 
       {/* Primary Pay Action Button */}
@@ -178,20 +178,20 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
           type="button"
           disabled={isSubmitting}
           onClick={handlePlaceOrder}
-          className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm uppercase tracking-wider shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+          className="w-full py-4 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
         >
           <ShieldCheck className="w-5 h-5" />
           <span>
             {isSubmitting
-              ? 'CONFIRMING ORDER WITH ATELIER...'
+              ? 'Processing Order...'
               : `PAY ₹${totals.totalPayable.toLocaleString()} & PLACE ORDER`}
           </span>
         </button>
       </div>
 
-      <div className="flex items-center justify-center gap-2 text-xs text-brand-ivory/60 text-center">
-        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-        <span>Authoritative Order Saga with Kafka Event Sourcing and Instant SMS/WhatsApp Confirmation</span>
+      <div className="flex items-center justify-center gap-2 text-xs text-gray-500 text-center">
+        <CheckCircle2 className="w-4 h-4 text-teal-600" />
+        <span>Safe and secure payments • 100% Authentic Handloom Guarantee</span>
       </div>
     </div>
   );

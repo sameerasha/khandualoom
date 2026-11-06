@@ -32,7 +32,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
   const stats = [
     {
-      label: 'Masterpiece Weaves',
+      label: 'Total Products',
       value: products.length,
       trend: '+12% this season',
       trendUp: true,
@@ -47,7 +47,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       color: '#DFBF7A',
     },
     {
-      label: 'Heritage Categories',
+      label: 'Total Categories',
       value: categoriesCount,
       trend: '7 GI Regions',
       trendUp: true,
@@ -66,7 +66,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     {
       label: 'Average Price',
       value: `₹${avgPrice.toLocaleString('en-IN')}`,
-      trend: '+6.4% luxury index',
+      trend: '+6.4% this month',
       trendUp: true,
       sparklineData: [34000, 38000, 39500, 42000, 45000, avgPrice],
       sparklineColor: '#3B82F6',
@@ -79,9 +79,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       color: '#3B82F6',
     },
     {
-      label: 'Atelier Vault Volume',
+      label: 'Total Sales Value',
       value: `₹${totalValue.toLocaleString('en-IN')}`,
-      trend: '+24.8% YoY growth',
+      trend: '+24.8% growth',
       trendUp: true,
       sparklineData: [420000, 680000, 850000, 1120000, 1340000, totalValue],
       sparklineColor: '#10B981',
@@ -97,7 +97,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
   return (
     <div className="admin-dashboard">
-      {/* Executive Atelier Welcome Hero Banner with 3D Seal */}
+      {/* Executive Welcome Hero Banner with 3D Seal */}
       <div className="relative mb-8 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#170B28] via-[#11061F] to-[#0A0414] border border-brand-gold/30 shadow-2xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Ambient Golden Radial Glow */}
         <div className="absolute -top-24 -left-24 w-80 h-80 bg-brand-gold/15 rounded-full blur-3xl pointer-events-none" />
@@ -106,31 +106,31 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         <div className="relative z-10 max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-brand-gold/40 bg-brand-gold/10 text-brand-gold text-[11px] font-mono uppercase tracking-widest mb-3">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Khandua Looms Authority • Active Session
+            Admin Dashboard • Online
           </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
-            Khandua Looms Store Command
+            Store Management
           </h1>
           <p className="text-sm text-brand-ivory/70 mt-2 font-light leading-relaxed">
-            Administration suite for Odisha handloom catalog curation, order fulfillment, patron accounts, and artisan storytelling.
+            Manage products, track orders, view customer accounts, and update website content.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 mt-5">
             <button
               onClick={onAddNewProduct}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold text-brand-purple-dark font-bold text-xs uppercase tracking-wider shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold text-brand-purple-dark font-bold text-xs uppercase tracking-wider shadow-lg shadow-brand-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Commission New Weave
+              Add Product
             </button>
             <button
               onClick={() => onNavigate('orders')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs text-brand-ivory transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs text-brand-ivory transition-colors cursor-pointer"
             >
-              Inspect Orders ({orders.length > 0 ? orders.length : 52})
+              View Orders ({orders.length > 0 ? orders.length : 52})
             </button>
           </div>
         </div>
@@ -146,7 +146,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         {stats.map((stat, i) => (
           <div
             key={i}
-            className="group relative p-5 rounded-2xl bg-white/[0.025] hover:bg-white/[0.04] border border-white/10 hover:border-brand-gold/40 transition-all duration-300 shadow-xl overflow-hidden flex flex-col justify-between"
+            className="group relative p-5 rounded-2xl bg-white/[0.025] hover:bg-white/[0.04] border border-white/10 hover:border-brand-gold/40 transition-all duration-300 shadow-xl overflow-hidden flex flex-col justify-between min-h-[140px]"
           >
             {/* Top Accent Light Bar */}
             <div
@@ -193,7 +193,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
       {/* Quick Actions Bar */}
       <div className="admin-dashboard__section">
-        <h2 className="admin-dashboard__section-title">Atelier Quick Workflows</h2>
+        <h2 className="admin-dashboard__section-title">Quick Actions</h2>
         <div className="admin-dashboard__actions">
           <button className="admin-action-card group" onClick={onAddNewProduct}>
             <div className="admin-action-card__icon group-hover:rotate-90 transition-transform">
@@ -203,8 +203,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                 <line x1="8" y1="12" x2="16" y2="12" />
               </svg>
             </div>
-            <span>Commission Weave</span>
-            <span className="text-[11px] text-brand-ivory/50 font-normal">Add catalog saree</span>
+            <span>Add Product</span>
+            <span className="text-[11px] text-brand-ivory/50 font-normal">Add a new saree</span>
           </button>
 
           <button className="admin-action-card group" onClick={() => onNavigate('products')}>
@@ -214,8 +214,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
             </div>
-            <span>Manage Inventory</span>
-            <span className="text-[11px] text-brand-ivory/50 font-normal">Pricing & Badges</span>
+            <span>Products</span>
+            <span className="text-[11px] text-brand-ivory/50 font-normal">View and edit products</span>
           </button>
 
           <button className="admin-action-card group" onClick={() => onNavigate('users')}>
@@ -227,8 +227,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                 <path d="M16 3.13a4 4 0 010 7.75" />
               </svg>
             </div>
-            <span>Patron Directory</span>
-            <span className="text-[11px] text-brand-ivory/50 font-normal">VIP Access & Roles</span>
+            <span>Customers</span>
+            <span className="text-[11px] text-brand-ivory/50 font-normal">View customer accounts</span>
           </button>
 
           <button className="admin-action-card group" onClick={onBackToStore}>
@@ -238,21 +238,21 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                 <circle cx="12" cy="12" r="3" />
               </svg>
             </div>
-            <span>View Storefront</span>
-            <span className="text-[11px] text-brand-ivory/50 font-normal">Live 3D Salon</span>
+            <span>View Store</span>
+            <span className="text-[11px] text-brand-ivory/50 font-normal">Open customer website</span>
           </button>
         </div>
       </div>
 
-      {/* Recent Masterpiece Showcases */}
+      {/* Recent Products */}
       <div className="admin-dashboard__section">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="admin-dashboard__section-title mb-0">Recent Masterpiece Curations</h2>
+          <h2 className="admin-dashboard__section-title mb-0">Recent Products</h2>
           <button
             onClick={() => onNavigate('products')}
-            className="text-xs font-mono uppercase tracking-wider text-brand-gold hover:underline"
+            className="text-xs font-mono uppercase tracking-wider text-brand-gold hover:underline cursor-pointer"
           >
-            View Complete Catalog →
+            View All Products →
           </button>
         </div>
 

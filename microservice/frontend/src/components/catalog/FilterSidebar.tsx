@@ -77,10 +77,10 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   );
 
   return (
-    <aside className="w-full lg:w-64 bg-[#140622] rounded-xl border border-brand-gold/15 p-5 divide-y divide-brand-gold/10 text-xs">
+    <aside className="w-full lg:w-64 bg-white rounded-2xl border border-gray-200 p-5 divide-y divide-gray-100 text-xs shadow-sm">
       <div className="pb-4 flex items-center justify-between">
-        <h3 className="font-bold uppercase tracking-wider text-brand-gold text-sm">
-          FILTERS
+        <h3 className="font-bold uppercase tracking-wider text-gray-900 text-sm">
+          Filters
         </h3>
         <button
           type="button"
@@ -94,17 +94,17 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               priceRange: [1000, 50000],
             })
           }
-          className="text-[11px] font-semibold text-brand-gold-light hover:underline uppercase"
+          className="text-[11px] font-semibold text-brand-purple hover:underline uppercase"
         >
-          Reset All
+          Clear All
         </button>
       </div>
 
       {/* GI Certified Tag Filter */}
       <div className="py-4">
         <label className="flex items-center justify-between cursor-pointer group">
-          <span className="font-bold text-brand-ivory group-hover:text-brand-gold uppercase tracking-wider">
-            GI TAGGED AUTHENTIC ONLY
+          <span className="font-bold text-gray-800 group-hover:text-brand-purple uppercase tracking-wider">
+            GI Tagged Only
           </span>
           <input
             type="checkbox"
@@ -118,8 +118,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       {/* Weave Technique Facet */}
       <div className="py-4">
         <div className="flex items-center justify-between mb-2.5">
-          <span className="font-bold uppercase tracking-wider text-brand-gold-light">
-            WEAVE TECHNIQUE
+          <span className="font-bold uppercase tracking-wider text-gray-700">
+            Weave Style
           </span>
         </div>
 
@@ -127,19 +127,19 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <div className="relative mb-2.5">
           <input
             type="text"
-            placeholder="Search weaves..."
+            placeholder="Search weave style..."
             value={weaveSearch}
             onChange={(e) => setWeaveSearch(e.target.value)}
-            className="w-full bg-[#1A0A2C] border border-brand-gold/20 rounded px-2.5 py-1 text-xs text-brand-ivory placeholder-brand-ivory/40 focus:outline-none focus:border-brand-gold"
+            className="w-full bg-gray-50 border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-gold"
           />
-          <Search className="w-3.5 h-3.5 text-brand-gold/50 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
 
         <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
           {filteredWeaves.map((weave) => (
             <label
               key={weave}
-              className="flex items-center justify-between text-brand-ivory/80 hover:text-brand-gold cursor-pointer"
+              className="flex items-center justify-between text-gray-700 hover:text-gray-900 cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <input
@@ -157,14 +157,14 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Fabric Purity Facet */}
       <div className="py-4">
-        <span className="font-bold uppercase tracking-wider text-brand-gold-light block mb-2.5">
-          FABRIC & PURITY
+        <span className="font-bold uppercase tracking-wider text-gray-700 block mb-2.5">
+          Fabric
         </span>
         <div className="space-y-2">
           {availableFabrics.map((fabric) => (
             <label
               key={fabric}
-              className="flex items-center justify-between text-brand-ivory/80 hover:text-brand-gold cursor-pointer"
+              className="flex items-center justify-between text-gray-700 hover:text-gray-900 cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <input
@@ -183,10 +183,10 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       {/* Price Slider */}
       <div className="py-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="font-bold uppercase tracking-wider text-brand-gold-light">
-            PRICE RANGE
+          <span className="font-bold uppercase tracking-wider text-gray-700">
+            Price Range
           </span>
-          <span className="text-brand-gold font-mono font-bold">
+          <span className="text-gray-900 font-mono font-bold">
             Up to ₹{filters.priceRange[1].toLocaleString()}
           </span>
         </div>
@@ -199,7 +199,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           onChange={(e) => handlePriceMaxChange(Number(e.target.value))}
           className="w-full accent-brand-gold cursor-pointer"
         />
-        <div className="flex justify-between text-[10px] text-brand-ivory/50 mt-1">
+        <div className="flex justify-between text-[10px] text-gray-400 mt-1">
           <span>₹5,000</span>
           <span>₹25,000</span>
           <span>₹50,000+</span>
@@ -208,14 +208,14 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Occasion Facet */}
       <div className="pt-4">
-        <span className="font-bold uppercase tracking-wider text-brand-gold-light block mb-2.5">
-          OCCASION
+        <span className="font-bold uppercase tracking-wider text-gray-700 block mb-2.5">
+          Occasion
         </span>
         <div className="space-y-2">
           {defaultOccasions.map((occasion) => (
             <label
               key={occasion}
-              className="flex items-center justify-between text-brand-ivory/80 hover:text-brand-gold cursor-pointer"
+              className="flex items-center justify-between text-gray-700 hover:text-gray-900 cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <input

@@ -30,29 +30,29 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
 
   if (!hasActiveFilters) {
     return (
-      <div className="text-xs text-brand-ivory/60 mb-4">
-        Showing <span className="text-brand-gold font-bold">{totalResults}</span> Authentic Sarees
+      <div className="text-xs text-gray-500 mb-4">
+        Showing <span className="text-gray-900 font-bold">{totalResults}</span> Sarees
       </div>
     );
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2 mb-4">
-      <span className="text-xs text-brand-ivory/60 mr-1">
-        <span className="text-brand-gold font-bold">{totalResults}</span> items :
+      <span className="text-xs text-gray-500 mr-1">
+        <span className="text-gray-900 font-bold">{totalResults}</span> items:
       </span>
 
       {filters.weaves.map((w) => (
         <span
           key={`weave-${w}`}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-gold/15 border border-brand-gold/30 text-brand-gold text-xs font-medium"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-300 text-gray-800 text-xs font-medium shadow-sm"
         >
           {w}
           <button
             type="button"
             onClick={() => onRemoveWeave(w)}
             aria-label={`Remove ${w} filter`}
-            className="hover:text-brand-gold-light"
+            className="hover:text-red-600"
           >
             <X className="w-3 h-3" />
           </button>
@@ -62,14 +62,14 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
       {filters.fabrics.map((f) => (
         <span
           key={`fabric-${f}`}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-gold/15 border border-brand-gold/30 text-brand-gold text-xs font-medium"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-300 text-gray-800 text-xs font-medium shadow-sm"
         >
           {f}
           <button
             type="button"
             onClick={() => onRemoveFabric(f)}
             aria-label={`Remove ${f} filter`}
-            className="hover:text-brand-gold-light"
+            className="hover:text-red-600"
           >
             <X className="w-3 h-3" />
           </button>
@@ -77,13 +77,13 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
       ))}
 
       {filters.giTaggedOnly && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-gold/15 border border-brand-gold/30 text-brand-gold text-xs font-medium">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-medium shadow-sm">
           GI Tagged Only
           <button
             type="button"
             onClick={onToggleGi}
             aria-label="Remove GI Tag filter"
-            className="hover:text-brand-gold-light"
+            className="hover:text-red-600"
           >
             <X className="w-3 h-3" />
           </button>
@@ -91,13 +91,13 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
       )}
 
       {(filters.priceRange[0] > 1000 || filters.priceRange[1] < 50000) && (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-gold/15 border border-brand-gold/30 text-brand-gold text-xs font-medium">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-300 text-gray-800 text-xs font-medium shadow-sm">
           ₹{filters.priceRange[0].toLocaleString()} – ₹{filters.priceRange[1].toLocaleString()}
           <button
             type="button"
             onClick={onResetPrice}
             aria-label="Reset price filter"
-            className="hover:text-brand-gold-light"
+            className="hover:text-red-600"
           >
             <X className="w-3 h-3" />
           </button>
@@ -107,9 +107,9 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
       <button
         type="button"
         onClick={onClearAll}
-        className="text-xs font-bold text-red-400 hover:text-red-300 uppercase tracking-wider ml-2 cursor-pointer"
+        className="text-xs font-bold text-rose-600 hover:text-rose-700 uppercase tracking-wider ml-2 cursor-pointer"
       >
-        CLEAR ALL
+        Clear All
       </button>
     </div>
   );

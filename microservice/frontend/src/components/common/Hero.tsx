@@ -70,7 +70,7 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick: _onSignUpClick, onExp
               transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="mt-6 text-base sm:text-lg text-brand-ivory/80 font-sans leading-relaxed max-w-xl font-light"
             >
-              Discover the beauty of Odisha's handloom traditions through exquisite sarees inspired by generations of artistry, culture, and craftsmanship.
+              Shop authentic handwoven sarees made by skilled weavers of Odisha, carrying centuries of traditional craftsmanship.
             </motion.p>
 
             {/* Call to Actions */}
@@ -84,7 +84,7 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick: _onSignUpClick, onExp
                 onClick={scrollToCatalog}
                 className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-brand-gold via-brand-gold-light to-brand-gold-dark text-brand-purple-dark font-serif font-bold px-8 py-4 rounded-full text-base transition-all duration-300 shadow-xl shadow-brand-gold/15 hover:shadow-brand-gold/30 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
-                <span>Shop Sarees</span>
+                <span>Shop Our Collection</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
 
@@ -93,7 +93,7 @@ export const Hero: React.FC<HeroProps> = ({ onSignUpClick: _onSignUpClick, onExp
                 className="inline-flex items-center gap-2 border border-brand-gold/35 text-brand-gold-light hover:bg-brand-gold/10 font-sans font-medium px-7 py-4 rounded-full text-base transition-all duration-300 backdrop-blur-sm cursor-pointer"
               >
                 <Compass className="w-4 h-4 text-brand-gold" />
-                <span>Explore Our Heritage</span>
+                <span>Our Story</span>
               </button>
             </motion.div>
 

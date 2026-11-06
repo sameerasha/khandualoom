@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { useAppDispatch } from '@/app/hooks';
 import { setSelectedCategory, setSearchQuery } from '@/features/products/productsSlice';
@@ -15,65 +16,63 @@ interface CollectionItem {
 
 const collections: CollectionItem[] = [
   {
-    id: 'khadua-silk',
-    name: 'Khadua Silk Sarees',
+    id: 'khandua-silk',
+    name: 'Khandua Silk Sarees',
     category: 'Khadua Silk',
-    description: 'Sacred Nuapatna weaves adorned with auspicious calligraphy, Gitagovinda verses, and pure mulberry silk sheen.',
+    description: 'Traditional Nuapatna tie-dye silk sarees woven with sacred Gita Govinda verses and rich zari borders.',
     image: '/images/products/p3/front.jpg',
-    tag: 'Signature Drape',
+    tag: 'Temple Weave',
   },
   {
     id: 'sambalpuri-ikat',
     name: 'Sambalpuri Ikat Sarees',
     category: 'Sambalpuri Ikat',
-    description: 'Iconic tie-dye Bandha weaves from Western Odisha featuring shankha (conch), chakra, and floral geometry.',
+    description: 'Traditional tie-dye Bandha sarees from Western Odisha with shankha, chakra, and floral patterns.',
     image: '/images/products/p2/front.jpg',
-    tag: 'Bandha Artistry',
+    tag: 'Bandha Art',
   },
   {
     id: 'bomkai-sarees',
     name: 'Bomkai Sarees',
     category: 'Bomkai',
-    description: 'Celebrated Sonepur extra-weft artistry with distinctive jhabba pallu, temple spires, and flora motifs.',
+    description: 'Celebrated Subarnapur extra-weft sarees with traditional jhabba pallu and nature-inspired motifs.',
     image: '/images/products/p4/front.jpg',
-    tag: 'Subarnapur Heritage',
+    tag: 'Traditional Weave',
   },
   {
     id: 'wedding-bridal',
     name: 'Wedding & Bridal Sarees',
     category: 'Wedding & Bridal',
-    description: 'Regal bridal heirlooms featuring needle-interlocked Phoda Kumbha borders, pure zari, and auspicious hues.',
+    description: 'Heavy silk sarees with needle-interlocked Phoda Kumbha temple borders for weddings and grand celebrations.',
     image: '/images/products/p5/front.jpg',
-    tag: 'Bridal Trousseau',
+    tag: 'Bridal Sarees',
   },
   {
     id: 'festive-collection',
     name: 'Festive Collection',
     category: 'Festive Collection',
-    description: 'Luminous Ahimsa silk, Bapta weaves, and vibrant celebratory palettes tailored for festivals and sacred pujas.',
+    description: 'Comfortable mulberry silk and Bapta sarees with vibrant festive colors for special occasions and pujas.',
     image: '/images/products/p11/front.jpg',
-    tag: 'Celebration Weaves',
+    tag: 'Festive Sarees',
   },
   {
     id: 'traditional-handlooms',
     name: 'Traditional Odisha Handlooms',
     category: 'Traditional Odisha Handlooms',
-    description: 'Authentic tribal Kotpad organic Aal dyes, Padua frame-loom cottons, and revived Habaspuri temple weaves.',
+    description: 'Authentic Kotpad organic dyed sarees, Padua cottons, and Berhampuri temple silk sarees.',
     image: '/images/products/p1/front.jpg',
-    tag: 'Tribal & Village Looms',
+    tag: 'Handloom Cotton',
   },
 ];
 
 export const ShopByCollection: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleSelectCollection = (category: string) => {
     dispatch(setSearchQuery(''));
     dispatch(setSelectedCategory(category));
-    const catalogElement = document.getElementById('catalog-section');
-    if (catalogElement) {
-      catalogElement.scrollIntoView({ behavior: 'smooth' });
-    }
+    navigate(`/collections/${encodeURIComponent(category)}`);
   };
 
   return (
@@ -90,14 +89,14 @@ export const ShopByCollection: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-brand-gold font-mono font-semibold mb-2">
               <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
-              <span>Curated Odisha Handloom Traditions</span>
+              <span>Made by Skilled Weavers</span>
             </div>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-ivory leading-tight">
-              Shop by Collection
+              Our Collections
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-brand-ivory/70 max-w-md font-light leading-relaxed">
-            Immerse yourself in centuries of generational craftsmanship across Odisha’s most renowned weaving clusters.
+            Shop authentic handwoven sarees made by skilled weavers across Odisha's historic weaving towns.
           </p>
         </div>
 
@@ -106,12 +105,20 @@ export const ShopByCollection: React.FC = () => {
           {collections.map((item, idx) => (
             <motion.div
               key={item.id}
+              role="button"
+              tabIndex={0}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => handleSelectCollection(item.category)}
-              className="group relative rounded-3xl overflow-hidden border border-brand-gold/25 bg-gradient-to-b from-[#180828] to-[#0D0216] shadow-xl hover:border-brand-gold/70 hover:shadow-[0_15px_40px_rgba(197,160,89,0.22)] transition-all duration-500 cursor-pointer flex flex-col justify-between"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSelectCollection(item.category);
+                }
+              }}
+              className="group relative rounded-3xl overflow-hidden border border-brand-gold/25 bg-gradient-to-b from-[#180828] to-[#0D0216] shadow-xl hover:border-brand-gold/70 hover:shadow-[0_15px_40px_rgba(197,160,89,0.22)] transition-all duration-500 cursor-pointer flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-brand-gold"
             >
               {/* Card Image Container */}
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40">
@@ -148,7 +155,7 @@ export const ShopByCollection: React.FC = () => {
                 </div>
 
                 <div className="pt-3 border-t border-brand-gold/15 flex items-center justify-between text-xs font-semibold text-brand-gold group-hover:text-brand-gold-light">
-                  <span className="uppercase tracking-wider font-mono text-[11px]">Explore Collection</span>
+                  <span className="uppercase tracking-wider font-mono text-[11px]">View Products</span>
                   <span className="inline-block transform group-hover:translate-x-1 transition-transform">→</span>
                 </div>
               </div>

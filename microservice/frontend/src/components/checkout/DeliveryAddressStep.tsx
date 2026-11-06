@@ -93,8 +93,8 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="font-serif text-xl font-bold text-brand-gold flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-brand-gold" />
+        <h2 className="text-base font-bold text-gray-900 tracking-wide flex items-center gap-2 uppercase">
+          <MapPin className="w-4 h-4 text-teal-600" />
           <span>Select Delivery Address</span>
         </h2>
 
@@ -102,7 +102,7 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
           <button
             type="button"
             onClick={() => setShowNewForm(true)}
-            className="text-xs font-bold uppercase tracking-wider text-brand-gold hover:text-brand-gold-light flex items-center gap-1.5 cursor-pointer"
+            className="text-xs font-bold uppercase tracking-wider text-teal-700 hover:text-teal-800 flex items-center gap-1 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>ADD NEW ADDRESS</span>
@@ -119,10 +119,10 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
               <div
                 key={idx}
                 onClick={() => setSelectedIdx(idx)}
-                className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-3 ${
+                className={`p-5 rounded-lg border transition-all cursor-pointer flex items-start gap-3.5 ${
                   isSelected
-                    ? 'bg-[#1D0C30] border-brand-gold shadow-md'
-                    : 'bg-[#150724] border-brand-gold/20 hover:border-brand-gold/40'
+                    ? 'bg-teal-50/40 border-teal-600 shadow-xs'
+                    : 'bg-white border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <input
@@ -130,29 +130,29 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
                   name="addressSelection"
                   checked={isSelected}
                   onChange={() => setSelectedIdx(idx)}
-                  className="w-4 h-4 accent-brand-gold mt-1 cursor-pointer"
+                  className="w-4 h-4 accent-teal-600 mt-1 cursor-pointer"
                 />
 
                 <div className="flex-1 text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-brand-ivory text-sm">{addr.fullName}</span>
-                    <span className="px-2 py-0.5 rounded bg-brand-gold/15 text-brand-gold text-[10px] uppercase font-bold">
+                    <span className="font-bold text-gray-900 text-sm">{addr.fullName}</span>
+                    <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-[10px] uppercase font-bold tracking-wider">
                       {addr.addressType || 'HOME'}
                     </span>
                   </div>
 
-                  <p className="text-brand-ivory/80 mt-1">{addr.address}</p>
-                  <p className="text-brand-ivory/80">
+                  <p className="text-gray-600 mt-1.5">{addr.address}</p>
+                  <p className="text-gray-600">
                     {addr.locality}, {addr.city}, {addr.state} -{' '}
-                    <strong className="text-brand-gold font-mono">{addr.pincode}</strong>
+                    <strong className="text-gray-900 font-mono">{addr.pincode}</strong>
                   </p>
-                  <p className="text-brand-ivory/60 mt-1">Mobile: {addr.phone}</p>
+                  <p className="text-gray-500 mt-1">Mobile: <span className="font-medium text-gray-800">{addr.phone}</span></p>
 
                   {isSelected && (
                     <button
                       type="button"
                       onClick={handleContinueWithSelected}
-                      className="mt-3 px-6 py-2 rounded bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-wider shadow cursor-pointer"
+                      className="mt-3.5 px-6 py-2.5 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs uppercase tracking-wider shadow-xs cursor-pointer transition-colors"
                     >
                       DELIVER TO THIS ADDRESS
                     </button>
@@ -164,28 +164,31 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
         </div>
       )}
 
-      {/* Add New Address Form matching Screenshot 5 */}
-      {showNewForm && (
+      {/* Add New Address Form matching reference Screenshot */}
+      {(showNewForm || savedAddresses.length === 0) && (
         <form
           onSubmit={handleSaveNewAddress}
-          className="p-6 rounded-2xl bg-[#170928] border border-brand-gold/25 space-y-4"
+          className="p-6 sm:p-8 rounded-lg bg-white border border-gray-200 shadow-xs space-y-4"
         >
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-bold text-sm text-brand-gold uppercase tracking-wider">
+          <div className="flex justify-between items-center mb-1 pb-2 border-b border-gray-100">
+            <h3 className="font-bold text-sm text-gray-900 uppercase tracking-wider">
               ADD NEW ADDRESS
             </h3>
-            <button
-              type="button"
-              onClick={() => setShowNewForm(false)}
-              className="text-xs text-brand-ivory/50 hover:text-brand-ivory"
-            >
-              Cancel
-            </button>
+            {savedAddresses.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowNewForm(false)}
+                className="text-xs text-gray-500 hover:text-gray-800 cursor-pointer"
+              >
+                Cancel
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Pin Code */}
             <div>
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
                 Pin Code*
               </label>
               <input
@@ -194,41 +197,44 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
                 placeholder="6 digits [0-9]"
                 value={pincode}
                 onChange={(e) => handlePincodeChange(e.target.value)}
-                className="w-full bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory font-mono focus:outline-none focus:border-brand-gold"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs text-gray-900 font-mono focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-colors"
                 required
               />
             </div>
 
+            {/* Locality / Town */}
             <div>
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
                 Locality / Town*
               </label>
               <input
                 type="text"
-                placeholder="e.g. Saheed Nagar / Nuapatna Market"
+                placeholder="Locality or Area"
                 value={locality}
                 onChange={(e) => setLocality(e.target.value)}
-                className="w-full bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory focus:outline-none focus:border-brand-gold"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-colors"
                 required
               />
             </div>
 
+            {/* City / District */}
             <div>
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
                 City / District*
               </label>
               <input
                 type="text"
-                placeholder="City"
+                placeholder="City or District"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory focus:outline-none focus:border-brand-gold"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-colors"
                 required
               />
             </div>
 
+            {/* State */}
             <div>
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
                 State*
               </label>
               <input
@@ -236,41 +242,44 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
                 placeholder="State"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                className="w-full bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory focus:outline-none focus:border-brand-gold"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-colors"
                 required
               />
             </div>
 
+            {/* Name */}
             <div className="sm:col-span-2">
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
-                Full Name*
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
+                Name*
               </label>
               <input
                 type="text"
-                placeholder="Recipient Name"
+                placeholder="Contact Name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory focus:outline-none focus:border-brand-gold"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-colors"
                 required
               />
             </div>
 
+            {/* Address */}
             <div className="sm:col-span-2">
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
-                Address (House No, Building, Street, Area)*
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
+                Address*
               </label>
               <textarea
-                rows={2}
-                placeholder="Street address details"
+                rows={3}
+                placeholder="House No, Flat, Street, Area"
                 value={streetAddress}
                 onChange={(e) => setStreetAddress(e.target.value)}
-                className="w-full bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory focus:outline-none focus:border-brand-gold"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-colors resize-none"
                 required
               />
             </div>
 
+            {/* Mobile No */}
             <div>
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
                 Mobile No*
               </label>
               <input
@@ -279,25 +288,26 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
                 placeholder="10-digit mobile number"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                className="w-full bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory font-mono focus:outline-none focus:border-brand-gold"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-xs text-gray-900 font-mono focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 transition-colors"
                 required
               />
             </div>
 
+            {/* Address Type */}
             <div>
-              <label className="text-[11px] font-semibold text-brand-gold-light uppercase block mb-1">
-                Address Type
+              <label className="text-xs font-semibold text-gray-700 block mb-1">
+                Type of Address
               </label>
               <div className="flex gap-2">
-                {(['HOME', 'WORK', 'OTHER'] as const).map((t) => (
+                {(['HOME', 'WORK'] as const).map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setAddressType(t)}
-                    className={`flex-1 py-2 rounded text-xs font-semibold uppercase ${
+                    className={`flex-1 py-2 rounded text-xs font-semibold uppercase transition-colors cursor-pointer ${
                       addressType === t
-                        ? 'bg-brand-gold text-brand-purple-dark'
-                        : 'bg-[#1A0A2C] border border-brand-gold/20 text-brand-ivory/70'
+                        ? 'bg-teal-600 text-white'
+                        : 'bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     {t}
@@ -307,23 +317,23 @@ export const DeliveryAddressStep: React.FC<DeliveryAddressStepProps> = ({ onProc
             </div>
           </div>
 
-          {errorMsg && <p className="text-xs text-rose-400 font-medium">{errorMsg}</p>}
+          {errorMsg && <p className="text-xs text-rose-600 font-medium">{errorMsg}</p>}
 
           <div className="pt-2">
             <button
               type="submit"
-              className="px-6 py-2.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              className="px-10 py-3 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
             >
-              SAVE ADDRESS
+              SAVE
             </button>
           </div>
         </form>
       )}
 
       {/* Trust notice */}
-      <div className="flex items-center gap-2 text-xs text-brand-ivory/60 pt-2">
-        <ShieldCheck className="w-4 h-4 text-emerald-400" />
-        <span>Your delivery details are protected and encrypted for genuine artisan shipment.</span>
+      <div className="flex items-center gap-2 text-xs text-gray-500 pt-2">
+        <ShieldCheck className="w-4 h-4 text-teal-600" />
+        <span>Your delivery details are protected and encrypted for genuine handloom dispatch.</span>
       </div>
     </div>
   );

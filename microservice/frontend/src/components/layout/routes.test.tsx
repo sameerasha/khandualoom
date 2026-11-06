@@ -23,7 +23,7 @@ describe('Route Navigation & Layouts', () => {
         <RouterProvider router={router} />
       </Provider>
     );
-    expect(screen.getByText(/100% SECURE/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/100% SECURE/i).length).toBeGreaterThan(0);
   });
 
   it('renders Admin Vault gate on /admin path', () => {

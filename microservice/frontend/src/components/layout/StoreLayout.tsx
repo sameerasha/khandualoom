@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Navbar } from '@/components/common/Navbar';
 import { Footer } from '@/components/common/Footer';
 import { CartSidebar } from '@/components/common/CartSidebar';
@@ -12,6 +12,9 @@ import { Product } from '@/types';
 
 export const StoreLayout: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isLandingPage = location.pathname === '/';
+
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [socialModalOpen, setSocialModalOpen] = useState(false);
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -19,6 +22,8 @@ export const StoreLayout: React.FC = () => {
   const [globalScrollProgress, setGlobalScrollProgress] = useState(0);
 
   useEffect(() => {
+    if (!isLandingPage) return;
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -29,7 +34,7 @@ export const StoreLayout: React.FC = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isLandingPage]);
 
   const handleOpenLegal = (doc: LegalDocType) => {
     setLegalInitialTab(doc);
@@ -41,11 +46,19 @@ export const StoreLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0617] text-brand-ivory flex flex-col selection:bg-brand-gold selection:text-brand-purple-dark relative">
-      {/* Persistent 3D Master Loom Canvas */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-700">
-        <CinematicLoomCanvas scrollProgress={globalScrollProgress} />
-      </div>
+    <div
+      className={`min-h-screen flex flex-col selection:bg-brand-gold selection:text-white relative transition-colors duration-300 ${
+        isLandingPage
+          ? 'bg-[#0F0617] text-brand-ivory'
+          : 'bg-[#F8F9FA] text-[#1E293B]'
+      }`}
+    >
+      {/* 3D Master Loom Canvas — strictly scoped to the Landing Page */}
+      {isLandingPage && (
+        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-700">
+          <CinematicLoomCanvas scrollProgress={globalScrollProgress} />
+        </div>
+      )}
 
       {/* Header & Main Navigation */}
       <div className="relative z-30">
@@ -57,8 +70,8 @@ export const StoreLayout: React.FC = () => {
         />
       </div>
 
-      {/* Main Routed Content Area */}
-      <main className="flex-1 relative z-10">
+      {/* Main Routed Content Area with Solid Clean Background on Internal Pages */}
+      <main className={`flex-1 relative z-10 ${!isLandingPage ? 'bg-[#F8F9FA]' : ''}`}>
         <Outlet />
       </main>
 

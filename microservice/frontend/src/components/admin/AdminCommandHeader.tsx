@@ -11,20 +11,20 @@ interface AdminCommandHeaderProps {
 }
 
 const ROUTE_TITLES: Record<string, { title: string; subtitle: string }> = {
-  dashboard: { title: 'Atelier Dashboard', subtitle: 'Real-time sales, order volume, and key revenue metrics' },
-  products: { title: 'Product Catalog Atelier', subtitle: 'Masterpieces curation, pricing, and handloom attributes' },
-  categories: { title: 'Categories & Navigation', subtitle: 'Manage mega-menu taxonomy, hierarchy, and category banners' },
-  inventory: { title: 'Stock Ledger & Reconciliation', subtitle: 'SKU availability, single-piece locks, and audited adjustments' },
-  homepage: { title: 'Homepage Visual Builder', subtitle: 'Drag-and-drop section ordering, banners, and responsive live preview' },
-  banners: { title: 'Banner & Promotional Studio', subtitle: 'Hero carousel, festive sales, and sticky promotional tabs' },
-  promotions: { title: 'Coupons & Bank Campaigns', subtitle: 'Discount codes, usage limits, and banking partner offers' },
-  features: { title: 'Dynamic Feature Management', subtitle: 'Toggle website capabilities and storefront modules without code updates' },
-  orders: { title: 'Orders & Dispatches', subtitle: 'Order fulfillment saga, courier tracking, and printable invoices' },
-  users: { title: 'Patron Registry', subtitle: 'Customer profiles, order frequency, and address books' },
-  artisans: { title: 'Artisan Masters', subtitle: 'Loom cooperative verifications and GI Tag accreditations' },
-  admins: { title: 'RBAC Administrators', subtitle: 'Role permissions matrix and security governance' },
-  audit: { title: 'Administrative Audit Trail', subtitle: 'Immutable operational history and change tracking' },
-  settings: { title: 'Store Settings & Brand', subtitle: 'Global configurations, currency, and maintenance mode' },
+  dashboard: { title: 'Dashboard', subtitle: 'View sales, orders, and revenue statistics' },
+  products: { title: 'Products', subtitle: 'Add, edit, and organize sarees and handloom products' },
+  categories: { title: 'Categories', subtitle: 'Manage product categories and menu order' },
+  inventory: { title: 'Manage Stock', subtitle: 'Check inventory levels and update stock count' },
+  homepage: { title: 'Website Content', subtitle: 'Customize homepage sections, layout, and texts' },
+  banners: { title: 'Banners', subtitle: 'Manage promotional banners and advertisements' },
+  promotions: { title: 'Offers', subtitle: 'Create coupon codes, discounts, and festive offers' },
+  features: { title: 'Feature Settings', subtitle: 'Enable or disable website features easily' },
+  orders: { title: 'Orders', subtitle: 'View customer orders, status, and shipping details' },
+  users: { title: 'Customers', subtitle: 'View registered customers and contact information' },
+  artisans: { title: 'Sellers & Artisans', subtitle: 'Manage weavers, craft societies, and GI certificates' },
+  admins: { title: 'User Permissions', subtitle: 'Manage admin accounts, access rights, and security' },
+  audit: { title: 'Audit Log', subtitle: 'View system activity history and operational logs' },
+  settings: { title: 'Website Settings', subtitle: 'Configure store details, currency, and maintenance' },
 };
 
 export const AdminCommandHeader: React.FC<AdminCommandHeaderProps> = ({

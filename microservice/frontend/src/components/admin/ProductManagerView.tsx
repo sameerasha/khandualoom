@@ -154,7 +154,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
                 <rect x="14" y="14" width="7" height="7" />
                 <rect x="3" y="14" width="7" height="7" />
               </svg>
-              Lookbook
+              Grid View
             </button>
           </div>
 
@@ -163,7 +163,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Commission Weave
+            Add Product
           </button>
         </div>
       </div>
@@ -172,25 +172,25 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1C0C30] to-[#120622] border border-brand-gold/30 shadow-lg">
           <div className="flex items-center justify-between text-brand-gold/70 mb-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Catalog Vault</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Total Products</span>
             <Package className="w-4 h-4 text-brand-gold" />
           </div>
           <div className="font-mono text-xl sm:text-2xl font-bold text-white">{catalogStats.total} Pieces</div>
-          <div className="text-[10px] font-sans text-brand-ivory/50 mt-0.5">Active Heirloom Weaves</div>
+          <div className="text-[10px] font-sans text-brand-ivory/50 mt-0.5">Active Products in Store</div>
         </div>
 
         <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1C0C30] to-[#120622] border border-amber-500/30 shadow-lg">
           <div className="flex items-center justify-between text-amber-400 mb-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Pure Silk Density</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Silk Products</span>
             <Sparkles className="w-4 h-4 text-amber-400" />
           </div>
           <div className="font-mono text-xl sm:text-2xl font-bold text-amber-300">{catalogStats.silkWeaves} Mulberry</div>
-          <div className="text-[10px] font-sans text-brand-ivory/50 mt-0.5">Sanctified Silk Drapes</div>
+          <div className="text-[10px] font-sans text-brand-ivory/50 mt-0.5">Pure Handwoven Silk</div>
         </div>
 
         <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1C0C30] to-[#120622] border border-emerald-500/30 shadow-lg">
           <div className="flex items-center justify-between text-emerald-400 mb-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Handloom Clusters</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Categories</span>
             <Layers className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="font-mono text-xl sm:text-2xl font-bold text-emerald-300">{catalogStats.distinctClusters} Regions</div>
@@ -199,7 +199,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
 
         <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1C0C30] to-[#120622] border border-brand-gold/40 shadow-lg">
           <div className="flex items-center justify-between text-brand-gold mb-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Vault Capitalization</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Total Stock Value</span>
             <ShieldCheck className="w-4 h-4 text-brand-gold" />
           </div>
           <div className="font-mono text-xl sm:text-2xl font-bold text-brand-gold">
@@ -227,7 +227,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
           <input
             type="text"
             className="product-manager__search"
-            placeholder="Search by weave name, color tone, or silk fabric..."
+            placeholder="Search by product name, color, or fabric..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -248,11 +248,11 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
               className="product-manager__select"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              aria-label="Filter by Weave Category"
+              aria-label="Filter by Category"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat === 'All' ? 'All Weave Regions' : cat}
+                  {cat === 'All' ? 'All Categories' : cat}
                 </option>
               ))}
             </select>
@@ -264,11 +264,11 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
               className="product-manager__select"
               value={selectedBadge}
               onChange={(e) => setSelectedBadge(e.target.value)}
-              aria-label="Filter by Heirloom Badge"
+              aria-label="Filter by Badge"
             >
               {badges.map((b) => (
                 <option key={b} value={b}>
-                  {b === 'All' ? 'All Heirloom Badges' : b}
+                  {b === 'All' ? 'All Badges' : b}
                 </option>
               ))}
             </select>
@@ -392,7 +392,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
                               type="button"
                               onClick={() => openInspection(product)}
                               className="p-2 rounded-xl border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/15 transition-all cursor-pointer shadow-xs"
-                              title="Examine Weave in High Definition"
+                              title="View Details"
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -400,7 +400,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
                               type="button"
                               onClick={() => onEditProduct(product)}
                               className="p-2 rounded-xl border border-white/15 text-brand-ivory/70 hover:text-white hover:border-brand-gold/40 hover:bg-white/5 transition-all cursor-pointer"
-                              title="Edit Weave Commission"
+                              title="Edit"
                             >
                               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -411,7 +411,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
                               type="button"
                               onClick={() => onDeleteProduct(product)}
                               className="p-2 rounded-xl border border-red-500/25 text-red-400 hover:bg-red-500/15 transition-all cursor-pointer"
-                              title="Delete from Catalog Vault"
+                              title="Delete"
                             >
                               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <polyline points="3 6 5 6 21 6" />
@@ -425,7 +425,7 @@ export const ProductManagerView: React.FC<ProductManagerViewProps> = ({
                   ) : (
                     <tr>
                       <td colSpan={6} className="text-center py-12 text-brand-ivory/50 font-sans">
-                        No heirloom sarees match your current filter.
+                        No products match your search or filter.
                       </td>
                     </tr>
                   )}
