@@ -8,6 +8,7 @@ import { ProfileDashboard } from '@/components/profile/ProfileDashboard';
 import { HomepageView } from '@/components/home/HomepageView';
 import { CatalogView } from '@/components/catalog/CatalogView';
 import { ProductDetailsView } from '@/components/product/ProductDetailsView';
+import { ShoppingBagView } from '@/components/cart/ShoppingBagView';
 
 // Placeholder / interim components until tasks 2-7 complete their views
 const HomePlaceholder: React.FC = () => (
@@ -50,7 +51,7 @@ export const routeDefinitions: RouteObject[] = [
       { path: 'catalog', element: <CatalogView /> },
       { path: 'collections/:category', element: <CatalogView /> },
       { path: 'products/:id', element: <ProductDetailsView /> },
-      { path: 'cart', element: <CartPlaceholder /> },
+      { path: 'cart', element: <ShoppingBagView /> },
       { path: 'contact', element: <ContactPage onBackToStore={() => window.history.back()} /> },
       { path: 'account/*', element: <ProfileDashboard onBackToStore={() => window.history.back()} /> },
       { path: 'admin/*', element: <AdminDashboard onBackToStore={() => window.history.back()} /> },
