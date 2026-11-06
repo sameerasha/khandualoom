@@ -21,33 +21,33 @@ export const HandloomSpecifications: React.FC<HandloomSpecificationsProps> = ({ 
   ];
 
   return (
-    <div className="py-6 border-t border-gray-200 space-y-4">
-      <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-        <ShieldCheck className="w-4 h-4 text-teal-600" />
+    <div className="py-6 border-t border-border space-y-4">
+      <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider flex items-center gap-2">
+        <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
         <span>Product Specifications</span>
       </h3>
 
       {/* Clean 2-Column Table */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white text-xs divide-y divide-gray-200 shadow-xs">
+      <div className="border border-border rounded-lg overflow-hidden bg-surface text-xs divide-y divide-border shadow-xs">
         {specs.map((item, idx) => (
           <div
             key={idx}
             className={`grid grid-cols-1 sm:grid-cols-12 py-2.5 px-4 transition-colors ${
-              idx % 2 === 0 ? 'bg-gray-50/70' : 'bg-white'
+              idx % 2 === 0 ? 'bg-background-secondary' : 'bg-surface'
             }`}
           >
-            <span className="sm:col-span-4 font-semibold text-gray-600">{item.label}</span>
-            <span className="sm:col-span-8 text-gray-900 font-medium">{item.value}</span>
+            <span className="sm:col-span-4 font-semibold text-text-secondary">{item.label}</span>
+            <span className="sm:col-span-8 text-text-primary font-medium">{item.value}</span>
           </div>
         ))}
       </div>
 
       {/* Handcrafted Note */}
-      <div className="p-3.5 rounded-lg bg-amber-50/60 border border-amber-200 flex gap-2.5 text-xs text-amber-900 mt-3">
-        <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+      <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/30 flex gap-2.5 text-xs text-amber-900 dark:text-amber-200 mt-3">
+        <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
         <div>
-          <p className="font-semibold text-amber-950">Handloom Note</p>
-          <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+          <p className="font-semibold text-amber-950 dark:text-amber-100">Handloom Note</p>
+          <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
             Every saree is handwoven by traditional artisan families on wooden pit looms. Minor variations in texture and yarn are natural characteristics of authentic handwoven textiles.
           </p>
         </div>

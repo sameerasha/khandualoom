@@ -60,26 +60,26 @@ export const ProductDetailsView: React.FC = () => {
     .slice(0, 4);
 
   return (
-    <div className="bg-white min-h-screen text-gray-900 pb-20 md:pb-12">
+    <div className="bg-background min-h-screen text-text-primary pb-20 md:pb-12 transition-colors">
       <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Breadcrumb & Back Navigation */}
-        <div className="flex items-center justify-between mb-6 text-xs text-gray-500">
+        <div className="flex items-center justify-between mb-6 text-xs text-text-muted">
           <div className="flex items-center gap-2 flex-wrap">
-            <Link to="/" className="hover:text-rose-900 transition-colors">Home</Link>
+            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
             <span>/</span>
-            <Link to="/catalog" className="hover:text-rose-900 transition-colors">Sarees</Link>
+            <Link to="/catalog" className="hover:text-primary transition-colors">Sarees</Link>
             <span>/</span>
-            <Link to={`/collections/${encodeURIComponent(product.category)}`} className="hover:text-rose-900 transition-colors">
+            <Link to={`/collections/${encodeURIComponent(product.category)}`} className="hover:text-primary transition-colors">
               {product.category}
             </Link>
             <span>/</span>
-            <span className="text-gray-900 font-medium truncate max-w-xs">{product.name}</span>
+            <span className="text-text-primary font-medium truncate max-w-xs">{product.name}</span>
           </div>
 
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-gray-700 hover:text-rose-900 transition-colors cursor-pointer font-medium"
+            className="flex items-center gap-1 text-text-secondary hover:text-primary transition-colors cursor-pointer font-medium"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back</span>
@@ -97,12 +97,12 @@ export const ProductDetailsView: React.FC = () => {
           <div className="lg:col-span-6 space-y-6">
             <div>
               {/* Artisan Society & Brand */}
-              <p className="text-xs font-bold uppercase tracking-wider text-teal-700 mb-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-accent mb-1">
                 {product.artisanSociety || `${product.weave || 'Heritage'} Weavers Cooperative`}
               </p>
 
               {/* Saree Full Title */}
-              <h1 className="font-serif text-2xl sm:text-3xl font-bold text-gray-900 leading-snug">
+              <h1 className="font-serif text-2xl sm:text-3xl font-bold text-text-primary leading-snug">
                 {product.name}
               </h1>
 
@@ -111,14 +111,14 @@ export const ProductDetailsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={scrollToReviews}
-                  className="mt-2.5 inline-flex items-center gap-2 border border-gray-200 px-3 py-1 rounded bg-gray-50 text-xs text-gray-800 hover:border-gray-300 transition-colors cursor-pointer"
+                  className="mt-2.5 inline-flex items-center gap-2 border border-border px-3 py-1 rounded-md bg-surface text-xs text-text-primary hover:border-border-strong transition-colors cursor-pointer"
                 >
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-text-primary">
                     {product.rating ? product.rating.toFixed(1) : '4.8'}
                   </span>
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <span className="text-gray-300">|</span>
-                  <span className="text-gray-600 font-normal">
+                  <span className="text-border">|</span>
+                  <span className="text-text-muted font-normal">
                     {product.reviews || 84} Ratings & Reviews
                   </span>
                 </button>
@@ -126,31 +126,31 @@ export const ProductDetailsView: React.FC = () => {
             </div>
 
             {/* Pricing Box */}
-            <div className="p-4 rounded-xl bg-gray-50 border border-gray-200">
+            <div className="p-4 rounded-xl bg-background-secondary border border-border">
               <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-extrabold text-gray-900">
+                <span className="text-3xl font-extrabold text-text-primary">
                   ₹{product.price.toLocaleString()}
                 </span>
 
                 {product.originalPrice && product.originalPrice > product.price && (
                   <>
-                    <span className="text-sm text-gray-400 line-through">
+                    <span className="text-sm text-text-muted line-through">
                       MRP ₹{product.originalPrice.toLocaleString()}
                     </span>
-                    <span className="text-sm font-bold text-rose-700">
+                    <span className="text-sm font-bold text-rose-600 dark:text-rose-400">
                       ({discountPercent}% OFF)
                     </span>
                   </>
                 )}
               </div>
-              <p className="text-xs text-emerald-700 font-semibold tracking-wide mt-1">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold tracking-wide mt-1">
                 inclusive of all taxes
               </p>
             </div>
 
             {/* Saree Size & Blouse Variant Selector */}
             <div className="space-y-2">
-              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
+              <span className="text-xs font-bold text-text-secondary uppercase tracking-wider block">
                 Length & Blouse
               </span>
               <div className="flex gap-2">
@@ -159,8 +159,8 @@ export const ProductDetailsView: React.FC = () => {
                   onClick={() => setSelectedVariant('standard')}
                   className={`px-3.5 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                     selectedVariant === 'standard'
-                      ? 'border-rose-900 bg-rose-50 text-rose-900 shadow-xs'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                      ? 'border-primary bg-primary/10 text-primary shadow-xs'
+                      : 'border-border bg-surface text-text-primary hover:border-border-strong'
                   }`}
                 >
                   Standard (5.5m Saree + 0.8m Blouse Piece)
@@ -170,26 +170,26 @@ export const ProductDetailsView: React.FC = () => {
 
             {/* Quantity Selector */}
             <div className="space-y-2">
-              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
+              <span className="text-xs font-bold text-text-secondary uppercase tracking-wider block">
                 Quantity
               </span>
-              <div className="inline-flex items-center border border-gray-300 rounded-lg bg-white">
+              <div className="inline-flex items-center border border-border rounded-lg bg-surface">
                 <button
                   type="button"
                   disabled={quantity <= 1}
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="px-3 py-2 text-gray-600 hover:text-black disabled:opacity-40 transition-colors cursor-pointer"
+                  className="px-3 py-2 text-text-secondary hover:text-text-primary disabled:opacity-40 transition-colors cursor-pointer"
                 >
                   <Minus className="w-3.5 h-3.5" />
                 </button>
-                <span className="px-4 py-2 text-xs font-bold font-mono text-gray-900">
+                <span className="px-4 py-2 text-xs font-bold font-mono text-text-primary">
                   {quantity}
                 </span>
                 <button
                   type="button"
                   disabled={quantity >= 5}
                   onClick={() => setQuantity((q) => Math.min(5, q + 1))}
-                  className="px-3 py-2 text-gray-600 hover:text-black disabled:opacity-40 transition-colors cursor-pointer"
+                  className="px-3 py-2 text-text-secondary hover:text-text-primary disabled:opacity-40 transition-colors cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </button>
@@ -198,14 +198,14 @@ export const ProductDetailsView: React.FC = () => {
 
             {/* Stock Status Badge */}
             {product.stock && product.stock <= 2 ? (
-              <div className="px-4 py-2 rounded-lg bg-amber-50 border border-amber-300 flex items-center gap-2 text-xs text-amber-800 font-medium">
-                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+              <div className="px-4 py-2 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 font-medium">
+                <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>
                   <strong>Only {product.stock} left in stock!</strong> Order soon before it sells out.
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
                 <span>In Stock • Ready to Dispatch in 24 Hours</span>
               </div>
@@ -216,7 +216,7 @@ export const ProductDetailsView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="w-full py-4 rounded-lg bg-rose-900 hover:bg-rose-800 text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-4 rounded-lg bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 {addedNotice ? (
                   <>
@@ -237,11 +237,11 @@ export const ProductDetailsView: React.FC = () => {
                   onClick={handleWishlist}
                   className={`w-full py-4 rounded-lg font-bold text-xs uppercase tracking-wider border transition-colors flex items-center justify-center gap-2 cursor-pointer ${
                     isWishlisted
-                      ? 'bg-rose-50 border-rose-400 text-rose-800'
-                      : 'bg-white border-gray-300 text-gray-800 hover:bg-gray-50'
+                      ? 'bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400'
+                      : 'bg-surface border-border text-text-primary hover:bg-background-secondary'
                   }`}
                 >
-                  <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-700 text-rose-700' : ''}`} />
+                  <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
                   <span>{isWishlisted ? 'IN WISHLIST' : 'WISHLIST'}</span>
                 </button>
               )}
@@ -252,13 +252,13 @@ export const ProductDetailsView: React.FC = () => {
 
             {/* Bank Discounts & Offers Box */}
             {features.bankDiscounts && (
-              <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs space-y-2">
-                <div className="flex items-center gap-1.5 font-bold uppercase text-gray-900 text-[11px]">
-                  <Tag className="w-3.5 h-3.5 text-teal-700" />
+              <div className="p-4 rounded-xl bg-background-secondary border border-border text-xs space-y-2">
+                <div className="flex items-center gap-1.5 font-bold uppercase text-text-primary text-[11px]">
+                  <Tag className="w-3.5 h-3.5 text-accent" />
                   <span>Special Offers & Discounts</span>
                 </div>
-                <ul className="space-y-1.5 text-gray-600 text-[11px] list-disc list-inside">
-                  <li>Flat ₹500 OFF with coupon code <strong className="text-rose-900">KHANDUA500</strong></li>
+                <ul className="space-y-1.5 text-text-secondary text-[11px] list-disc list-inside">
+                  <li>Flat ₹500 OFF with coupon code <strong className="text-primary font-bold">KHANDUA500</strong></li>
                   <li>10% Instant Discount on HDFC & ICICI Bank Cards</li>
                   <li>Free Silk Mark Authentication Certificate included with every order</li>
                 </ul>
@@ -267,10 +267,10 @@ export const ProductDetailsView: React.FC = () => {
 
             {/* Product Description */}
             <div className="space-y-2 pt-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-800">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-text-primary">
                 Product Description
               </h3>
-              <p className="text-xs text-gray-600 leading-relaxed font-normal">
+              <p className="text-xs text-text-secondary leading-relaxed font-normal">
                 {product.description ||
                   `This authentic ${product.category} handloom saree is woven with traditional precision in Odisha. Featuring traditional border motifs, pure silk texture, and artisanal craftsmanship passed down through generations. Perfect for weddings, ceremonies, and festive occasions.`}
               </p>
@@ -290,12 +290,12 @@ export const ProductDetailsView: React.FC = () => {
 
         {/* Similar Products Recommendation Section */}
         {relatedSarees.length > 0 && (
-          <section className="mt-16 pt-10 border-t border-gray-200">
+          <section className="mt-16 pt-10 border-t border-border">
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+              <h3 className="text-xl font-bold text-text-primary tracking-tight">
                 You May Also Like
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-text-muted mt-0.5">
                 Similar traditional sarees from our handloom collection
               </p>
             </div>
@@ -313,18 +313,18 @@ export const ProductDetailsView: React.FC = () => {
       </div>
 
       {/* Mobile Sticky Add to Bag Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white p-3 border-t border-gray-200 md:hidden flex items-center gap-3 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-surface p-3 border-t border-border md:hidden flex items-center gap-3 shadow-lg">
         <button
           type="button"
           onClick={handleWishlist}
-          className="p-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+          className="p-3 rounded-lg border border-border text-text-primary hover:bg-background-secondary"
         >
-          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-700 text-rose-700' : ''}`} />
+          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
         </button>
         <button
           type="button"
           onClick={handleAddToCart}
-          className="flex-1 py-3 px-4 rounded-lg bg-rose-900 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm"
+          className="flex-1 py-3 px-4 rounded-lg bg-primary text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs"
         >
           <ShoppingBag className="w-4 h-4" />
           <span>{addedNotice ? 'ADDED!' : 'ADD TO BAG'}</span>

@@ -32,10 +32,10 @@ export const CatalogProductCard: React.FC<CatalogProductCardProps> = ({ product 
   return (
     <div
       onClick={handleCardClick}
-      className="group relative bg-white rounded-2xl border border-gray-200/90 overflow-hidden hover:border-brand-gold hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col"
+      className="group relative bg-surface text-text-primary rounded-2xl border border-border overflow-hidden hover:border-accent hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col"
     >
       {/* Saree Image Showcase */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
+      <div className="relative aspect-[3/4] overflow-hidden bg-background-secondary">
         <img
           src={product.image}
           alt={product.name}
@@ -44,11 +44,11 @@ export const CatalogProductCard: React.FC<CatalogProductCardProps> = ({ product 
         />
 
         {/* Rating Badge Overlay in Bottom-Left Corner */}
-        <div className="absolute bottom-2.5 left-2.5 bg-white/95 backdrop-blur-md px-2 py-1 rounded-md flex items-center gap-1.5 text-xs font-semibold text-gray-900 border border-gray-200 shadow-sm">
+        <div className="absolute bottom-2.5 left-2.5 bg-surface/90 backdrop-blur-md px-2 py-1 rounded-md flex items-center gap-1.5 text-xs font-semibold text-text-primary border border-border shadow-xs">
           <span>{product.rating ? product.rating.toFixed(1) : '4.8'}</span>
           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-600">{product.reviews || 24}</span>
+          <span className="text-border">|</span>
+          <span className="text-text-muted">{product.reviews || 24}</span>
         </div>
 
         {/* Quick Wishlist Action */}
@@ -56,18 +56,18 @@ export const CatalogProductCard: React.FC<CatalogProductCardProps> = ({ product 
           type="button"
           onClick={handleWishlistClick}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition-all cursor-pointer shadow-sm ${
+          className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition-all cursor-pointer shadow-xs ${
             isWishlisted
-              ? 'bg-rose-50 text-rose-600 border border-rose-200'
-              : 'bg-white/80 text-gray-600 hover:text-rose-600 hover:bg-white'
+              ? 'bg-rose-500/20 text-rose-500 border border-rose-500/30'
+              : 'bg-surface/80 text-text-muted hover:text-rose-500 hover:bg-surface'
           }`}
         >
-          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-600 text-rose-600' : ''}`} />
+          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
         </button>
 
         {/* GI Tag Badge if present */}
         {product.isGiTagged && (
-          <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow-sm">
+          <div className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow-xs">
             GI Tagged
           </div>
         )}
@@ -77,27 +77,27 @@ export const CatalogProductCard: React.FC<CatalogProductCardProps> = ({ product 
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
           {/* Artisan Society / Brand attribution */}
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700 truncate">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-accent truncate">
             {product.artisanSociety || `${product.weave || 'Traditional'} Weavers`}
           </p>
 
           {/* Saree Title */}
-          <h3 className="font-serif text-sm font-semibold text-gray-900 group-hover:text-brand-purple transition-colors line-clamp-1 mt-0.5">
+          <h3 className="font-serif text-sm font-semibold text-text-primary group-hover:text-primary transition-colors line-clamp-1 mt-0.5">
             {product.name}
           </h3>
 
           {/* Pricing Row */}
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-base font-bold text-gray-900">
+            <span className="text-base font-bold text-text-primary">
               ₹{product.price.toLocaleString()}
             </span>
 
             {product.originalPrice && product.originalPrice > product.price && (
               <>
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-xs text-text-muted line-through">
                   ₹{product.originalPrice.toLocaleString()}
                 </span>
-                <span className="text-xs font-bold text-rose-600">
+                <span className="text-xs font-bold text-rose-600 dark:text-rose-400">
                   ({discountPercent}% OFF)
                 </span>
               </>
@@ -106,17 +106,17 @@ export const CatalogProductCard: React.FC<CatalogProductCardProps> = ({ product 
         </div>
 
         {/* Stock status indicator */}
-        <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between text-[11px]">
+        <div className="mt-2.5 pt-2 border-t border-border flex items-center justify-between text-[11px]">
           {product.stock && product.stock <= 2 ? (
-            <span className="text-amber-700 font-semibold tracking-wide flex items-center gap-1">
+            <span className="text-amber-600 dark:text-amber-400 font-semibold tracking-wide flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block" />
               Only {product.stock} Left!
             </span>
           ) : (
-            <span className="text-emerald-700 font-medium">In Stock</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">In Stock</span>
           )}
 
-          <span className="text-gray-500">{product.fabric || 'Pure Silk'}</span>
+          <span className="text-text-muted">{product.fabric || 'Pure Silk'}</span>
         </div>
       </div>
     </div>

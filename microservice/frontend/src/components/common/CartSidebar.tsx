@@ -36,107 +36,112 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={() => dispatch(setCartOpen(false))}
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-brand-purple-dark border-l border-brand-gold/30 text-brand-ivory flex flex-col shadow-2xl">
+        <div className="w-screen max-w-md bg-surface border-l border-border text-text-primary flex flex-col shadow-2xl">
           {/* Header */}
-          <div className="p-6 border-b border-brand-gold/20 flex items-center justify-between">
+          <div className="p-6 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-brand-gold" />
-              <h2 className="font-serif text-xl font-bold text-brand-ivory">
+              <ShoppingBag className="w-5 h-5 text-accent" />
+              <h2 className="font-serif text-xl font-bold text-text-primary">
                 Your Bag ({items.reduce((acc, i) => acc + i.quantity, 0)})
               </h2>
             </div>
             <button
               onClick={() => dispatch(setCartOpen(false))}
-              className="p-1 rounded-full text-brand-gold hover:text-white hover:bg-white/10"
+              className="p-1 rounded-full text-text-muted hover:text-text-primary hover:bg-background-secondary transition-colors"
               aria-label="Close cart"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Cart Item List */}
+          {/* Cart Items List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {items.length === 0 ? (
               <div className="text-center py-16 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-brand-purple/60 border border-brand-gold/20 flex items-center justify-center mx-auto text-brand-gold">
+                <div className="w-16 h-16 rounded-full bg-background-secondary border border-border flex items-center justify-center mx-auto text-text-muted">
                   <ShoppingBag className="w-8 h-8 opacity-60" />
                 </div>
-                <p className="font-serif text-lg text-brand-ivory">Your bag is empty</p>
-                <p className="text-xs text-brand-ivory/60 max-w-xs mx-auto">
-                  Browse our handloom collection and drape yourself in pure silk luxury.
+                <p className="font-serif text-lg text-text-primary">Your Bag is Empty</p>
+                <p className="text-xs text-text-muted max-w-xs mx-auto">
+                  Explore our authentic handwoven sarees made by skilled weavers of Odisha.
                 </p>
                 <button
                   onClick={() => dispatch(setCartOpen(false))}
-                  className="mt-4 px-6 py-2.5 rounded-full bg-brand-gold text-brand-purple-dark text-xs font-bold hover:brightness-110"
+                  className="mt-4 px-6 py-2.5 rounded-full bg-primary hover:bg-primary-hover text-white text-xs font-bold shadow-md transition-all cursor-pointer"
                 >
                   Start Shopping
                 </button>
               </div>
             ) : (
-              items.map(({ product, quantity }) => (
+              items.map((item) => (
                 <div
-                  key={product.id}
-                  className="flex gap-4 p-3 rounded-xl bg-brand-purple/40 border border-brand-gold/15"
+                  key={item.product.id}
+                  className="flex gap-4 p-3.5 rounded-2xl bg-background-secondary border border-border hover:border-accent transition-all group"
                 >
                   <img
-                    src={product.image || '/images/saree_crimson_red.png'}
-                    alt={product.name}
-                    className="w-20 h-24 object-cover rounded-lg border border-brand-gold/20"
+                    src={item.product.image || '/images/products/p1/front.jpg'}
+                    alt={item.product.name}
+                    className="w-20 h-24 object-cover rounded-xl border border-border bg-surface shrink-0"
                   />
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-serif font-bold text-sm text-brand-ivory line-clamp-1">
-                          {product.name}
-                        </h4>
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="font-serif text-sm font-semibold text-text-primary line-clamp-1">
+                          {item.product.name}
+                        </h3>
                         <button
-                          onClick={() => dispatch(removeFromCart(product.id))}
-                          className="text-brand-ivory/40 hover:text-brand-crimson p-1"
-                          aria-label="Remove item"
+                          onClick={() => dispatch(removeFromCart(item.product.id))}
+                          className="text-text-muted hover:text-red-500 transition-colors p-1"
+                          title="Remove item"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="text-xs text-brand-gold-light/70">{product.fabric}</p>
+                      <p className="text-xs text-text-muted mt-0.5">
+                        ₹{item.product.price.toLocaleString()}
+                      </p>
                     </div>
 
                     <div className="flex justify-between items-center mt-2">
-                      <div className="flex items-center gap-2 border border-brand-gold/30 rounded-lg px-2 py-0.5 bg-brand-purple-dark/80">
+                      <div className="flex items-center gap-2 border border-border rounded-lg bg-surface px-2 py-0.5">
                         <button
                           onClick={() =>
                             dispatch(
                               updateQuantity({
-                                productId: product.id,
-                                quantity: quantity - 1,
+                                productId: item.product.id,
+                                quantity: Math.max(1, item.quantity - 1),
                               })
                             )
                           }
-                          className="text-brand-gold hover:text-white p-0.5"
+                          className="text-text-secondary hover:text-text-primary disabled:opacity-30"
+                          disabled={item.quantity <= 1}
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-xs font-bold px-1">{quantity}</span>
+                        <span className="text-xs font-mono font-bold text-text-primary px-1">
+                          {item.quantity}
+                        </span>
                         <button
                           onClick={() =>
                             dispatch(
                               updateQuantity({
-                                productId: product.id,
-                                quantity: quantity + 1,
+                                productId: item.product.id,
+                                quantity: item.quantity + 1,
                               })
                             )
                           }
-                          className="text-brand-gold hover:text-white p-0.5"
+                          className="text-text-secondary hover:text-text-primary"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
-                      <span className="font-serif font-bold text-sm text-brand-gold">
-                        ₹{(product.price * quantity).toLocaleString('en-IN')}
+                      <span className="font-serif font-bold text-sm text-text-primary">
+                        ₹{(item.product.price * item.quantity).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -145,36 +150,46 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
             )}
           </div>
 
-          {/* Footer Order Summary */}
+          {/* Footer & Authoritative Total */}
           {items.length > 0 && (
-            <div className="p-6 border-t border-brand-gold/20 bg-brand-purple/20 space-y-3">
-              <div className="flex justify-between text-xs text-brand-ivory/80">
-                <span>Subtotal</span>
-                <span>₹{subtotal.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between text-xs text-brand-ivory/80">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? <span className="text-emerald-400 font-bold">FREE</span> : `₹${shipping}`}</span>
-              </div>
-              <div className="flex justify-between text-sm font-bold text-brand-gold border-t border-brand-gold/15 pt-2">
-                <span>Total Amount</span>
-                <span className="font-serif text-lg">₹{total.toLocaleString('en-IN')}</span>
+            <div className="p-6 border-t border-border bg-surface space-y-4">
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-text-secondary">
+                  <span>Subtotal</span>
+                  <span className="font-mono">₹{subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-text-secondary">
+                  <span>Delivery</span>
+                  <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold text-text-primary pt-2 border-t border-border">
+                  <span>Total</span>
+                  <span className="font-mono text-base text-text-primary">
+                    ₹{total.toLocaleString()}
+                  </span>
+                </div>
               </div>
 
-              <button
-                onClick={handleCheckoutClick}
-                className="w-full mt-3 bg-gradient-to-r from-brand-gold to-brand-gold-dark text-brand-purple-dark font-serif font-bold py-3.5 rounded-full flex items-center justify-center gap-2 hover:brightness-110 shadow-lg text-sm"
-              >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => dispatch(clearCart())}
+                  className="px-3 py-3 rounded-xl border border-border text-text-muted hover:text-red-500 text-xs font-bold transition-all"
+                  title="Clear all bag items"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleCheckoutClick}
+                  className="flex-1 py-3.5 px-6 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-widest shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>Proceed to Checkout</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
 
-              <button
-                onClick={() => dispatch(clearCart())}
-                className="w-full text-center text-xs text-brand-ivory/40 hover:text-brand-ivory/80 pt-1"
-              >
-                Clear Bag
-              </button>
+              <p className="text-[10px] text-center text-text-muted">
+                100% Genuine Handwoven Sarees • Free Insured Delivery
+              </p>
             </div>
           )}
         </div>

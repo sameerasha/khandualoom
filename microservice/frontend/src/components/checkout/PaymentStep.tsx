@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { clearCart } from '@/features/cart/cartSlice';
 import { useCreateOrderMutation } from '@/features/orders/ordersApi';
 import { CartTotals } from '@/features/cart/cartCalculations';
-import { CreditCard, QrCode, Banknote, ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
+import { CreditCard, QrCode, Banknote, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 interface PaymentStepProps {
   totals: CartTotals;
@@ -59,19 +59,15 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
         idempotencyKey,
       }).unwrap();
 
-      const orderId = response.id || Math.floor(100000 + Math.random() * 900000);
-
       // Clear shopping bag after successful placement
       dispatch(clearCart());
-      onSuccess(orderId);
-      navigate(`/checkout/success/${orderId}`);
+      onSuccess(response.id || 1001);
+      navigate(`/account/orders`);
     } catch (err: any) {
-      console.error('Order placement failed:', err);
-      // Even if mock fallback, generate simulated order id for continuity
-      const fallbackOrderId = Math.floor(100000 + Math.random() * 900000);
+      console.error('Order creation failed:', err);
+      // Fallback optimistic redirection for demonstration / offline environments
       dispatch(clearCart());
-      onSuccess(fallbackOrderId);
-      navigate(`/checkout/success/${fallbackOrderId}`);
+      navigate(`/account/orders`);
     } finally {
       setIsSubmitting(false);
     }
@@ -79,20 +75,24 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
 
   return (
     <div className="space-y-6">
-      <h2 className="text-base font-bold text-gray-900 tracking-wide flex items-center gap-2 uppercase">
-        <Lock className="w-4 h-4 text-teal-600" />
-        <span>Select Payment Mode</span>
-      </h2>
+      <div className="pb-3 border-b border-border">
+        <h2 className="text-base font-bold text-text-primary uppercase tracking-wide">
+          Payment Method
+        </h2>
+        <p className="text-xs text-text-muted mt-0.5">
+          Choose your preferred secure payment method
+        </p>
+      </div>
 
-      {/* Payment Options Grid */}
+      {/* Payment Options Stack */}
       <div className="space-y-3">
-        {/* UPI / QR Code */}
+        {/* UPI Option */}
         <label
           onClick={() => setPaymentMethod('RAZORPAY_UPI')}
           className={`p-4 rounded-lg border flex items-center justify-between cursor-pointer transition-all ${
             paymentMethod === 'RAZORPAY_UPI'
-              ? 'bg-teal-50/50 border-teal-600 shadow-xs'
-              : 'bg-white border-gray-200 hover:border-gray-300'
+              ? 'bg-teal-500/10 border-teal-600 dark:border-teal-400 shadow-xs'
+              : 'bg-surface border-border hover:border-border-strong'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -103,24 +103,24 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
               onChange={() => setPaymentMethod('RAZORPAY_UPI')}
               className="w-4 h-4 accent-teal-600 cursor-pointer"
             />
-            <QrCode className="w-5 h-5 text-teal-700" />
+            <QrCode className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             <div>
-              <p className="font-bold text-sm text-gray-900">UPI / QR Code</p>
-              <p className="text-xs text-gray-500">Google Pay, PhonePe, Paytm, BHIM</p>
+              <p className="font-bold text-sm text-text-primary">UPI (Google Pay, PhonePe, Paytm)</p>
+              <p className="text-xs text-text-muted">Instant payment through any UPI app</p>
             </div>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-100/60 border border-teal-200 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded">
             Fastest
           </span>
         </label>
 
-        {/* Credit & Debit Cards */}
+        {/* Credit / Debit Card */}
         <label
           onClick={() => setPaymentMethod('RAZORPAY_CARD')}
           className={`p-4 rounded-lg border flex items-center justify-between cursor-pointer transition-all ${
             paymentMethod === 'RAZORPAY_CARD'
-              ? 'bg-teal-50/50 border-teal-600 shadow-xs'
-              : 'bg-white border-gray-200 hover:border-gray-300'
+              ? 'bg-teal-500/10 border-teal-600 dark:border-teal-400 shadow-xs'
+              : 'bg-surface border-border hover:border-border-strong'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -131,13 +131,13 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
               onChange={() => setPaymentMethod('RAZORPAY_CARD')}
               className="w-4 h-4 accent-teal-600 cursor-pointer"
             />
-            <CreditCard className="w-5 h-5 text-teal-700" />
+            <CreditCard className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             <div>
-              <p className="font-bold text-sm text-gray-900">Credit / Debit Card</p>
-              <p className="text-xs text-gray-500">Visa, MasterCard, RuPay, American Express</p>
+              <p className="font-bold text-sm text-text-primary">Credit / Debit Card</p>
+              <p className="text-xs text-text-muted">Visa, MasterCard, RuPay, American Express</p>
             </div>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-700 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary bg-background-secondary border border-border px-2 py-0.5 rounded">
             All Banks
           </span>
         </label>
@@ -147,8 +147,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
           onClick={() => setPaymentMethod('COD')}
           className={`p-4 rounded-lg border flex items-center justify-between cursor-pointer transition-all ${
             paymentMethod === 'COD'
-              ? 'bg-teal-50/50 border-teal-600 shadow-xs'
-              : 'bg-white border-gray-200 hover:border-gray-300'
+              ? 'bg-teal-500/10 border-teal-600 dark:border-teal-400 shadow-xs'
+              : 'bg-surface border-border hover:border-border-strong'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -159,17 +159,17 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
               onChange={() => setPaymentMethod('COD')}
               className="w-4 h-4 accent-teal-600 cursor-pointer"
             />
-            <Banknote className="w-5 h-5 text-teal-700" />
+            <Banknote className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             <div>
-              <p className="font-bold text-sm text-gray-900">Cash on Delivery (COD)</p>
-              <p className="text-xs text-gray-500">Pay cash upon verified doorstep delivery</p>
+              <p className="font-bold text-sm text-text-primary">Cash on Delivery (COD)</p>
+              <p className="text-xs text-text-muted">Pay cash upon verified doorstep delivery</p>
             </div>
           </div>
         </label>
       </div>
 
       {errorMessage && (
-        <p className="text-xs text-rose-600 font-medium">{errorMessage}</p>
+        <p className="text-xs text-rose-500 font-medium">{errorMessage}</p>
       )}
 
       {/* Primary Pay Action Button */}
@@ -178,7 +178,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
           type="button"
           disabled={isSubmitting}
           onClick={handlePlaceOrder}
-          className="w-full py-4 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
+          className="w-full py-4 rounded-lg bg-primary hover:bg-primary-hover text-white font-bold text-sm uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
         >
           <ShieldCheck className="w-5 h-5" />
           <span>
@@ -189,8 +189,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({ totals, onSuccess }) =
         </button>
       </div>
 
-      <div className="flex items-center justify-center gap-2 text-xs text-gray-500 text-center">
-        <CheckCircle2 className="w-4 h-4 text-teal-600" />
+      <div className="flex items-center justify-center gap-2 text-xs text-text-muted text-center">
+        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
         <span>Safe and secure payments • 100% Authentic Handloom Guarantee</span>
       </div>
     </div>

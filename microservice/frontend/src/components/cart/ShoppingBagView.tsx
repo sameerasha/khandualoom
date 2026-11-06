@@ -57,18 +57,18 @@ export const ShoppingBagView: React.FC = () => {
   if (cartItems.length === 0) {
     return (
       <div className="py-20 px-4 max-w-7xl mx-auto text-center">
-        <div className="w-20 h-20 rounded-full bg-brand-gold/10 border border-brand-gold/25 flex items-center justify-center mx-auto mb-4 text-brand-gold">
+        <div className="w-20 h-20 rounded-full bg-surface border border-border flex items-center justify-center mx-auto mb-4 text-primary shadow-xs">
           <ShoppingBag className="w-10 h-10" />
         </div>
-        <h1 className="font-serif text-3xl font-bold text-brand-gold">
+        <h1 className="font-serif text-3xl font-bold text-text-primary">
           Your Shopping Bag is Empty
         </h1>
-        <p className="text-sm text-brand-ivory/60 max-w-md mx-auto mt-2 mb-8">
+        <p className="text-sm text-text-muted max-w-md mx-auto mt-2 mb-8">
           Shop our collection of handwoven sarees made by skilled weavers of Odisha.
         </p>
         <Link
           to="/catalog"
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-gold to-brand-gold-light text-brand-purple-dark font-bold text-xs uppercase tracking-widest shadow-xl hover:shadow-[0_0_20px_rgba(197,160,89,0.5)] transition-all"
+          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-widest shadow-md transition-all"
         >
           <span>Start Shopping</span>
           <ArrowRight className="w-4 h-4" />
@@ -80,16 +80,16 @@ export const ShoppingBagView: React.FC = () => {
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Page Title */}
-      <div className="mb-6 flex items-baseline justify-between border-b border-brand-gold/15 pb-4">
+      <div className="mb-6 flex items-baseline justify-between border-b border-border pb-4">
         <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brand-gold">
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-text-primary">
             Shopping Bag
           </h1>
-          <p className="text-xs text-brand-ivory/60 mt-0.5">
+          <p className="text-xs text-text-muted mt-0.5">
             Authentic Handwoven Sarees • Free Insured Delivery
           </p>
         </div>
-        <span className="text-xs font-semibold text-brand-gold-light">
+        <span className="text-xs font-semibold text-text-muted">
           {cartItems.length} {cartItems.length === 1 ? 'Item' : 'Items'}
         </span>
       </div>
@@ -97,16 +97,16 @@ export const ShoppingBagView: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Selection Bar & Items List (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          {/* Bulk Selection Header matching Screenshot 4 */}
-          <div className="p-3.5 rounded-xl bg-[#170928] border border-brand-gold/20 flex items-center justify-between text-xs font-medium">
+          {/* Bulk Selection Header */}
+          <div className="p-3.5 rounded-xl bg-surface border border-border flex items-center justify-between text-xs font-medium shadow-xs">
             <label className="flex items-center gap-2.5 cursor-pointer">
               <input
                 type="checkbox"
                 checked={allSelected}
                 onChange={handleSelectAll}
-                className="w-4 h-4 accent-brand-gold rounded cursor-pointer"
+                className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
               />
-              <span className="text-brand-ivory font-bold uppercase tracking-wider">
+              <span className="text-text-primary font-bold uppercase tracking-wider">
                 {selectedIds.length}/{cartItems.length} ITEMS SELECTED
               </span>
             </label>
@@ -116,14 +116,14 @@ export const ShoppingBagView: React.FC = () => {
                 type="button"
                 onClick={handleRemoveSelected}
                 disabled={selectedIds.length === 0}
-                className="font-bold text-brand-ivory/70 hover:text-red-400 uppercase tracking-wider disabled:opacity-40 cursor-pointer"
+                className="font-bold text-text-muted hover:text-red-500 uppercase tracking-wider disabled:opacity-40 cursor-pointer"
               >
                 REMOVE
               </button>
               <button
                 type="button"
                 onClick={() => dispatch(clearCart())}
-                className="font-bold text-brand-ivory/50 hover:text-red-400 uppercase tracking-wider cursor-pointer"
+                className="font-bold text-text-muted hover:text-red-500 uppercase tracking-wider cursor-pointer"
               >
                 CLEAR ALL
               </button>

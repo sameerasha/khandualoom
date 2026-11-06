@@ -45,17 +45,17 @@ export const AuthoritativePriceSummary: React.FC<AuthoritativePriceSummaryProps>
 
   return (
     <div className="space-y-6">
-      {/* Coupons Section matching Screenshot 4 */}
+      {/* Coupons Section */}
       {features.coupons && (
-        <div className="p-4 rounded-xl bg-[#170928] border border-brand-gold/20">
-          <div className="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-brand-gold">
+        <div className="p-4 rounded-xl bg-surface border border-border shadow-xs">
+          <div className="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-accent">
             <Tag className="w-4 h-4" />
             <span>APPLY PROMO COUPON</span>
           </div>
 
           {appliedCoupon ? (
-            <div className="flex items-center justify-between p-2.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-xs">
-              <div className="flex items-center gap-2 text-emerald-300 font-medium">
+            <div className="flex items-center justify-between p-2.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-xs">
+              <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-medium">
                 <Check className="w-4 h-4" />
                 <span>
                   Code <strong>{appliedCoupon.code}</strong> applied (-₹{totals.couponDiscount})
@@ -64,7 +64,7 @@ export const AuthoritativePriceSummary: React.FC<AuthoritativePriceSummaryProps>
               <button
                 type="button"
                 onClick={() => dispatch(removeCoupon())}
-                className="text-[11px] font-bold text-red-400 hover:text-red-300 uppercase cursor-pointer"
+                className="text-[11px] font-bold text-red-500 hover:text-red-400 uppercase cursor-pointer"
               >
                 Remove
               </button>
@@ -76,11 +76,11 @@ export const AuthoritativePriceSummary: React.FC<AuthoritativePriceSummaryProps>
                 placeholder="Enter coupon code (e.g. KHANDUA500)"
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value)}
-                className="flex-1 bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory placeholder-brand-ivory/40 uppercase font-mono focus:outline-none focus:border-brand-gold"
+                className="flex-1 bg-input-background border border-input-border rounded px-3 py-2 text-xs text-text-primary placeholder-text-muted uppercase font-mono focus:outline-none focus:border-accent"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-brand-gold text-brand-purple-dark font-bold text-xs uppercase tracking-wider rounded hover:bg-brand-gold-light transition-colors cursor-pointer"
+                className="px-4 py-2 bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-wider rounded transition-colors cursor-pointer"
               >
                 Apply
               </button>
@@ -88,82 +88,82 @@ export const AuthoritativePriceSummary: React.FC<AuthoritativePriceSummaryProps>
           )}
 
           {couponError && (
-            <p className="text-[11px] text-rose-400 mt-2 font-medium">{couponError}</p>
+            <p className="text-[11px] text-rose-500 mt-2 font-medium">{couponError}</p>
           )}
         </div>
       )}
 
-      {/* PRICE DETAILS Breakdown Card matching Screenshot 4 */}
-      <div className="p-5 rounded-xl bg-[#170928] border border-brand-gold/20 text-xs space-y-3.5">
-        <h3 className="font-bold uppercase tracking-wider text-brand-gold text-xs border-b border-brand-gold/15 pb-2.5">
+      {/* PRICE DETAILS Breakdown Card */}
+      <div className="p-5 rounded-xl bg-surface border border-border text-xs space-y-3.5 shadow-xs">
+        <h3 className="font-bold uppercase tracking-wider text-text-primary text-xs border-b border-border pb-2.5">
           PRICE DETAILS ({totals.totalItems} {totals.totalItems === 1 ? 'Item' : 'Items'})
         </h3>
 
-        <div className="flex justify-between text-brand-ivory/80">
+        <div className="flex justify-between text-text-secondary">
           <span>Total MRP</span>
           <span>₹{totals.totalMrp.toLocaleString()}</span>
         </div>
 
-        <div className="flex justify-between text-brand-ivory/80">
+        <div className="flex justify-between text-text-secondary">
           <span>Discount on MRP</span>
-          <span className="text-emerald-400 font-semibold">
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
             - ₹{totals.discountOnMrp.toLocaleString()}
           </span>
         </div>
 
         {totals.couponDiscount > 0 && (
-          <div className="flex justify-between text-brand-ivory/80">
+          <div className="flex justify-between text-text-secondary">
             <span>Coupon Discount</span>
-            <span className="text-emerald-400 font-semibold">
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
               - ₹{totals.couponDiscount.toLocaleString()}
             </span>
           </div>
         )}
 
         {totals.donation > 0 && (
-          <div className="flex justify-between text-brand-ivory/80">
+          <div className="flex justify-between text-rose-600 dark:text-rose-400">
             <span>Weaver Welfare Contribution</span>
-            <span className="text-rose-300 font-semibold">+ ₹{totals.donation}</span>
+            <span>+ ₹{totals.donation}</span>
           </div>
         )}
 
-        <div className="flex justify-between text-brand-ivory/80">
+        <div className="flex justify-between text-text-secondary">
           <span>Delivery Fee</span>
-          {totals.deliveryFee === 0 ? (
-            <span className="text-emerald-400 font-bold uppercase tracking-wider text-[11px]">
-              FREE
-            </span>
-          ) : (
-            <span>₹{totals.deliveryFee}</span>
-          )}
+          <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
+            {totals.deliveryFee === 0 ? 'FREE' : `₹${totals.deliveryFee}`}
+          </span>
         </div>
 
-        {/* Divider & Total Amount */}
-        <div className="pt-3 border-t border-brand-gold/20 flex justify-between items-baseline">
-          <span className="font-bold text-sm text-brand-ivory">Total Amount</span>
-          <span className="font-extrabold text-lg text-brand-gold">
+        {/* Total Payable Row */}
+        <div className="pt-3 border-t border-border flex justify-between items-baseline font-bold text-sm">
+          <span className="text-text-primary">Total Amount</span>
+          <span className="text-lg font-mono text-text-primary">
             ₹{totals.totalPayable.toLocaleString()}
           </span>
         </div>
 
-        <p className="text-[10px] text-brand-ivory/50 leading-relaxed pt-1">
-          By placing your order, you agree to Khandua Looms's Authenticity Guarantee, Terms of Service, and Privacy Policy.
-        </p>
+        {/* Savings Callout */}
+        {totals.discountOnMrp + totals.couponDiscount > 0 && (
+          <div className="p-2.5 rounded bg-emerald-500/10 border border-emerald-500/25 text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold text-center">
+            You will save ₹{(totals.discountOnMrp + totals.couponDiscount).toLocaleString()} on this order!
+          </div>
+        )}
 
-        {/* Primary PLACE ORDER Action Button */}
+        {/* Place Order CTA */}
         <button
           type="button"
           disabled={totals.totalItems === 0}
           onClick={() => navigate('/checkout')}
-          className="w-full py-4 rounded-xl bg-gradient-to-r from-rose-600 via-rose-700 to-rose-800 hover:from-rose-500 hover:to-rose-700 text-white font-bold text-sm uppercase tracking-wider shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-rose-400/40"
+          className="w-full mt-2 py-4 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase tracking-widest shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <span>PLACE ORDER</span>
           <ArrowRight className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center justify-center gap-1.5 text-[11px] text-brand-ivory/60 pt-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Safe & Secure 256-Bit Encrypted Payments</span>
+        {/* Trust Badges */}
+        <div className="pt-2 flex items-center justify-center gap-2 text-[10px] text-text-muted">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>100% Genuine Handlooms • Encrypted Checkout</span>
         </div>
       </div>
     </div>
