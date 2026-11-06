@@ -1,7 +1,6 @@
 import featureReducer, {
   toggleFeature,
   setFeature,
-  setAllFeatures,
   resetFeatures,
   defaultFeatures,
 } from './featureSlice';

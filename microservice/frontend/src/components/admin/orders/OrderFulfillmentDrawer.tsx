@@ -2,13 +2,8 @@ import React, { useState } from 'react';
 import { Order } from '@/types';
 import {
   X,
-  Truck,
-  CheckCircle,
-  Clock,
   Printer,
-  ShieldCheck,
   Send,
-  RotateCcw,
 } from 'lucide-react';
 import { PrintableInvoiceModal } from './PrintableInvoiceModal';
 

@@ -19,6 +19,7 @@ export const AuthoritativePriceSummary: React.FC<AuthoritativePriceSummaryProps>
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const appliedCoupon = useAppSelector((state) => state.cart.appliedCoupon);
+  const features = useAppSelector((state) => state.features.features);
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
 
@@ -45,50 +46,52 @@ export const AuthoritativePriceSummary: React.FC<AuthoritativePriceSummaryProps>
   return (
     <div className="space-y-6">
       {/* Coupons Section matching Screenshot 4 */}
-      <div className="p-4 rounded-xl bg-[#170928] border border-brand-gold/20">
-        <div className="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-brand-gold">
-          <Tag className="w-4 h-4" />
-          <span>APPLY PROMO COUPON</span>
-        </div>
-
-        {appliedCoupon ? (
-          <div className="flex items-center justify-between p-2.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-xs">
-            <div className="flex items-center gap-2 text-emerald-300 font-medium">
-              <Check className="w-4 h-4" />
-              <span>
-                Code <strong>{appliedCoupon.code}</strong> applied (-₹{totals.couponDiscount})
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => dispatch(removeCoupon())}
-              className="text-[11px] font-bold text-red-400 hover:text-red-300 uppercase cursor-pointer"
-            >
-              Remove
-            </button>
+      {features.coupons && (
+        <div className="p-4 rounded-xl bg-[#170928] border border-brand-gold/20">
+          <div className="flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-wider text-brand-gold">
+            <Tag className="w-4 h-4" />
+            <span>APPLY PROMO COUPON</span>
           </div>
-        ) : (
-          <form onSubmit={handleApplyInput} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Enter coupon code (e.g. KHANDUA500)"
-              value={couponInput}
-              onChange={(e) => setCouponInput(e.target.value)}
-              className="flex-1 bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory placeholder-brand-ivory/40 uppercase font-mono focus:outline-none focus:border-brand-gold"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-brand-gold text-brand-purple-dark font-bold text-xs uppercase tracking-wider rounded hover:bg-brand-gold-light transition-colors cursor-pointer"
-            >
-              Apply
-            </button>
-          </form>
-        )}
 
-        {couponError && (
-          <p className="text-[11px] text-rose-400 mt-2 font-medium">{couponError}</p>
-        )}
-      </div>
+          {appliedCoupon ? (
+            <div className="flex items-center justify-between p-2.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-xs">
+              <div className="flex items-center gap-2 text-emerald-300 font-medium">
+                <Check className="w-4 h-4" />
+                <span>
+                  Code <strong>{appliedCoupon.code}</strong> applied (-₹{totals.couponDiscount})
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => dispatch(removeCoupon())}
+                className="text-[11px] font-bold text-red-400 hover:text-red-300 uppercase cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleApplyInput} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter coupon code (e.g. KHANDUA500)"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+                className="flex-1 bg-[#1A0A2C] border border-brand-gold/25 rounded px-3 py-2 text-xs text-brand-ivory placeholder-brand-ivory/40 uppercase font-mono focus:outline-none focus:border-brand-gold"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-brand-gold text-brand-purple-dark font-bold text-xs uppercase tracking-wider rounded hover:bg-brand-gold-light transition-colors cursor-pointer"
+              >
+                Apply
+              </button>
+            </form>
+          )}
+
+          {couponError && (
+            <p className="text-[11px] text-rose-400 mt-2 font-medium">{couponError}</p>
+          )}
+        </div>
+      )}
 
       {/* PRICE DETAILS Breakdown Card matching Screenshot 4 */}
       <div className="p-5 rounded-xl bg-[#170928] border border-brand-gold/20 text-xs space-y-3.5">

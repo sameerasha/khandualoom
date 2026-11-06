@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Product } from '@/types';
 import { SilkSheenCanvas } from './SilkSheenCanvas';
 import { Eye, Layers } from 'lucide-react';
+import { useAppSelector } from '@/app/hooks';
 
 interface ProductMediaGalleryProps {
   product: Product;
@@ -10,12 +11,15 @@ interface ProductMediaGalleryProps {
 export const ProductMediaGallery: React.FC<ProductMediaGalleryProps> = ({ product }) => {
   const [show3d, setShow3d] = useState(false);
   const [activeImage, setActiveImage] = useState(product.image);
+  const features = useAppSelector((state) => state.features.features);
 
   // Collect all available image URLs
   const imageList = [
     product.image,
     ...(product.images || []).map((img) => (typeof img === 'string' ? img : img.imageUrl)),
   ].filter((url, idx, self) => url && self.indexOf(url) === idx);
+
+  const canShow3d = features.threeDSheenCanvas && show3d;
 
   return (
     <div className="space-y-4">
@@ -24,30 +28,32 @@ export const ProductMediaGallery: React.FC<ProductMediaGalleryProps> = ({ produc
         <span className="text-xs text-brand-ivory/60 font-medium">
           {imageList.length} Masterwork Photographs
         </span>
-        <button
-          type="button"
-          onClick={() => setShow3d(!show3d)}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
-            show3d
-              ? 'bg-brand-gold text-brand-purple-dark shadow-[0_0_15px_rgba(197,160,89,0.4)]'
-              : 'bg-[#1D0B33] text-brand-gold border border-brand-gold/30 hover:bg-brand-gold/15'
-          }`}
-        >
-          {show3d ? (
-            <>
-              <Eye className="w-3.5 h-3.5" />
-              <span>View Gallery</span>
-            </>
-          ) : (
-            <>
-              <Layers className="w-3.5 h-3.5" />
-              <span>Interactive 3D Sheen</span>
-            </>
-          )}
-        </button>
+        {features.threeDSheenCanvas && (
+          <button
+            type="button"
+            onClick={() => setShow3d(!show3d)}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+              show3d
+                ? 'bg-brand-gold text-brand-purple-dark shadow-[0_0_15px_rgba(197,160,89,0.4)]'
+                : 'bg-[#1D0B33] text-brand-gold border border-brand-gold/30 hover:bg-brand-gold/15'
+            }`}
+          >
+            {show3d ? (
+              <>
+                <Eye className="w-3.5 h-3.5" />
+                <span>View Gallery</span>
+              </>
+            ) : (
+              <>
+                <Layers className="w-3.5 h-3.5" />
+                <span>Interactive 3D Sheen</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
 
-      {show3d ? (
+      {canShow3d ? (
         <SilkSheenCanvas color="#9B111E" />
       ) : (
         <div className="space-y-4">

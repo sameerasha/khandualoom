@@ -10,11 +10,9 @@ import {
   Boxes,
   AlertTriangle,
   Search,
-  Filter,
   CheckCircle,
   PlusCircle,
   Clock,
-  Sparkles,
   Layers,
 } from 'lucide-react';
 import { StockAdjustmentModal } from './StockAdjustmentModal';

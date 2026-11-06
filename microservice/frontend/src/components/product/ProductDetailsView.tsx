@@ -26,6 +26,7 @@ export const ProductDetailsView: React.FC = () => {
     fallbackProducts[0];
 
   const wishlistItems = useAppSelector((state) => state.wishlist.items);
+  const features = useAppSelector((state) => state.features.features);
   const isWishlisted = wishlistItems.some((item) => item.id === product.id);
 
   const discountPercent =
@@ -93,12 +94,14 @@ export const ProductDetailsView: React.FC = () => {
             </h1>
 
             {/* Rating Callout matching Myntra benchmark */}
-            <div className="mt-3 inline-flex items-center gap-2 bg-[#1A0A2C] border border-brand-gold/25 px-3 py-1.5 rounded-md text-xs">
-              <span className="font-bold text-brand-ivory">{product.rating ? product.rating.toFixed(1) : '4.8'}</span>
-              <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold" />
-              <span className="text-brand-ivory/40">|</span>
-              <span className="text-brand-ivory/70">{product.reviews || 84} Verified Connoisseurs</span>
-            </div>
+            {features.reviewsAndRatings && (
+              <div className="mt-3 inline-flex items-center gap-2 bg-[#1A0A2C] border border-brand-gold/25 px-3 py-1.5 rounded-md text-xs">
+                <span className="font-bold text-brand-ivory">{product.rating ? product.rating.toFixed(1) : '4.8'}</span>
+                <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold" />
+                <span className="text-brand-ivory/40">|</span>
+                <span className="text-brand-ivory/70">{product.reviews || 84} Verified Connoisseurs</span>
+              </div>
+            )}
           </div>
 
           {/* Pricing Card */}
@@ -145,35 +148,39 @@ export const ProductDetailsView: React.FC = () => {
               <span>ADD TO BAG</span>
             </button>
 
-            <button
-              type="button"
-              onClick={handleWishlist}
-              className={`w-full py-4 rounded-xl font-bold text-sm uppercase tracking-wider border transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                isWishlisted
-                  ? 'bg-rose-950/60 border-rose-500 text-rose-300'
-                  : 'bg-[#19092B] border-brand-gold/30 text-brand-gold hover:bg-brand-gold/15'
-              }`}
-            >
-              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-400' : ''}`} />
-              <span>{isWishlisted ? 'WISHLISTED' : 'WISHLIST'}</span>
-            </button>
+            {features.wishlist && (
+              <button
+                type="button"
+                onClick={handleWishlist}
+                className={`w-full py-4 rounded-xl font-bold text-sm uppercase tracking-wider border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  isWishlisted
+                    ? 'bg-rose-950/60 border-rose-500 text-rose-300'
+                    : 'bg-[#19092B] border-brand-gold/30 text-brand-gold hover:bg-brand-gold/15'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-400' : ''}`} />
+                <span>{isWishlisted ? 'WISHLISTED' : 'WISHLIST'}</span>
+              </button>
+            )}
           </div>
 
           {/* Delivery & Pincode Checker */}
-          <PincodeDeliveryChecker />
+          {features.pincodeChecker && <PincodeDeliveryChecker />}
 
           {/* Bank Discounts & Offers Box */}
-          <div className="p-4 rounded-xl bg-[#140622] border border-brand-gold/15 text-xs space-y-2">
-            <div className="flex items-center gap-1.5 font-bold uppercase text-brand-gold text-[11px]">
-              <Tag className="w-3.5 h-3.5" />
-              <span>BEST BANK & FESTIVAL OFFERS</span>
+          {features.bankDiscounts && (
+            <div className="p-4 rounded-xl bg-[#140622] border border-brand-gold/15 text-xs space-y-2">
+              <div className="flex items-center gap-1.5 font-bold uppercase text-brand-gold text-[11px]">
+                <Tag className="w-3.5 h-3.5" />
+                <span>BEST BANK & FESTIVAL OFFERS</span>
+              </div>
+              <ul className="space-y-1.5 text-brand-ivory/80 text-[11px] list-disc list-inside">
+                <li>10% Instant Discount on HDFC Bank Credit & Debit Cards (Max ₹1,500)</li>
+                <li>Flat ₹500 OFF with coupon code <strong className="text-brand-gold">KHANDUA500</strong></li>
+                <li>Free Silk Mark Authentication Certificate included with every order</li>
+              </ul>
             </div>
-            <ul className="space-y-1.5 text-brand-ivory/80 text-[11px] list-disc list-inside">
-              <li>10% Instant Discount on HDFC Bank Credit & Debit Cards (Max ₹1,500)</li>
-              <li>Flat ₹500 OFF with coupon code <strong className="text-brand-gold">KHANDUA500</strong></li>
-              <li>Free Silk Mark Authentication Certificate included with every order</li>
-            </ul>
-          </div>
+          )}
 
           {/* Handloom Specifications Table */}
           <HandloomSpecifications product={product} />

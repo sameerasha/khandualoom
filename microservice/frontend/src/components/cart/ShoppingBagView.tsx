@@ -13,6 +13,7 @@ export const ShoppingBagView: React.FC = () => {
   const cartItems = useAppSelector((state) => state.cart.items);
   const appliedCoupon = useAppSelector((state) => state.cart.appliedCoupon);
   const donationAmount = useAppSelector((state) => state.cart.donationAmount);
+  const features = useAppSelector((state) => state.features.features);
 
   // Local state for item selection (defaults to all selected)
   const [selectedIds, setSelectedIds] = useState<number[]>(
@@ -141,7 +142,7 @@ export const ShoppingBagView: React.FC = () => {
           </div>
 
           {/* Weaver Welfare Donation Tile */}
-          <WeaverDonationTile />
+          {features.weaverDonation && <WeaverDonationTile />}
         </div>
 
         {/* Right Column: Authoritative Price Details (5 cols) */}

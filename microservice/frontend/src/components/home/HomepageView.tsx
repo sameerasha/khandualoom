@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Hero } from '@/components/common/Hero';
 import { ShopByCollection } from '@/components/common/ShopByCollection';
@@ -16,9 +16,13 @@ import { StickyDiscountTab } from './StickyDiscountTab';
 import { useGetProductsQuery } from '@/features/products/productsApi';
 import { fallbackProducts } from '@/data/fallbackProducts';
 import { Product } from '@/types';
+import { useAppSelector } from '@/app/hooks';
 
 export const HomepageView: React.FC = () => {
   const navigate = useNavigate();
+  const features = useAppSelector((state) => state.features.features);
+  const sections = useAppSelector((state) => state.homepageConfig.sections);
+
   const { data: fetchedProducts } = useGetProductsQuery({});
   const allProducts = fetchedProducts && fetchedProducts.length > 0 ? fetchedProducts : fallbackProducts;
 
@@ -26,10 +30,14 @@ export const HomepageView: React.FC = () => {
     navigate(`/products/${product.id}`);
   };
 
+  const activeSections = [...sections]
+    .filter((s) => s.enabled)
+    .sort((a, b) => a.order - b.order);
+
   return (
     <div className="relative">
       {/* Floating Side Discount Tab */}
-      <StickyDiscountTab />
+      {features.coupons && <StickyDiscountTab />}
 
       {/* Hero Section */}
       <Hero
@@ -39,40 +47,44 @@ export const HomepageView: React.FC = () => {
       />
 
       {/* Trust & Bank Instant Discount Strip */}
-      <TrustAndOfferStrip />
+      {features.bankDiscounts && <TrustAndOfferStrip />}
 
-      {/* Promotional Campaign Hero Banner */}
-      <PromotionalHeroBanner />
+      {/* Dynamically Ordered & Toggled Homepage Sections */}
+      {activeSections.map((section) => {
+        switch (section.type) {
+          case 'hero':
+            return <PromotionalHeroBanner key={section.id} />;
+          case 'categories':
+            return <ShopByCollection key={section.id} />;
+          case 'highlights':
+            return (
+              <NewArrivalsSection
+                key={section.id}
+                products={allProducts}
+                onSelectProduct={handleSelectProduct}
+              />
+            );
+          case 'coupons':
+            return features.coupons ? <CouponsCorner key={section.id} /> : null;
+          case 'artisan':
+            return (
+              <Fragment key={section.id}>
+                <HeritageFeaturesSection />
+                <About />
+                <CraftShowcaseSection onExploreCatalog={() => navigate('/catalog')} />
+              </Fragment>
+            );
+          case 'testimonials':
+            return <Testimonials key={section.id} />;
+          case 'newsletter':
+            return <NewsletterSection key={section.id} />;
+          default:
+            return null;
+        }
+      })}
 
-      {/* Shop By Collection */}
-      <ShopByCollection />
-
-      {/* New Arrivals */}
-      <NewArrivalsSection
-        products={allProducts}
-        onSelectProduct={handleSelectProduct}
-      />
-
-      {/* Coupons Corner */}
-      <CouponsCorner />
-
-      {/* Why Choose Khandua Looms */}
-      <HeritageFeaturesSection />
-
-      {/* Heritage Story */}
-      <About />
-
-      {/* Craft Showcase */}
-      <CraftShowcaseSection onExploreCatalog={() => navigate('/catalog')} />
-
-      {/* Customer Testimonials */}
-      <Testimonials />
-
-      {/* Newsletter */}
-      <NewsletterSection />
-
-      {/* Recently Viewed */}
-      <RecentViews onSelectProduct={handleSelectProduct} />
+      {/* Recently Viewed Sarees */}
+      {features.recentViews && <RecentViews onSelectProduct={handleSelectProduct} />}
     </div>
   );
 };

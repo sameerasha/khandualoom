@@ -16,7 +16,6 @@ import {
   Edit2,
   Save,
   RotateCcw,
-  Sparkles,
   Monitor,
   CheckCircle,
 } from 'lucide-react';

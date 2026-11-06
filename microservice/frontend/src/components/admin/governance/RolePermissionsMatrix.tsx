@@ -1,5 +1,5 @@
 import React from 'react';
-import { initialRoles, RolePermission } from '@/features/admin/auditApi';
+import { initialRoles } from '@/features/admin/auditApi';
 import { ShieldCheck, Check, X } from 'lucide-react';
 
 export const RolePermissionsMatrix: React.FC = () => {

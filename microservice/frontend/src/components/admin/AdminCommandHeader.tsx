@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, ShieldCheck, Activity, LogOut, User as UserIcon } from 'lucide-react';
+import { ExternalLink, Activity, LogOut, User as UserIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { logout } from '@/features/auth/authSlice';
 

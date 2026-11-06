@@ -18,7 +18,6 @@ import {
   CheckCircle,
   Copy,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 import { CouponEditorModal } from './CouponEditorModal';
 

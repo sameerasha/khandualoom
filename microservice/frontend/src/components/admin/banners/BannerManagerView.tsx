@@ -12,7 +12,6 @@ import {
   Eye,
   EyeOff,
   Calendar,
-  ExternalLink,
   CheckCircle,
 } from 'lucide-react';
 import { BannerEditorModal } from './BannerEditorModal';

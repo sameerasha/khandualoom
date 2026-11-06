@@ -25,4 +25,15 @@ describe('Route Navigation & Layouts', () => {
     );
     expect(screen.getByText(/100% SECURE/i)).toBeInTheDocument();
   });
+
+  it('renders Admin Vault gate on /admin path', () => {
+    const router = createMemoryRouter(routeDefinitions, { initialEntries: ['/admin'] });
+    render(
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
+    );
+    expect(screen.getByText(/Khandua Looms Vault/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Unlock Admin Atelier/i })).toBeInTheDocument();
+  });
 });

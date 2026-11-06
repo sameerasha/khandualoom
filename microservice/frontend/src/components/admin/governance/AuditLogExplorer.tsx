@@ -4,14 +4,8 @@ import {
   loadAuditLogs,
 } from '@/features/admin/auditApi';
 import {
-  History,
-  Shield,
   Search,
-  Filter,
   ShieldCheck,
-  CheckCircle,
-  Clock,
-  Layers,
 } from 'lucide-react';
 import { RolePermissionsMatrix } from './RolePermissionsMatrix';
 

@@ -23,6 +23,13 @@ import { AdminManagerView, AdminUserItem } from './AdminManagerView';
 import { ArtisanManagerView } from './ArtisanManagerView';
 import { ProductEditorModal } from './ProductEditorModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { CategoryManagerView } from './categories/CategoryManagerView';
+import { InventoryLedgerView } from './inventory/InventoryLedgerView';
+import { HomepageBuilderView } from './homepage/HomepageBuilderView';
+import { BannerManagerView } from './banners/BannerManagerView';
+import { PromotionsManagerView } from './promotions/PromotionsManagerView';
+import { FeatureManagerView } from './FeatureManagerView';
+import { AuditLogExplorer } from './governance/AuditLogExplorer';
 
 interface AdminDashboardProps {
   onBackToStore: () => void;
@@ -472,6 +479,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
         )
       )}
 
+      {activeTab === 'categories' && <CategoryManagerView />}
+
+      {activeTab === 'inventory' && <InventoryLedgerView />}
+
+      {activeTab === 'homepage' && <HomepageBuilderView />}
+
+      {activeTab === 'banners' && <BannerManagerView />}
+
+      {activeTab === 'promotions' && <PromotionsManagerView />}
+
+      {activeTab === 'features' && <FeatureManagerView />}
+
       {activeTab === 'artisans' && <ArtisanManagerView />}
 
       {activeTab === 'orders' && (
@@ -482,16 +501,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
         <UserManagerView users={usersList} onToggleRole={handleToggleUserRole} />
       )}
 
+      {activeTab === 'admins' && (
+        <AdminManagerView admins={adminsList} onCreateAdmin={handleCreateAdmin} />
+      )}
+
+      {activeTab === 'audit' && <AuditLogExplorer />}
+
       {activeTab === 'settings' && (
         <StoreSettingsView
           socials={socialsList}
           onSaveSocial={handleSaveSocial}
           onDeleteSocial={handleDeleteSocial}
         />
-      )}
-
-      {activeTab === 'admins' && (
-        <AdminManagerView admins={adminsList} onCreateAdmin={handleCreateAdmin} />
       )}
 
       {/* Delete Confirmation Modal */}

@@ -11,13 +11,7 @@ import {
   ToggleRight,
   Save,
   RotateCcw,
-  Sparkles,
   CheckCircle,
-  HelpCircle,
-  ShieldAlert,
-  ShoppingBag,
-  Eye,
-  CreditCard,
 } from 'lucide-react';
 
 interface FeatureMeta {

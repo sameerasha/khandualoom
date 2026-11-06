@@ -19,6 +19,10 @@ export const routeDefinitions: RouteObject[] = [
     element: <OAuth2RedirectHandler />,
   },
   {
+    path: '/admin/*',
+    element: <AdminDashboard onBackToStore={() => { window.location.href = '/'; }} />,
+  },
+  {
     path: '/',
     element: <StoreLayout />,
     children: [
@@ -30,7 +34,6 @@ export const routeDefinitions: RouteObject[] = [
       { path: 'contact', element: <ContactPage onBackToStore={() => window.history.back()} /> },
       { path: 'account/orders', element: <OrderHistoryView /> },
       { path: 'account/*', element: <ProfileDashboard onBackToStore={() => window.history.back()} /> },
-      { path: 'admin/*', element: <AdminDashboard onBackToStore={() => window.history.back()} /> },
     ],
   },
   {

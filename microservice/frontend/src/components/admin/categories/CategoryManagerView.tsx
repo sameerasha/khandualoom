@@ -14,7 +14,6 @@ import {
   Eye,
   EyeOff,
   CheckCircle,
-  FolderPlus,
 } from 'lucide-react';
 import { CategoryTreeEditor } from './CategoryTreeEditor';
 
