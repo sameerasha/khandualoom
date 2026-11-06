@@ -147,13 +147,13 @@ export const OrderManagerView: React.FC<OrderManagerViewProps> = ({ orders, onSt
       <div className="admin-dashboard__header">
         <div>
           <h1 className="admin-dashboard__title flex items-center gap-3">
-            Atelier Order Command
+            Order Management
             <span className="text-xs font-mono px-2.5 py-0.5 rounded-full border border-brand-gold/40 bg-brand-gold/10 text-brand-gold font-normal">
-              {stats.total} TOTAL HEIRLOOM DISPATCHES
+              {stats.total} Orders
             </span>
           </h1>
           <p className="admin-dashboard__subtitle">
-            Curate order fulfillment, track insured white-glove transit, and manage royal patron commissions.
+            Order Management & Fulfillment Lifecycle across Nuapatna weaving cooperatives and insured courier dispatches.
           </p>
         </div>
       </div>
