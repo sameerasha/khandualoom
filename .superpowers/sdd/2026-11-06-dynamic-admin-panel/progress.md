@@ -10,4 +10,4 @@ Task 6: complete (commits ff1dc96, tests: npx jest src/features/admin/couponApi.
 Task 7: complete (commits f51a3ae, tests: npx jest src/components/admin/inventory/InventoryLedger.test.tsx → PASS 1/1)
 Task 8: complete (commits bdd8bbd, tests: npx jest src/components/admin/orders/OrderFulfillment.test.tsx → PASS 1/1)
 Task 9: complete (commits 3b7de18, tests: npx jest src/components/admin/governance/AuditLogExplorer.test.tsx → PASS 1/1)
-Task 10: complete (commits pending release, tests: npx jest src → PASS 19/19 suites, 38/38 tests; tsc --noEmit → 0 errors; vite build → 0 errors)
+Task 10: complete (commits 710263e, tests: npx jest src → PASS 19/19 suites, 38/38 tests; tsc --noEmit → 0 errors; vite build → 0 errors)
