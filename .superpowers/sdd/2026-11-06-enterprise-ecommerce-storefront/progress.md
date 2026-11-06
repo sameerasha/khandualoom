@@ -9,3 +9,4 @@ Task 4: complete (commits 8990120, tests: npx jest src/features/pincode/pincodeS
 Task 5: complete (commits 77df02a, tests: npx jest src/features/cart/cartCalculations.test.ts → PASS 1/1)
 Task 6: complete (commits 6030101, tests: npx jest src/features/checkout/checkout.test.ts → PASS 1/1)
 Task 7: complete (commits 0bf40bf, tests: npx jest src/components/account/OrderHistoryView.test.tsx → PASS 1/1)
+Task 8: complete (commits fc566fe, tests: npm test → PASS 10/10 suites, 27/27 tests, build: vite build → PASS)
