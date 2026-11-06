@@ -1,22 +1,40 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { ShieldCheck, Lock, HelpCircle } from 'lucide-react';
+import { ShieldCheck, Lock } from 'lucide-react';
+import { ThemeSwitcher } from '@/theme/ThemeSwitcher';
+import { useTheme } from '@/theme/useTheme';
 
 export const CheckoutLayout: React.FC = () => {
   const location = useLocation();
+  const { isDark } = useTheme();
 
   // Determine current active step based on path or default to delivery
   const isPayment = location.pathname.includes('/payment');
   const isSuccess = location.pathname.includes('/success');
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] text-gray-800 flex flex-col font-sans selection:bg-teal-500 selection:text-white relative">
+    <div
+      className={`min-h-screen flex flex-col font-sans selection:bg-teal-500 selection:text-white relative transition-colors ${
+        isDark ? 'bg-[#0F0617] text-brand-ivory' : 'bg-[#FDFDFD] text-gray-800'
+      }`}
+    >
       {/* Myntra-Style Stepper Header */}
-      <header role="banner" className="border-b border-gray-200 bg-white sticky top-0 z-40 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <header
+        role="banner"
+        className={`sticky top-0 z-40 shadow-xs border-b transition-colors ${
+          isDark ? 'bg-[#12051E] border-brand-gold/25' : 'bg-white border-gray-200'
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <span className="font-serif text-2xl font-black tracking-wider text-rose-900 group-hover:text-rose-700 transition-colors">
+          <Link to="/" className="flex items-center gap-2 group shrink-0">
+            <span
+              className={`font-serif text-2xl font-black tracking-wider transition-colors ${
+                isDark
+                  ? 'text-brand-gold group-hover:text-brand-gold-light'
+                  : 'text-rose-900 group-hover:text-rose-700'
+              }`}
+            >
               KHANDUA LOOMS
             </span>
           </Link>
@@ -24,24 +42,33 @@ export const CheckoutLayout: React.FC = () => {
           {/* Stepper matching reference screenshot */}
           {!isSuccess && (
             <div className="hidden md:flex items-center gap-3 text-xs tracking-widest font-semibold uppercase">
-              <Link to="/cart" className="text-gray-400 hover:text-gray-700 transition-colors">
+              <Link
+                to="/cart"
+                className={`transition-colors ${
+                  isDark ? 'text-gray-400 hover:text-brand-gold' : 'text-gray-400 hover:text-gray-700'
+                }`}
+              >
                 BAG
               </Link>
-              <span className="text-gray-300">----------</span>
+              <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>----------</span>
               <span
                 className={`transition-colors pb-1 ${
                   !isPayment
-                    ? 'text-teal-600 font-bold border-b-2 border-teal-600'
+                    ? isDark
+                      ? 'text-teal-400 font-bold border-b-2 border-teal-400'
+                      : 'text-teal-600 font-bold border-b-2 border-teal-600'
                     : 'text-gray-400'
                 }`}
               >
                 DELIVERY
               </span>
-              <span className="text-gray-300">----------</span>
+              <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>----------</span>
               <span
                 className={`transition-colors pb-1 ${
                   isPayment
-                    ? 'text-teal-600 font-bold border-b-2 border-teal-600'
+                    ? isDark
+                      ? 'text-teal-400 font-bold border-b-2 border-teal-400'
+                      : 'text-teal-600 font-bold border-b-2 border-teal-600'
                     : 'text-gray-400'
                 }`}
               >
@@ -50,10 +77,18 @@ export const CheckoutLayout: React.FC = () => {
             </div>
           )}
 
-          {/* Security Guarantee Badge */}
-          <div className="flex items-center gap-1.5 text-gray-600 font-bold text-xs tracking-wider uppercase">
-            <Lock className="w-4 h-4 text-teal-600" />
-            <span>100% SECURE</span>
+          {/* Right Header: Security Guarantee Badge & Theme Switcher */}
+          <div className="flex items-center gap-4">
+            <div
+              className={`flex items-center gap-1.5 font-bold text-xs tracking-wider uppercase ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
+              <Lock className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              <span>100% SECURE</span>
+            </div>
+
+            <ThemeSwitcher />
           </div>
         </div>
       </header>
@@ -64,41 +99,97 @@ export const CheckoutLayout: React.FC = () => {
       </main>
 
       {/* Trust Footer matching reference screenshot */}
-      <footer role="contentinfo" className="border-t border-gray-200 py-6 bg-white text-xs text-gray-600 mt-auto">
+      <footer
+        role="contentinfo"
+        className={`border-t py-6 text-xs mt-auto transition-colors ${
+          isDark
+            ? 'border-brand-gold/20 bg-[#12051E] text-gray-400'
+            : 'border-gray-200 bg-white text-gray-600'
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Payment & Security Logos */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-            <div className="flex items-center gap-1 text-[11px] font-semibold text-gray-500 border border-gray-200 px-2 py-1 rounded bg-gray-50">
-              <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+            <div
+              className={`flex items-center gap-1 text-[11px] font-semibold border px-2 py-1 rounded ${
+                isDark
+                  ? 'border-brand-gold/30 bg-[#1C0D2E] text-gray-300'
+                  : 'border-gray-200 bg-gray-50 text-gray-500'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
               <span>256-bit SSL</span>
             </div>
-            <span className="font-bold text-blue-800 text-xs tracking-tighter px-2 py-1 border border-gray-200 rounded bg-white">
+            <span
+              className={`font-bold text-xs tracking-tighter px-2 py-1 border rounded ${
+                isDark
+                  ? 'border-brand-gold/30 bg-[#1C0D2E] text-sky-400'
+                  : 'border-gray-200 bg-white text-blue-800'
+              }`}
+            >
               VISA
             </span>
-            <span className="font-bold text-red-600 text-xs px-2 py-1 border border-gray-200 rounded bg-white">
+            <span
+              className={`font-bold text-xs px-2 py-1 border rounded ${
+                isDark
+                  ? 'border-brand-gold/30 bg-[#1C0D2E] text-rose-400'
+                  : 'border-gray-200 bg-white text-red-600'
+              }`}
+            >
               Mastercard
             </span>
-            <span className="font-bold text-sky-700 text-xs px-2 py-1 border border-gray-200 rounded bg-white">
+            <span
+              className={`font-bold text-xs px-2 py-1 border rounded ${
+                isDark
+                  ? 'border-brand-gold/30 bg-[#1C0D2E] text-sky-300'
+                  : 'border-gray-200 bg-white text-sky-700'
+              }`}
+            >
               AMEX
             </span>
-            <span className="font-semibold text-gray-700 text-xs px-2 py-1 border border-gray-200 rounded bg-white">
+            <span
+              className={`font-semibold text-xs px-2 py-1 border rounded ${
+                isDark
+                  ? 'border-brand-gold/30 bg-[#1C0D2E] text-gray-300'
+                  : 'border-gray-200 bg-white text-gray-700'
+              }`}
+            >
               Diners Club
             </span>
-            <span className="font-medium text-gray-700 text-xs px-2 py-1 border border-gray-200 rounded bg-white">
+            <span
+              className={`font-medium text-xs px-2 py-1 border rounded ${
+                isDark
+                  ? 'border-brand-gold/30 bg-[#1C0D2E] text-gray-300'
+                  : 'border-gray-200 bg-white text-gray-700'
+              }`}
+            >
               Net Banking
             </span>
-            <span className="font-medium text-emerald-700 text-xs px-2 py-1 border border-emerald-200 rounded bg-emerald-50">
-              Cash on Delivery
-            </span>
-            <span className="font-bold text-teal-700 text-xs px-2 py-1 border border-teal-200 rounded bg-white">
-              RuPay
+            <span
+              className={`font-medium text-xs px-2 py-1 border rounded ${
+                isDark
+                  ? 'border-emerald-800/40 bg-emerald-950/20 text-emerald-300'
+                  : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+              }`}
+            >
+              UPI & Cash on Delivery
             </span>
           </div>
 
-          {/* Need help contact */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium hover:text-gray-900 transition-colors">
-            <HelpCircle className="w-4 h-4 text-gray-400" />
-            <span>Need help ? <a href="mailto:support@khandualoom.com" className="font-semibold text-teal-700 hover:underline">Contact Us</a></span>
+          <div
+            className={`flex items-center gap-2 text-xs font-semibold ${
+              isDark ? 'text-gray-400' : 'text-gray-500'
+            }`}
+          >
+            <span>Need Help?</span>
+            <Link
+              to="/contact"
+              className={`hover:underline font-bold ${
+                isDark ? 'text-brand-gold' : 'text-teal-700'
+              }`}
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
       </footer>

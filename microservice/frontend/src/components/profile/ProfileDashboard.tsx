@@ -21,7 +21,10 @@ import {
   X,
   Loader2,
   Check,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useTheme } from '@/theme/useTheme';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { setUserProfile } from '@/features/auth/authSlice';
 import { useGetMyOrdersQuery } from '@/features/orders/ordersApi';
@@ -40,6 +43,7 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({
   onBackToStore,
 }) => {
   const dispatch = useAppDispatch();
+  const { theme, setTheme } = useTheme();
   const { user: authUser } = useAppSelector((state) => state.auth);
 
   // RTK Query hooks
@@ -318,7 +322,7 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#07010C] text-brand-ivory py-10 px-4 sm:px-6 lg:px-8 selection:bg-brand-gold/30 selection:text-white">
+    <div className="min-h-screen bg-background text-text-primary py-10 px-4 sm:px-6 lg:px-8 selection:bg-brand-gold/30 selection:text-white transition-colors">
       {/* Toast Notification */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-[10000] flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-[#1E0B2B] to-[#12041D] border border-brand-gold/50 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(223,191,122,0.2)] text-sm animate-in slide-in-from-bottom duration-300">
@@ -817,6 +821,54 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({
                 </button>
               </div>
             </form>
+
+            {/* Website Appearance / Theme Preference Selector */}
+            <div className="pt-6 border-t border-brand-gold/20">
+              <div className="flex items-center gap-2 mb-1">
+                <Sun className="w-4 h-4 text-amber-500" />
+                <h4 className="font-serif text-sm font-bold text-white">Website Appearance & Theme</h4>
+              </div>
+              <p className="text-xs text-brand-ivory/60 mb-4">
+                Choose between clean modern light theme and luxury handloom dark theme
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTheme('light')}
+                  className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                    theme === 'light'
+                      ? 'border-amber-400 bg-amber-500/15 shadow-md'
+                      : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                    <Sun className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-xs text-white">Light Theme (Default)</p>
+                    <p className="text-[11px] text-brand-ivory/60 mt-0.5">Crisp, bright white fashion catalog</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setTheme('dark')}
+                  className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                    theme === 'dark'
+                      ? 'border-brand-gold bg-brand-gold/15 shadow-md'
+                      : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <div className="w-8 h-8 rounded-xl bg-brand-gold/20 flex items-center justify-center text-brand-gold shrink-0">
+                    <Moon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-xs text-white">Dark Theme</p>
+                    <p className="text-[11px] text-brand-ivory/60 mt-0.5">Luxury charcoal & gold handloom palette</p>
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

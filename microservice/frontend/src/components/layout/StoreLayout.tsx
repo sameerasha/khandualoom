@@ -9,10 +9,12 @@ import { LegalModal, LegalDocType } from '@/components/common/LegalModal';
 import { SocialMediaModal } from '@/components/common/SocialMediaModal';
 import { CinematicLoomCanvas } from '@/components/3d/CinematicLoomCanvas';
 import { Product } from '@/types';
+import { useTheme } from '@/theme/useTheme';
 
 export const StoreLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDark } = useTheme();
   const isLandingPage = location.pathname === '/';
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -49,13 +51,19 @@ export const StoreLayout: React.FC = () => {
     <div
       className={`min-h-screen flex flex-col selection:bg-brand-gold selection:text-white relative transition-colors duration-300 ${
         isLandingPage
-          ? 'bg-[#0F0617] text-brand-ivory'
-          : 'bg-[#F8F9FA] text-[#1E293B]'
+          ? isDark
+            ? 'bg-[#0F0617] text-brand-ivory'
+            : 'bg-[#FFFFFF] text-slate-900'
+          : 'bg-background text-text-primary'
       }`}
     >
       {/* 3D Master Loom Canvas — strictly scoped to the Landing Page */}
       {isLandingPage && (
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-700">
+        <div
+          className={`fixed inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-700 ${
+            isDark ? 'opacity-100' : 'opacity-70'
+          }`}
+        >
           <CinematicLoomCanvas scrollProgress={globalScrollProgress} />
         </div>
       )}
@@ -71,7 +79,7 @@ export const StoreLayout: React.FC = () => {
       </div>
 
       {/* Main Routed Content Area with Solid Clean Background on Internal Pages */}
-      <main className={`flex-1 relative z-10 ${!isLandingPage ? 'bg-[#F8F9FA]' : ''}`}>
+      <main className={`flex-1 relative z-10 ${!isLandingPage ? 'bg-background' : ''}`}>
         <Outlet />
       </main>
 
