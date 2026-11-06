@@ -17,6 +17,15 @@ export interface Product {
   rating: number;
   reviews: number;
   badge?: string;
+  stock?: number;
+  weaveType?: string;
+  isGiTagged?: boolean;
+  occasion?: string;
+  artisanSociety?: string;
+  sareeLength?: string;
+  blouseIncluded?: boolean;
+  silkMarkCertified?: boolean;
+  craftmarkCertified?: boolean;
 }
 
 export interface CartItem {
